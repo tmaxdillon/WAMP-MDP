@@ -1,6 +1,6 @@
 function [] = visMDPSim(simStruct)
 
-FM = simStruct.FM;
+FM = simStruct.output.FM_P;
 output = simStruct.output;
 
 if output.abridged
@@ -9,15 +9,15 @@ else
     f_pts = 1:length(output.E_sim(1:end-1));
 end
 
-%find J_actions
-for f = 1:length(output.val_Jstar)
-    state = output.E_sim_ind(f);
-    if state > 0
-        J_actions(:,f) = output.val_all(state,:,1,f);
-    else
-        J_actions(:,f) = nan;
-    end
-end
+% %find J_actions
+% for f = 1:length(output.val_Jstar)
+%     state = output.E_sim_ind(f);
+%     if state > 0
+%         J_actions(:,f) = output.val_all(state,:,1,f);
+%     else
+%         J_actions(:,f) = nan;
+%     end
+% end
 
 
 figure
@@ -99,28 +99,28 @@ grid on
 % grid on
 % legend(legendStrings)
 %ERROR
-ax(5) = subplot(4,1,4);
-time_surf = repmat(FM(1,1:(size(output.Pw_error,2)),1) ...
-    ,[size(output.Pw_error,1),1]);
-extent_surf = repmat(1:size(output.Pw_error,1),[size(output.Pw_error,2),1])';
-s1 = surf(datetime(time_surf,'ConvertFrom','datenum'),extent_surf, ...
-    output.Pw_error/1000);
-view(2)
-set(s1, 'edgecolor','none')
-colormap(gca,redblue(11))
-c = colorbar('Location','west');
-c.Label.String = 'Overestimate [kW]';
-caxis([-max(abs(output.Pw_error(:)/1000)) max(abs(output.Pw_error(:)/1000))])
-ylabel({'Forecast','Extent [days]'},'FontSize',20)
-ylh = get(gca,'ylabel');
-ylp = get(ylh, 'Position');
-ylp(1) = ylp(1)-4;
-set(ylh, 'Rotation',0, 'Position',ylp,'VerticalAlignment','middle', ...
-    'HorizontalAlignment','center')
-set(gca,'FontSize',16)
-xlabel('Time')
-zlabel('Overestimate [W]')
-grid on
+% ax(5) = subplot(4,1,4);
+% time_surf = repmat(FM(1,1:(size(output.Pw_error,2)),1) ...
+%     ,[size(output.Pw_error,1),1]);
+% extent_surf = repmat(1:size(output.Pw_error,1),[size(output.Pw_error,2),1])';
+% s1 = surf(datetime(time_surf,'ConvertFrom','datenum'),extent_surf, ...
+%     output.Pw_error/1000);
+% view(2)
+% set(s1, 'edgecolor','none')
+% colormap(gca,redblue(11))
+% c = colorbar('Location','west');
+% c.Label.String = 'Overestimate [kW]';
+% caxis([-max(abs(output.Pw_error(:)/1000)) max(abs(output.Pw_error(:)/1000))])
+% ylabel({'Forecast','Extent [days]'},'FontSize',20)
+% ylh = get(gca,'ylabel');
+% ylp = get(ylh, 'Position');
+% ylp(1) = ylp(1)-4;
+% set(ylh, 'Rotation',0, 'Position',ylp,'VerticalAlignment','middle', ...
+%     'HorizontalAlignment','center')
+% set(gca,'FontSize',16)
+% xlabel('Time')
+% zlabel('Overestimate [W]')
+% grid on
 
 set(gcf, 'Position', [100, 100, 1400, 650])
 

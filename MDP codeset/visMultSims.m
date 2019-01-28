@@ -2,20 +2,14 @@ function [] = visMultSims(multStruct)
 
 if isequal(multStruct(1).sim.tuned_parameter,'mu0') || ...
         isequal(multStruct(1).sim.tuned_parameter,'SLval') || ...
-        isequal(multStruct(1).sim.tuned_parameter,'epsH') || ...
-        isequal(multStruct(1).sim.tuned_parameter,'epsI') || ...
-        isequal(multStruct(1).sim.tuned_parameter,'epsmu') || ...
+        isequal(multStruct(1).sim.tuned_parameter,'eps') || ...
         isequal(multStruct(1).sim.tuned_parameter,'sub')
     
     %x axis title
     if isequal(multStruct(1).sim.tuned_parameter,'SLval')
         xlab = 'Stage Limit [h]';
-    elseif isequal(multStruct(1).sim.tuned_parameter,'epsH')
-        xlab = 'Epsilon (Homotopic)';
-    elseif isequal(multStruct(1).sim.tuned_parameter,'epsI')
-        xlab = 'Epsilon (Inverse)';
-    elseif isequal(multStruct(1).sim.tuned_parameter,'epsmu')
-        xlab = 'Epsilon (Operational Penalty Only)';
+    elseif isequal(multStruct(1).sim.tuned_parameter,'eps')
+        xlab = 'Epsilon';
     elseif isequal(multStruct(1).sim.tuned_parameter,'sub')
         xlab = 'Spin Up Buffer [h]';
         xt = multStruct(1).sim.tuning_array;
