@@ -25,7 +25,7 @@ if ~exist('FM','var')
 end
 
 %forecast parameters
-frc.stagelimit = true;          %toggle limit on stages
+frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 8;          %[h] limit on stages
 frc.sub = 0;                    %[hr] model spin up buffer
 
@@ -127,8 +127,7 @@ else
     stru.(name).output = output;
     stru.(name).sim = sim;
     stru.(name).FM = FM;
-    save( ...
-        [name '.mat'],'-struct','stru','-v7.3');
+    save([name '.mat'],'-struct','stru','-v7.3');
     visMDPSim(stru.(name))
 end
 
