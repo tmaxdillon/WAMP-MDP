@@ -25,15 +25,24 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
                 if sim.debug
                     wec_power(t) = FM_P(t,f,2); %power produced by wec
                 end
-                [~,E_evolved] = powerToBattery(FM_P(t,f,2),amp.E(s), ... 
+                [P,E_evolved] = powerToBattery(FM_P(t,f,2),amp.E(s), ... 
                     amp,mdp,wec);
                 % posterior bound
             elseif sim.pb == 1
                 if sim.debug
                     wec_power(t) = FM_P(1,f+t-1,2); %power produced by wec
                 end
-                [~,E_evolved] = powerToBattery(FM_P(1,f+t-1,2),amp.E(s), ... 
+                [P,E_evolved] = powerToBattery(FM_P(1,f+t-1,2),amp.E(s), ... 
                     amp,mdp,wec);
+            end
+            sd = S(t)*(amp.sdr/100)*(1/(30*24)) ...
+                *mdp.dt; %[Wh] self discharge
+            %find power consumed into batter bank
+            E_evolved = mdp.dt*(P - amp.Ps(a)) + amp.E(s) - sd;
+            if E_evolved > amp.E_max %dump power
+                E_evolved = amp.E_max;
+            elseif E_evolved <= 0 %bottom out
+                E_evolved = 0;
             end
             
             %2: find the state index of the evolved battery
