@@ -26,14 +26,14 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
                     wec_power(t) = FM_P(t,f,2); %power produced by wec
                 end
                 [~,E_evolved] = powerToBattery(FM_P(t,f,2),amp.E(s), ... 
-                    amp,mdp,wec);
+                    amp.Ps(a),amp,mdp,wec);
                 % posterior bound
             elseif sim.pb == 1
                 if sim.debug
                     wec_power(t) = FM_P(1,f+t-1,2); %power produced by wec
                 end
                 [~,E_evolved] = powerToBattery(FM_P(1,f+t-1,2),amp.E(s), ... 
-                    amp,mdp,wec);
+                    amp.Ps(a),amp,mdp,wec);
             end
             
             %2: find the state index of the evolved battery
@@ -41,13 +41,14 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
             
             %3: compute the 'value' of this action via bellman's equation
             compare(s,a,t) = beta(amp.E(s),amp,mdp) + mdp.mu(a) +  ...
-                Jstar(state_evol(s,a,t),t+1);
+                Jstar(state_evol(s,a,t),t+1)*mdp.alpha^t;
             
         end
         
         %compare the value of the four actions, finding the optimal
         %value to go and the optimal policy
         [Jstar(s,t),policy(s,t)] = min(compare(s,:,t));
+        %  ^ maybe divide Jstar by t as an alternative to discount factor?
         
     end
 end

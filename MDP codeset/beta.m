@@ -1,4 +1,4 @@
-%created by Trent Dillon on June 13th
+%created by Trent Dillon on June 13th 2018
 %function outputs the battery cost for the WAMP MDP using a polynomial
 %utility function, given an input of amount of charge in battery
 
@@ -6,10 +6,8 @@ function [beta] = beta(E,amp,mdp)
 %polynomial coefficients found using trial and error on 
 %https://mycurvefit.com/ and createBetaUtilityPiecewise.m
 
-%beta coefficient
-b = mdp.b;
-
 E(E<0)=0; %negative battery capacity not possible
+b = mdp.b;
 
 %DISCRETIZE CHARGE (posterior bound may reach infinity otherwise)
 [~,E_ind] = min(abs(amp.E-E)); %find index of current state

@@ -41,17 +41,7 @@ mdp.T = size(FM_P,1); %number of stages
 output.FM_P = FM_P;
 output.FM_mod = FM_mod;
 
-%simulation extent (number of forecasts)
-if frc.Flimit
-    sim.F = frc.Flimitval;
-else
-    sim.F = size(FM_P,2);         
-end
-
-%discretize battery
-amp.E = 0:amp.Ps(2)-5:amp.E_max;        %[Wh], discretized battery state
-amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
-mdp.n = length(amp.E);
+sim.F = size(FM_P,2);         %simulation extent (number of forecasts)
 
 %preallocate outputs
 output.E_sim = zeros(sim.F,1); %battery time series
@@ -68,11 +58,13 @@ output.beta = zeros(sim.F,1); %beta time series
 if sim.debug
     output.policy_all = zeros(mdp.n,mdp.T,sim.F); %policy all matrix
     output.state_evol_all = zeros(mdp.n,mdp.m,mdp.T+1,sim.F); %state matrix
-    output.wec_power_mdp = zeros(mdp.T,sim.F); %mdp wave params
-    output.wec_power_sim = zeros(1,sim.F); %sim wave params
+    output.wave_params_mdp = zeros(2,mdp.T,sim.F); %mdp wave params
+    output.wave_params_sim = zeros(2,sim.F); %sim wave params
 end
 
-%set initial output values
+%set initial out values
+amp.E = 0:amp.Ps(2)-5:amp.E_max;        %[Wh], discretized battery state
+amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 output.E_sim(1) = amp.E_start; %set initial value of battery time series
 output.beta(1) = beta(amp.E_start,amp,mdp); %set initial beta value
 
@@ -136,8 +128,8 @@ for f=1:sim.F %over each forecast
             output.val_togo(:,:,f) = Jstar;                 %value to go
             output.policy_all(:,:,f) = policy;              %policy all
             output.state_evol_all(:,:,:,f) = state_evol;    %state evolution
-            output.wec_power_mdp(:,f) = wec_power;        %power from wec (mdp)
-            output.wec_power_sim(f) = FM_P(1,f,2);        %power from wec (sim)
+            output.wec_power_mdp(:,:,f) = wec_power;        %power from wec (mdp)
+            output.wec_power_sim(:,f) = FM_P(1,f,2);        %power from wec (sim)
         else
             [Jstar,policy,compare] = ...
                 backwardRecursion(FM_P,mdp,amp,sim,wec,f);
