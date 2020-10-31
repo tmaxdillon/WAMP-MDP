@@ -41,7 +41,17 @@ mdp.T = size(FM_P,1); %number of stages
 output.FM_P = FM_P;
 output.FM_mod = FM_mod;
 
-sim.F = size(FM_P,2);         %simulation extent (number of forecasts)
+%simulation extent (number of forecasts)
+if frc.Flimit
+    sim.F = frc.Flimitval;
+else
+    sim.F = size(FM_P,2);         
+end
+
+%discretize battery
+amp.E = 0:amp.Ps(2)-5:amp.E_max;        %[Wh], discretized battery state
+amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
+mdp.n = length(amp.E);
 
 %preallocate outputs
 output.E_sim = zeros(sim.F,1); %battery time series
@@ -51,20 +61,18 @@ output.Pb_sim = zeros(sim.F,1); %net power sent to battery time series
 output.wec.cw = zeros(sim.F,1); %capture width
 output.wec.cwr = zeros(sim.F,1); %capture width ratio
 output.Pw_error = zeros(ceil((mdp.T-1)/24),sim.F); %error matrix
-output.val_Jstar = zeros(sim.F,1); %Jstar time series
-output.val_all = zeros(mdp.n,mdp.m,mdp.T+1,sim.F); %all J
-output.val_togo = zeros(mdp.n,mdp.T+1,sim.F); %val to go matrix
 output.beta = zeros(sim.F,1); %beta time series
 if sim.debug
+    output.val_Jstar = zeros(sim.F,1); %Jstar time series
+    output.val_all = zeros(mdp.n,mdp.m,mdp.T+1,sim.F); %all J
+    output.val_togo = zeros(mdp.n,mdp.T+1,sim.F); %val to go matrix
     output.policy_all = zeros(mdp.n,mdp.T,sim.F); %policy all matrix
     output.state_evol_all = zeros(mdp.n,mdp.m,mdp.T+1,sim.F); %state matrix
-    output.wave_params_mdp = zeros(2,mdp.T,sim.F); %mdp wave params
-    output.wave_params_sim = zeros(2,sim.F); %sim wave params
+    output.wec_power_mdp = zeros(mdp.T,sim.F); %mdp wave params
+    output.wec_power_sim = zeros(1,sim.F); %sim wave params
 end
 
-%set initial out values
-amp.E = 0:amp.Ps(2)-5:amp.E_max;        %[Wh], discretized battery state
-amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
+%set initial output values
 output.E_sim(1) = amp.E_start; %set initial value of battery time series
 output.beta(1) = beta(amp.E_start,amp,mdp); %set initial beta value
 
@@ -120,7 +128,7 @@ for f=1:sim.F %over each forecast
         
         %BACKWARD RECURSION
         if sim.debug
-            [Jstar,policy,compare,state_evol,wec_power] = ...
+            [policy,Jstar,compare,state_evol,wec_power] = ...
                 backwardRecursion(FM_P,mdp,amp,sim,wec,f);
             %DOCUMENT BELLMANS (AND DEBUG) VALUES
             output.val_all(:,:,:,f) = compare(:,:,:);       %all values
@@ -128,15 +136,12 @@ for f=1:sim.F %over each forecast
             output.val_togo(:,:,f) = Jstar;                 %value to go
             output.policy_all(:,:,f) = policy;              %policy all
             output.state_evol_all(:,:,:,f) = state_evol;    %state evolution
-            output.wec_power_mdp(:,:,f) = wec_power;        %power from wec (mdp)
-            output.wec_power_sim(:,f) = FM_P(1,f,2);        %power from wec (sim)
+            output.wec_power_mdp(:,f) = wec_power;        %power from wec (mdp)
+            output.wec_power_sim(f) = FM_P(1,f,2);        %power from wec (sim)
         else
-            [Jstar,policy,compare] = ...
+            [policy] = ...
                 backwardRecursion(FM_P,mdp,amp,sim,wec,f);
             %DOCUMENT BELLMANS
-            output.val_all(:,:,:,f) = compare(:,:,:);       %all values
-            output.val_Jstar(f,:) = Jstar(ind_E_sim,1);     %optimal value
-            output.val_togo(:,:,f) = Jstar;                 %value to go
         end
         
         %EVOLVE SIMULATION:
@@ -150,7 +155,7 @@ for f=1:sim.F %over each forecast
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
     
     %CAPTURE WIDTH
-    [~,output.wec.cw(f)] = powerFromWEC(FM_mod(1,f,2),FM_mod(1,f,3),wec);
+    [~,output.wec.cw(f)] = powerFromWEC_mdp(FM_mod(1,f,2),FM_mod(1,f,3),wec);
     output.wec.cwr(f) = output.wec.cw(f)/wec.width;
     
     %COMPUTE ERROR IN FORECAST
@@ -179,6 +184,7 @@ output.wec.width = wec.width; %width
 output.wec.r = wec.r; %rated power
 output.wec.cw_avg = mean(output.wec.cw); %average capture width
 output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
+output.wec.CF = mean(output.Pw_sim)/wec.r;
 
 
 

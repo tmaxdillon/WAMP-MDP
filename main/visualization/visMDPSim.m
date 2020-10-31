@@ -1,8 +1,11 @@
 function [] = visMDPSim(simStruct)
 
+yoff = 2.9;
+
 FM_P = simStruct.output.FM_P;
 FM_mod = simStruct.output.FM_mod;
 output = simStruct.output;
+amp = simStruct.amp;
 
 if output.abridged
     f_pts = 1:find(output.E_sim > 0,1,'last');
@@ -23,79 +26,81 @@ end
 
 figure
 %RESOURCE TIME SERIES
-ax(1) = subplot(4,1,1);
+ax(1) = subaxis(4,1,1,'SpacingVert',0.02);
 plot(datetime(FM_mod(1,f_pts,1),'ConvertFrom','datenum'), ... 
     FM_mod(1,f_pts,2),datetime(FM_mod(1,f_pts,1),'ConvertFrom','datenum'), ... 
     FM_mod(1,f_pts,3),'LineWidth',2);
 ylim([-inf inf])
 ylh = get(gca,'ylabel');
 ylp = get(ylh, 'Position');
-ylp(1) = ylp(1)-4;
+ylp(1) = ylp(1)-yoff;
 set(ylh, 'Rotation',0, 'Position',ylp,'VerticalAlignment','middle', ...
     'HorizontalAlignment','center')
 set(gca,'XTickLabel',[]);
-set(gca,'FontSize',16)
+set(gca,'FontSize',20)
 grid on
 title({['Average Power ' num2str(round(output.power_avg,2)) ...
     ', Average Beta = ' num2str(round(output.beta_avg,4))],''})
 xl = xlim;
 xt = xticks;
 %POWER TIME SERIES
-ax(2) = subplot(4,1,2);
+ax(2) = subaxis(4,1,2);
 plot(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'), ...
     output.Pw_sim(f_pts)/1000,'Color', ...
-    [204 255 204]/256,'LineWidth',2)
-hold on
-plot(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'),output.Pb_sim(f_pts)/1000, ...
-    'g','LineWidth',2)
+    [0 0 0]/256,'LineWidth',2)
+% hold on
+% plot(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'),output.Pb_sim(f_pts)/1000, ...
+%     'g','LineWidth',2)
 ylim([-inf output.wec.r+0.5])
-yticks(0:0.5:5)
-ylabel('Power [kW]','FontSize',20)
+%yticks(0:0.5:5)
+%ylabel({'Power','Produced','[kW]'},'FontSize',20)
 ylh = get(gca,'ylabel');
 ylp = get(ylh, 'Position');
-ylp(1) = ylp(1)-4;
+ylp(1) = ylp(1)-yoff;
 set(ylh, 'Rotation',0, 'Position',ylp,'VerticalAlignment','middle', ...
     'HorizontalAlignment','center')
 set(gca,'XTickLabel',[]);
-set(gca,'FontSize',16)
-legend('WEC Power','Net Power to Battery','Location','Northwest')
+set(gca,'FontSize',20)
+%legend('WEC Power','Net Power to Battery','Location','Northwest')
 grid on
 %OPERATIONAL STATE TIME SERIES
-ax(3) = subplot(4,1,3);
+ax(3) = subaxis(4,1,3);
 for i = 1:max(output.a_sim)
     scatter(datetime(FM_P(1,(output.a_sim==i),1),'ConvertFrom', ...
-        'datenum'),output.a_sim(output.a_sim==i),'.','MarkerEdgeColor','m')
+        'datenum'),output.a_sim(output.a_sim==i),'.','MarkerEdgeColor', ... 
+        [255 51 51]/256)
     hold on
 end
 xlim(xl)
 xticks(xt)
 ylim([0.5 max(output.a_sim) + 0.5])
 yticks(1:max(output.a_sim))
-ylabel({'Operational','Mode'},'FontSize',20)
+yticks([])
+%ylabel({'Sensing','Mode'},'FontSize',20)
 ylh = get(gca,'ylabel');
 ylp = get(ylh,'Position');
-ylp(1) = ylp(1)-4;
+ylp(1) = ylp(1)-yoff;
 set(ylh, 'Rotation',0, 'Position',ylp,'VerticalAlignment','middle', ...
     'HorizontalAlignment','center')
 set(gca,'XTickLabel',[]);
-set(gca,'FontSize',16)
+set(gca,'FontSize',20)
 grid on
 %BATTERY CAPACITY TIME SERIES
-ax(4) = subplot(4,1,4);
+ax(4) = subaxis(4,1,4);
 scatter(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'), ...
     output.E_sim(f_pts)/1000,20,output.beta(f_pts),'Filled')
-colormap(gca,flipud(brewermap(50,'RdYlGn')))
+colormap(gca,flipud(brewermap(50,'PiYG')))
 caxis([0 1])
-ylim([0 inf])
+ylim([0 amp.E_max/1000+.25])
 %yticks(1:11)
-ylabel({'Battery','State [kWh]'},'FontSize',20)
+%ylabel({'Battery','State [kWh]'},'FontSize',20)
 ylh = get(gca,'ylabel');
 ylp = get(ylh, 'Position');
-ylp(1) = ylp(1)-4;
+ylp(1) = ylp(1)-yoff;
 set(ylh, 'Rotation',0, 'Position',ylp,'VerticalAlignment','middle', ...
     'HorizontalAlignment','center')
 %set(gca,'XTick',[]);
-set(gca,'FontSize',16)
+set(gca,'FontSize',20)
 xlabel('Time','FontSize',16)
 grid on
 %J VALUES
@@ -137,7 +142,7 @@ grid on
 % zlabel('Overestimate [W]')
 % grid on
 
-set(gcf, 'Position', [100, 100, 1400, 650])
+set(gcf, 'Position', [100, 100, 1400, 450])
 
 linkaxes(ax,'x')
 end

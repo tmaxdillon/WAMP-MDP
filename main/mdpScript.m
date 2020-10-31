@@ -12,6 +12,7 @@
 %3 - modify time series vis (add 2D error sublot and power draw TS)
 
 %post presentation
+%1 - have meta data for multiple runs
 %3 - discount factor runs
 %3 - adapt visMultSims so it can handle multiple mult sims
 %1 - n sensitivity analysis
@@ -35,9 +36,12 @@ tTot = tic;
 if sim.multiple
     % multiple simulation setup
     sim.S = length(sim.tuning_array); %simulation index
-    multStruct(sim.S) = struct();
+    clear multStruct_mdp multStruct_pb multStruct_sl
+    multStruct_mdp(sim.S) = struct();
+    if sim.multiple_pb, multStruct_pb(sim.S) = struct(); end
+    if sim.multiple_sl, multStruct_sl(sim.S) = struct(); end
     sim.pb = false;
-    sim.simple_logic = false;
+    sim.sl = false;
     for i = 1:sim.S
         sim.s = i;
         if isequal(sim.tuned_parameter,'eps')
@@ -50,41 +54,48 @@ if sim.multiple
         if isequal(sim.tuned_parameter,'slv')
             frc.slv = sim.tuning_array(i);
         end
-        if isequal(sim.tuned_par
+        if isequal(sim.tuned_parameter,'emx')
+            amp.E_max = sim.tuning_array(i);
+        end
         disp('STOCHASTIC')
         output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot); %run simulation
         if sim.multiple_pb
             disp('POSTERIOR BOUND')
             sim.pb = true;
             pb = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot);
-            multStruct(sim.s).pb.output = pb;
-            multStruct(sim.s).pb.wec = wec;
-            multStruct(sim.s).pb.mdp = mdp;
-            multStruct(sim.s).pb.sim = sim;
-            multStruct(sim.s).pb.FM = FM;
+            multStruct_pb(sim.s).amp = amp;
+            multStruct_pb(sim.s).frc = frc;
+            multStruct_pb(sim.s).output = pb;            
+            multStruct_pb(sim.s).mdp = mdp;
+            multStruct_pb(sim.s).sim = sim;
+            multStruct_pb(sim.s).wec = wec;
             sim.pb = false;
         end
         if sim.multiple_sl
             disp('SIMPLE LOGIC')
             sim.sl = true;
-            sl = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot);
-            multStruct(sim.s).sl.output = sl;
-            multStruct(sim.s).sl.wec = wec;
-            multStruct(sim.s).sl.mdp = mdp;
-            multStruct(sim.s).sl.sim = sim;
-            multStruct(sim.s).sl.FM = FM;
+            sl = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot); 
+            multStruct_sl(sim.s).amp = amp;
+            multStruct_sl(sim.s).frc = frc;
+            multStruct_sl(sim.s).mdp = mdp;
+            multStruct_sl(sim.s).output = sl;
+            multStruct_sl(sim.s).sim = sim;
+            multStruct_sl(sim.s).wec = wec;
             sim.sl = false;
         end
-        multStruct(sim.s).amp = amp;
-        multStruct(sim.s).wec = wec;
-        multStruct(sim.s).mdp = mdp;
-        multStruct(sim.s).output = output;
-        multStruct(sim.s).sim = sim;
-        multStruct(sim.s).FM = FM;
+        multStruct_mdp(sim.s).amp = amp;
+        multStruct_mdp(sim.s).frc = frc;
+        multStruct_mdp(sim.s).mdp = mdp;
+        multStruct_mdp(sim.s).output = output;
+        multStruct_mdp(sim.s).sim = sim;
+        multStruct_mdp(sim.s).wec = wec;
         clear pb output
     end
     disp([num2str(sim.s) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
+    save('multStruct_pb','multStruct_pb','-v7.3')
+    save('multStruct_sl','multStruct_sl','-v7.3')
+    save('multStruct_mdp','multStruct_mdp','-v7.3')
 else
     output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot); %run simulation
     simStruct.output = output;

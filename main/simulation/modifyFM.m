@@ -29,7 +29,7 @@ FM_P = zeros(size(FM,1),size(FM,2),2); %preallocate
 FM_P(:,:,1) = FM(:,:,1); %time stays the same, it is a flat circle
 for f = 1:size(FM,2)
     for t = 1:size(FM,1)
-        FM_P(t,f,2) = powerFromWEC(FM(t,f,2),FM(t,f,3),wec);
+        FM_P(t,f,2) = powerFromWEC_mdp(FM(t,f,2),FM(t,f,3),wec);
     end
 end
 %disp(['Forecast matrix converted to power matrix after ' ...

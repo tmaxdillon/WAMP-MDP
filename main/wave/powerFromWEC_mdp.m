@@ -4,7 +4,7 @@
 
 %for use in MDP codeset
 
-function [power,cw] = powerFromWEC(Hs,Tp,wec)
+function [power,cw] = powerFromWEC_mdp(Hs,Tp,wec)
 
 rho = 1020;
 g = 9.81;
@@ -16,13 +16,13 @@ tp_eff = skewedGaussian_mdp(Tp,wec.tp_c(1),wec.tp_c(2), ...
 wavepower = (1/(16*4*pi))*rho*g^2*Hs^2*Tp; %[W], wavepower
 power = wec.eta_ct*wec.width*hs_eff*tp_eff*wavepower - ...
     wec.r*wec.house*1000; %[W]
+power(power<0) = 0; %remove negative power
 
 %compute capture width (removing house load and ct effiency)
 cw = ((power + wec.r*wec.house*1000)/(wec.eta_ct))/wavepower;
 
 %scale to rated power
 power(power>wec.r*1000) = wec.r; %[W]
-power(power<0) = 0;
 
 % H/L > 0.14 then waves break (deep water assumption)
 L = g*Tp^2/(2*pi);
