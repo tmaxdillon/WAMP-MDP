@@ -1,4 +1,5 @@
-function [power_batt,E_evolved] = powerToBattery(power_wec,E,draw,amp,mdp,wec)
+function [power_batt,E_evolved] = powerToBattery(power_wec,E,draw,amp, ...
+    mdp,wec)
 
 if wec.FO
     %never more than a third of the power

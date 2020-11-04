@@ -1,6 +1,6 @@
 function [FM_P,FM] = modifyFM(FM,frc,wec)
 ti = tic; 
-% disp('Updating power matrix.')
+disp('Updating power matrix.')
 if frc.stagelimit
     if frc.stagelimit
         FM = FM(1:1+frc.stagelimitval,:,:);
@@ -25,22 +25,22 @@ FM_P = zeros(size(FM,1),size(FM,2),4); %preallocate
 FM_P(:,:,1) = FM(:,:,1); %time stays the same, it is a flat circle
 rp = (wec.B*wec.F(wec.Tp_ra,wec.Hs_ra,wec.B)*wec.eta_ct*(1/(16*4*pi)) ...
     *wec.rho*wec.g^2*wec.Hs_ra^2*wec.Tp_ra)/(1+wec.h); %rated power
-Bmat = wec.B*ones(size(FM,[1 2])); %[m] B matrix for interpolation
-% for f = 1:size(FM,2)
-%     for t = 1:size(FM,1)
-%         %FM_P(t,f,2) = powerFromWEC_mdp(FM(t,f,2),FM(t,f,3),wec);
-%         FM_P(t,f,2) = wec.B*wec.F(FM(t,f,3),FM(t,f,2),wec.B)* ...
-%             wec.eta_ct*(1/(16*4*pi))*wec.rho*wec.g^2* ...
-%             FM(t,f,2)^2*FM(t,f,3) - rp*wec.h;
-%     end
-% end
-FM_P(:,:,2) = wec.B.*wec.F(FM(:,:,3),FM(:,:,2),Bmat).* ...
+for f = 1:size(FM,2)
+    for t = 1:size(FM,1)
+        %FM_P(t,f,2) = powerFromWEC_mdp(FM(t,f,2),FM(t,f,3),wec);
+        FM_P(t,f,2) = wec.B*wec.F(FM(t,f,3),FM(t,f,2),wec.B)* ...
+            wec.eta_ct*(1/(16*4*pi))*wec.rho*wec.g^2* ...
+            FM(t,f,2)^2*FM(t,f,3) - rp*wec.h;
+    end
+end
+FM_P(:,:,2) = wec.B.*wec.F(FM(:,:,3),FM(:,:,2), ...
+    wec.B*ones(size(FM,[1 2]))).* ...
     wec.eta_ct.*(1/(16*4*pi)).*wec.rho.*wec.g^2.* ...
     FM(:,:,2).^2.*FM(:,:,3) - rp*wec.h; %[W] power output
-FM_P(:,:,3) = wec.B*wec.F(FM(:,:,3),FM(:,:,2),Bmat); %[m] cw
-FM_P(:,:,4) = wec.F(FM(:,:,3),FM(:,:,2),Bmat); %[~] cwr
+FM_P(:,:,3) = wec.B*wec.F(FM(:,:,3),FM(:,:,2),wec.B); %[m] cw
+FM_P(:,:,4) = wec.F(FM(:,:,3),FM(:,:,2),wec.B); %[~] cwr
 FM_P(FM_P<0) = 0; %remove negative power generation
-% disp(['Forecast matrix converted to power matrix after ' ...
-%     num2str(round(toc(ti))) ' seconds.'])
+disp(['Forecast matrix converted to power matrix after ' ...
+    num2str(round(toc(ti))) ' seconds.'])
 end
 

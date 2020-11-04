@@ -22,6 +22,9 @@
 %5 - try smoothing over outages (reconstruct Hs and Tp)
 %5 - maximum/minimum charge/discharge rates into battery model
 
+%new things I have noticed...
+% - update WEC modeling
+
 %% simulate OO-WEC
 
 %load forecast matrix
@@ -108,28 +111,3 @@ else
 end
 
 clear i tTot
-
-% % save and visualize MDP outputs
-% if sim.multiple
-%     name = ['multSim_' sim.tuned_parameter  num2str(sim.S)];
-%     stru.(name) = multStruct;
-%     save([name '.mat'],'-struct','stru','-v7.3');
-%     visMultSims(stru.(name))
-% else
-%     %set name
-%     name = ['sim_n' num2str(mdp.n) 'eps' num2str(mdp.eps) ...
-%         'sub' num2str(frc.sub) ];
-%     if sim.pb
-%         name = [name 'pb'];
-%     end
-%     stru.(name).amp = amp;
-%     stru.(name).wec = wec;
-%     stru.(name).mdp = mdp;
-%     stru.(name).output = output;
-%     stru.(name).sim = sim;
-%     stru.(name).FM = FM;
-%     save([name '.mat'],'-struct','stru','-v7.3');
-%     visMDPSim(stru.(name))
-% end
-
-clear stru name

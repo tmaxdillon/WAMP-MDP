@@ -11,6 +11,7 @@ if sim.multiple
 else
     disp('Simulation beginning')
 end
+disp(['n = ' num2str(mdp.n)])
 tSim = tic;
 
 %modify forecast matrix based on user settings for buffer and limit val
