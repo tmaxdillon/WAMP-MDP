@@ -17,12 +17,17 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     if sim.debug
         wec_power(t) = FM_P(t,f,2); %power produced by wec
     end
-    %parallelization
-    %parfor (s = 1:mdp.n,sim.mw) %over all states in parallel
-    for s = 1:mdp.n 
-        %preallocate
-        compare_sa = zeros(mdp.n,mdp.m);
-        state_evol_sa = zeros(mdp.n,mdp.m);
+    %parallelization setup
+    if isempty(gcp('nocreate')) %no parallel pool running
+        cores = feature('numcores'); %find number of cores
+        if cores > 2 %only start if using HPC
+            parpool(cores);
+        end
+    end
+    %preallocate
+    compare_sa = zeros(mdp.n,mdp.m);
+    state_evol_sa = zeros(mdp.n,mdp.m);
+    parfor (s = 1:mdp.n,sim.mw) %over all states in parallel
         [compare_sa(s,:),state_evol_sa(s,:)] = ...
             evaluateActions(Jstar,FM_P,amp,mdp,sim,wec,f,t,s);
         %compare the value of the four actions, finding the optimal
