@@ -33,12 +33,11 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         %compare the value of the four actions, finding the optimal
         %value to go and the optimal policy
         [Jstar_s(s),policy_s(s)] = min(compare_sa(s,:));
-        %  ^ maybe divide Jstar by t as an alternative to discount factor?
     end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
     compare(:,:,t) = compare_sa;
-    state_evol_sa(:,:,t) = state_evol_sa;
+    state_evol(:,:,t) = state_evol_sa;
     
 end
 

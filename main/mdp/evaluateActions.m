@@ -19,6 +19,7 @@ for a=1:mdp.m %over all actions
     %3: compute the 'value' of this action via bellman's equation
     compare_a(a) = beta(amp.E(s),amp,mdp) + mdp.mu(a) +  ...
         Jstar(state_evol_a(a),t+1)*mdp.alpha^t;
+        %  ^ maybe divide Jstar by t as an alternative to discount factor?
 end
 
 end
