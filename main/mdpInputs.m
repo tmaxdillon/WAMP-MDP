@@ -33,6 +33,7 @@ wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 4;              %[m]
 wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
+wec.FO = false;             %toggle fred. olsen
 
 % wec.Hsm = 1;            %[m], height median
 % wec.Tpm = 7;            %[s], period median
