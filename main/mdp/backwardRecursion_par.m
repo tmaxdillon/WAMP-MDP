@@ -20,19 +20,21 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     %parallelization setup
     if isempty(gcp('nocreate')) %no parallel pool running
         cores = feature('numcores'); %find number of cores
-        if cores > 2 %only start if using HPC
+        if cores > 1 %only start if using HPC (1 if debug in matlab ide)
             parpool(cores);
         end
     end
     %preallocate
-    compare_sa = zeros(mdp.n,mdp.m);
-    state_evol_sa = zeros(mdp.n,mdp.m);
+    %compare_sa = zeros(mdp.n,mdp.m);
+    %state_evol_sa = zeros(mdp.n,mdp.m);
     parfor (s = 1:mdp.n,sim.mw) %over all states in parallel
-        [compare_sa(s,:),state_evol_sa(s,:)] = ...
+        [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
             evaluateActions(Jstar,FM_P,amp,mdp,sim,wec,f,t,s);
         %compare the value of the four actions, finding the optimal
         %value to go and the optimal policy
-        [Jstar_s(s),policy_s(s)] = min(compare_sa(s,:));
+        %[Jstar_s(s),policy_s(s)] = min(compare_sa(s,:));
+        compare_sa(s,:) = compare_a;
+        state_evol_sa(s,:) = state_evol_a;
     end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
