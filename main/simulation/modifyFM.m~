@@ -1,4 +1,6 @@
 function [FM_P,FM] = modifyFM(FM,frc,wec)
+ti = tic; 
+% disp('Updating power matrix.')
 if frc.stagelimit
     if frc.stagelimit
         FM = FM(1:1+frc.stagelimitval,:,:);

@@ -36,9 +36,9 @@ end
 mdpInputs
 
 tTot = tic;
-if sim.multiple
-    % multiple simulation setup
-    sim.S = length(sim.tuning_array); %simulation index
+if sim.multiple %sensitivity analysis
+    sim.S = length(sim.tuning_array); %sensitivity length
+    %preallocate
     clear multStruct_mdp multStruct_pb multStruct_sl
     multStruct_mdp(sim.S) = struct();
     if sim.multiple_pb, multStruct_pb(sim.S) = struct(); end
@@ -92,7 +92,7 @@ if sim.multiple
         multStruct_mdp(sim.s).output = output;
         multStruct_mdp(sim.s).sim = sim;
         multStruct_mdp(sim.s).wec = wec;
-        clear pb output
+        clear pb sl output
     end
     disp([num2str(sim.s) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])

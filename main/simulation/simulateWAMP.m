@@ -27,7 +27,7 @@ else
 end
 
 %discretize battery
-if sim.hpc %high discretization
+if sim.hpc && sim.hr_on %high discretization
     amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], discretized battery state
 else %discretize to ensure there's a state lower than Ps(2)
     amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
@@ -103,8 +103,13 @@ for f=1:sim.F %over each forecast
         [~,ind_E_sim] = min(abs(amp.E-output.E_sim(f))); %index of state       
         %BACKWARD RECURSION
         if sim.debug
-            [policy,Jstar,compare,state_evol,wec_power] = ...
-                backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+            if sim.hpc
+                [policy,Jstar,compare,state_evol,wec_power] = ...
+                    backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+            else
+                [policy,Jstar,compare,state_evol,wec_power] = ...
+                    backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+            end
             %DOCUMENT BELLMANS (AND DEBUG) VALUES
             output.val_all(:,:,:,f) = compare(:,:,:); %all values
             output.val_Jstar(f,:) = Jstar(ind_E_sim,1); %optimal value
@@ -114,9 +119,11 @@ for f=1:sim.F %over each forecast
             output.wec_power_mdp(:,f) = wec_power; %power from wec (mdp)
             output.wec_power_sim(f) = FM_P(1,f,2); %power from wec (sim)
         else
-            [policy] = ...
-                backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
-            %DOCUMENT BELLMANS
+            if sim.hpc
+                [policy] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+            else
+                [policy] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+            end
         end        
         %EVOLVE SIMULATION:
         output.a_sim(f) = policy(ind_E_sim,1); %action given current state

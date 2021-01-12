@@ -2,8 +2,8 @@
 frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 90;         %[h] limit on stages
 frc.sub = 3;                    %[hr] model spin up buffer
-frc.Flimit = false;             %to shorten runtime
-frc.Flimitval = 100;            %number of forecasts to simulate
+frc.Flimit = true;             %to shorten runtime
+frc.Flimitval = 200;            %number of forecasts to simulate
 
 %MDP parameters:
 mdp.n = 1000;                       %number of states
@@ -35,18 +35,6 @@ wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
 
-% wec.Hsm = 1;            %[m], height median
-% wec.Tpm = 7;            %[s], period median
-% wec.w = 60;             %[~], width of normal dist
-% wec.r = 2;              %[kW], rated (max) power of device
-% wec.tp_N = 1000;        %discretization for Tp skewed gaussian fit
-% wec.med_prob = 0.1;     %median probability for fitting skewed gaussian
-% wec.tp_res = 0.3;       %multiplier on median tp for resonance
-% wec.tp_rated = 1;       %multiplier on median tp for rated power
-% wec.hs_res = 1;         %multiplier on median hs for resonance
-% wec.hs_rated = 2;       %multiplier on median hs for rated power
-% wec.cutout = 15;        %wavepower X times ratedpower initiates cutout
-
 %SIM parameters:
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;             %toggle for simple logic in one sim
@@ -55,7 +43,9 @@ sim.debug = false;          %include debugging variables in output
 sim.multiple = false;       %multiple simulations?
 sim.multiple_pb = true;     %toggle for posterior bound comparison
 sim.multiple_sl = false;    %toggle for simple logic comparison
-if feature('numcores') > 2  %check to see if HPC
+sim.hr_on = false;          %toggle enabling high res state space
+sim.corelim = 1;            % numcores > corelim == using HPC
+if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
 else
     sim.hpc = false;

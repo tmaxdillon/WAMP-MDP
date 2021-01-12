@@ -43,19 +43,9 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         %  ^ maybe divide Jstar by t as an alternative to discount factor?
     end
     %PARALLELIZED EQUIVALENT
-%     for s=1:mdp.n
-%         [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
-%             evaluateActions(Jstar,FM_P,amp,mdp,sim,wec,f,t,s);
-%         %compare the value of the four actions, finding the optimal
-%         %value to go and the optimal policy
-%         %[Jstar_s(s),policy_s(s)] = min(compare_sa(s,:));
-%         compare_sa(s,:) = compare_a;
-%         state_evol_sa(s,:) = state_evol_a;
-%     end
-%     Jstar(:,t) = Jstar_s;
-%     policy(:,t) = policy_s;
-%     compare(:,:,t) = compare_sa;
-%     state_evol(:,:,t) = state_evol_sa;
+    for s=1:mdp.n
+        [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
+            evaluateActions(Jstar,FM_P,amp,mdp,sim,wec,f,t,s);
 end
 
 
