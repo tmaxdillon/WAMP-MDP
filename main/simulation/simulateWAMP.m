@@ -163,5 +163,10 @@ output.wec.cw_avg = mean(output.wec.cw); %average capture width
 output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
 
+%print results
+results.power_avg = output.power_avg;
+results.beta_avg = output.beta_avg;
+results
+
 
 
