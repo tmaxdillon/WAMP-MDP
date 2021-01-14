@@ -28,6 +28,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     %compare_sa = zeros(mdp.n,mdp.m);
     %state_evol_sa = zeros(mdp.n,mdp.m);
     parfor (s = 1:mdp.n,sim.mw) %over all states in parallel
+        %disp('in parfor still')
         [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
             evaluateActions(Jstar,FM_P,amp,mdp,sim,wec,f,t,s);
         %compare the value of the four actions, finding the optimal
@@ -35,8 +36,8 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         %[Jstar_s(s),policy_s(s)] = min(compare_sa(s,:));
         compare_sa(s,:) = compare_a;
         state_evol_sa(s,:) = state_evol_a;
-        %disp(['s = ' num2str(s) ' of ' num2str(mdp.n)  ...
-        %    ' t = ' num2str(t) ' f = ' num2str(f)])
+        disp(['s = ' num2str(s) ' of ' num2str(mdp.n)  ...
+            ' t = ' num2str(t) ' f = ' num2str(f)])
     end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;

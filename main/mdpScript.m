@@ -6,12 +6,7 @@
 
 %% to do
 
-%before presentation
-%1 - simple logic runs
-%2 - sensitivity to epsilon runs for the three strategies
-%3 - modify time series vis (add 2D error sublot and power draw TS)
-
-%post presentation
+%old goals
 %1 - have meta data for multiple runs
 %3 - discount factor runs
 %3 - adapt visMultSims so it can handle multiple mult sims
@@ -23,7 +18,7 @@
 %5 - maximum/minimum charge/discharge rates into battery model
 
 %new things I have noticed...
-% - update WEC modeling
+% - add capacity fading to simulateWAMP
 
 %% simulate OO-WEC
 

@@ -3,7 +3,7 @@ frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 90;         %[h] limit on stages
 frc.sub = 3;                    %[hr] model spin up buffer
 frc.Flimit = true;             %to shorten runtime
-frc.Flimitval = 200;            %number of forecasts to simulate
+frc.Flimitval = 100;            %number of forecasts to simulate
 
 %MDP parameters:
 mdp.n = 1000;                       %number of states
@@ -38,7 +38,7 @@ wec.FO = false;             %toggle fred. olsen
 %SIM parameters:
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;             %toggle for simple logic in one sim
-sim.notif = 100;            %notifications every __ forecasts
+sim.notif = 5;            %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.multiple = false;       %multiple simulations?
 sim.multiple_pb = true;     %toggle for posterior bound comparison
