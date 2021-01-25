@@ -119,12 +119,27 @@ for f=1:sim.F %over each forecast
             output.wec_power_mdp(:,f) = wec_power; %power from wec (mdp)
             output.wec_power_sim(f) = FM_P(1,f,2); %power from wec (sim)
         else
-            if sim.hpc
-                [policy] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
-            else
-                [policy] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+%             if sim.hpc
+%                 [policy] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+%             else
+%                 [policy] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+%             end
+            %parallelization setup
+            if isempty(gcp('nocreate')) %no parallel pool running
+                cores = feature('numcores'); %find number of cores
+                %if cores > 1 %only start if using HPC 
+                parpool(cores);
+                %end
             end
-        end        
+            tic;
+            [policy] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+            pt = toc;
+            tic;
+            [policy] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+            npt = toc;
+%             disp(['Parallel RT = ' num2str(round(pt,2)) 's, ' ...
+%                 'non Parallel RT = ' num2str(round(npt,2)) 's.'])
+        end
         %EVOLVE SIMULATION:
         output.a_sim(f) = policy(ind_E_sim,1); %action given current state
     end

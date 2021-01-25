@@ -1,5 +1,5 @@
 function [Jstar,policy,compare_a,state_evol_a] = ...
-    evaluateActions(Jstar,FM_P,amp,mdp,sim,wec,f,t,s)
+    evaluateActions(Jstar,P_fc,P_pb,amp,mdp,pb,wec,t,s)
 
 %preallocate
 state_evol_a = zeros(1,mdp.m);
@@ -7,11 +7,11 @@ compare_a = zeros(1,mdp.m);
 
 for a=1:mdp.m %over all actions
     %1: compute evolution of battery
-    if sim.pb == 0 % using forecast
-        [~,E_evolved] = powerToBattery(FM_P(t,f,2),amp.E(s), ...
-            amp.Ps(a),amp,mdp,wec);
-    elseif sim.pb == 1 % posterior bound
-        [~,E_evolved] = powerToBattery(FM_P(1,f+t-1,2), ...
+    if pb == 0 % using forecast
+        [~,E_evolved] = powerToBattery(P_fc, ...
+            amp.E(s),amp.Ps(a),amp,mdp,wec);
+    elseif pb == 1 % posterior bound
+        [~,E_evolved] = powerToBattery(P_pb, ...
             amp.E(s),amp.Ps(a),amp,mdp,wec);
     end
     %2: find the state index of the evolved battery
