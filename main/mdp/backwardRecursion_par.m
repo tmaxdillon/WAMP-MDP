@@ -11,6 +11,14 @@ if sim.debug
 end
 
 pb = sim.pb; %posterior bound toggle
+%parallelization setup
+if isempty(gcp('nocreate')) %no parallel pool running
+    cores = feature('numcores'); %find number of cores
+    %if cores > 1 %only start if using HPC (1 if debug in matlab ide)
+    parpool(cores);
+    %end
+end
+ticBytes(gcp)
 
 %find extent of forecast, Tf (which depends on how recent the forecast
 %is) by searching for start of NaN values
@@ -19,21 +27,14 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     if sim.debug
         wec_power(t) = FM_P(t,f,2); %power produced by wec
     end
-    %parallelization setup
-    if isempty(gcp('nocreate')) %no parallel pool running
-        cores = feature('numcores'); %find number of cores
-        %if cores > 1 %only start if using HPC (1 if debug in matlab ide)
-        parpool(cores);
-        %end
-    end
     %preallocate
     %compare_sa = zeros(mdp.n,mdp.m);
     %state_evol_sa = zeros(mdp.n,mdp.m);
     P_fc = FM_P(t,f,2); %forecast power
     P_pb = FM_P(1,f+t-1,2); %posterior bound power
-    tsltic = tic;
+    tsltic = tic; %tic for state loop
     parfor (s = 1:mdp.n,sim.mw) %over all states in parallel
-        tic;
+        tic; %tic for evaluate actions
         [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
             evaluateActions(Jstar,P_fc,P_pb,amp,mdp,pb,wec,t,s);
 %         [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
@@ -42,9 +43,9 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         state_evol_sa(s,:) = state_evol_a;
         %disp(['s = ' num2str(s) ' of ' num2str(mdp.n)  ...
         %    ' t = ' num2str(t) ' f = ' num2str(f)])
-        tea(s) = toc*1000;
+        tea(s) = toc*1000; %time for evaluate actions
     end
-    tsl(t) = toc(tsltic)*1000;
+    tsl(t) = toc(tsltic)*1000; %toc for state loop
     disp(['Par max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
@@ -54,5 +55,6 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
 end
 
 disp(['Par state loop mean RT = ' num2str(round(mean(tsl),2)) 'ms.'])
+tocBytes(gcp)
 
 
