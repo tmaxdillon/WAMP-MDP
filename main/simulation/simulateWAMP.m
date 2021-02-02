@@ -57,7 +57,8 @@ end
 
 %set initial output values
 output.E_sim(1) = amp.E_start; %set initial value of battery time series
-output.beta(1) = beta(amp.E_start,amp,mdp); %set initial beta value
+output.beta(1) = beta(amp.E_start, ...
+    amp.E,amp.E_max,mdp.b,mdp.beta_lb); %set initial beta value
 
 %set default values
 output.abridged = false; %default: not posterior bound abridged
@@ -125,18 +126,19 @@ for f=1:sim.F %over each forecast
 %                 [policy] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
 %             end
             %parallelization setup
-            if isempty(gcp('nocreate')) %no parallel pool running
+            if isempty(gcp('nocreate')) && sim.hpc %no par pool running
                 cores = feature('numcores'); %find number of cores
-                %if cores > 1 %only start if using HPC 
                 parpool(cores);
-                %end
             end
-            tic;
-            [policy] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
-            pt = toc;
-            tic;
-            [policy] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
-            npt = toc;
+            [policy1] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+            sim.hpc = 0;
+            [policy2] = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+            sim.hpc = 1;
+            if ~isequal(policy1,policy2)
+                error('policies arent equal')
+            else
+                policy = policy1;
+            end
 %             disp(['Parallel RT = ' num2str(round(pt,2)) 's, ' ...
 %                 'non Parallel RT = ' num2str(round(npt,2)) 's.'])
         end
@@ -145,8 +147,9 @@ for f=1:sim.F %over each forecast
     end
     [output.Pb_sim(f),E_evolved] = powerToBattery(output.Pw_sim(f), ...
         output.E_sim(f),amp.Ps(output.a_sim(f)), ...
-        amp,mdp,wec); %net power sent to battery
-    output.beta(f+1) = beta(E_evolved,amp,mdp); %document beta value
+        amp.sdr,amp.E_max,mdp.dt,wec.FO); %net power sent to battery
+    output.beta(f+1) = beta(E_evolved,amp.E,amp.E_max, ...
+        mdp.b,mdp.beta_lb); %document beta value
     [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state    
     output.wec.cw(f) = FM_P(1,f,3); %capture width
