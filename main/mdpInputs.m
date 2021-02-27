@@ -15,13 +15,14 @@ sim.multiple = false;       %multiple simulations?
 sim.multiple_pb = true;     %toggle for posterior bound comparison
 sim.multiple_sl = true;    %toggle for simple logic comparison
 sim.hr_on = false;          %toggle enabling high res state space
-sim.corelim = 2;            % numcores > corelim == using HPC
+sim.corelim = 37;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
+    sim.mw = 36; %max workers
 else
     sim.hpc = false;
+    sim.mw = 0; %max workers
 end
-sim.mw = 36;                %max workers
 
 %MDP parameters:
 mdp.n = 20;                       %number of states
