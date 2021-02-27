@@ -19,6 +19,7 @@ if sim.hpc
 else
     dispstr = 'n';
     sim.mw = 1;
+    disp('sim.mw is 1')
 end
 
 %find extent of forecast, Tf (which depends on how recent the forecast
