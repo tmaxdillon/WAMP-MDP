@@ -8,10 +8,10 @@ frc.Flimitval = 3;              %number of forecasts to simulate
 %SIM parameters:
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
-sim.notif = 50;             %notifications every __ forecasts
+sim.notif = 10;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_hpc = false;      %debug HPC runtime and overhead
-sim.multiple = true;       %multiple simulations?
+sim.multiple = false;       %multiple simulations?
 sim.multiple_pb = true;     %toggle for posterior bound comparison
 sim.multiple_sl = true;    %toggle for simple logic comparison
 sim.hr_on = false;          %toggle enabling high res state space
@@ -34,7 +34,7 @@ mdp.b = 1;                          %battery steepness
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:
-amp.E_max = 1500;                       %[Wh], maximum battery capacity
+amp.E_max = 5000;                       %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate

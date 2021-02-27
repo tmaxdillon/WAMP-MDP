@@ -13,12 +13,12 @@ end
 %set parallelization settings and diagnostics
 if sim.debug_hpc
     ticBytes(gcp)
-    if sim.hpc
-        dispstr = '';
-    else
-        dispstr = 'n';
-        sim.mw = 1;
-    end
+end
+if sim.hpc
+    dispstr = '';
+else
+    dispstr = 'n';
+    sim.mw = 1;
 end
 
 %find extent of forecast, Tf (which depends on how recent the forecast
