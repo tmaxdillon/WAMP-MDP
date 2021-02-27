@@ -10,14 +10,24 @@ if sim.debug
     wec_power = zeros(1,mdp.T); %wec power for debugging
 end
 
-%parallelization setup
-if isempty(gcp('nocreate')) %no parallel pool running
-    cores = feature('numcores'); %find number of cores
-    %if cores > 1 %only start if using HPC (1 if debug in matlab ide)
-    parpool(cores);
-    %end
+% %parallelization setup
+% if isempty(gcp('nocreate')) %no parallel pool running
+%     cores = feature('numcores'); %find number of cores
+%     %if cores > 1 %only start if using HPC (1 if debug in matlab ide)
+%     parpool(cores);
+%     %end
+% end
+
+%set parallelization settings and diagnostics
+if sim.debug_hpc
+    ticBytes(gcp)
+    if sim.hpc
+        dispstr = '';
+    else
+        dispstr = 'n';
+        sim.mw = 1;
+    end
 end
-ticBytes(gcp)
 
 %find extent of forecast, Tf (which depends on how recent the forecast
 %is) by searching for start of NaN values
@@ -41,26 +51,33 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     beta_lb = mdp.beta_lb; %lower bound for beta function
     mu = mdp.mu; %sensing penalties
     alpha = mdp.alpha; %discount factor
+    m = mdp.m; %number of states
     tsltic = tic; %tic for state loop
     parfor (s = 1:mdp.n,sim.mw) %over all states in parallel
         tic; %tic for evaluate actions
         [Jstar_s(s),policy_s(s),compare_sa(s,:),state_evol_sa(s,:)] = ...
             evaluateActions(Jstar_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
-            dt,pb,FO,b,beta_lb,mu,t,s);
+            dt,pb,FO,b,beta_lb,mu,alpha,m,t,s);
         %compare_sa(s,:) = compare_a;
         %state_evol_sa(s,:) = state_evol_a;
         tea(s) = toc*1000; %time for evaluate actions
     end
-    tsl(t) = toc(tsltic)*1000; %toc for state loop
-    disp(['Par max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
+    if sim.debug_hpc
+        tsl(t) = toc(tsltic)*1000; %toc for state loop
+        disp([dispstr 'Par max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
+    end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
-    compare(:,:,t) = compare_sa;
-    state_evol(:,:,t) = state_evol_sa;
-    
+    if sim.debug
+        compare(:,:,t) = compare_sa;
+        state_evol(:,:,t) = state_evol_sa;
+    end
 end
 
-disp(['Par state loop mean RT = ' num2str(round(mean(tsl),2)) 'ms.'])
-tocBytes(gcp)
+if sim.debug_hpc
+    disp([dispstr 'Par state loop mean RT = ' ...
+        num2str(round(mean(tsl),2)) 'ms.'])
+    tocBytes(gcp)
+end
 
 

@@ -29,6 +29,10 @@ FM_P(:,:,2) = wec.B.*wec.F(FM(:,:,3),FM(:,:,2),Bmat).* ...
     FM(:,:,2).^2.*FM(:,:,3) - rp*wec.h; %[W] power output
 FM_P(:,:,3) = wec.B*wec.F(FM(:,:,3),FM(:,:,2),Bmat); %[m] cw
 FM_P(:,:,4) = wec.F(FM(:,:,3),FM(:,:,2),Bmat); %[~] cwr
-FM_P(FM_P<0) = 0; %remove negative power generation
+P = FM_P(:,:,2);
+P(P<0) = 0; %remove negative power generation
+P(P>rp) = rp; %capped at rated power
+FM_P(:,:,2) = P;
+
 end
 

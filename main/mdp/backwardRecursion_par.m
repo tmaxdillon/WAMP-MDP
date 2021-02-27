@@ -10,21 +10,15 @@ if sim.debug
     wec_power = zeros(1,mdp.T); %wec power for debugging
 end
 
-% %parallelization setup
-% if isempty(gcp('nocreate')) %no parallel pool running
-%     cores = feature('numcores'); %find number of cores
-%     %if cores > 1 %only start if using HPC (1 if debug in matlab ide)
-%     parpool(cores);
-%     %end
-% end
-
 %set parallelization settings and diagnostics
-ticBytes(gcp)
-if sim.hpc
-    dispstr = '';
-else
-    dispstr = 'n';
-    sim.mw = 1;
+if sim.debug_hpc
+    ticBytes(gcp)
+    if sim.hpc
+        dispstr = '';
+    else
+        dispstr = 'n';
+        sim.mw = 1;
+    end
 end
 
 %find extent of forecast, Tf (which depends on how recent the forecast
@@ -37,7 +31,11 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     %reduce overhead by unpacking variables from matrices and structs
     Jstar_t1 = Jstar(:,t+1); %Jstar one time step ahead
     P_fc = FM_P(t,f,2); %forecast power
-    P_pb = FM_P(1,f+t-1,2); %posterior bound power    
+    if sim.pb == 1
+        P_pb = FM_P(1,f+t-1,2); %posterior bound power
+    else
+        P_pb = [];
+    end
     E = amp.E; %discretized battery capacities
     Ps = amp.Ps; %sensor loads
     sdr = amp.sdr; %self discharge rate
@@ -60,16 +58,22 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         %state_evol_sa(s,:) = state_evol_a;
         tea(s) = toc*1000; %time for evaluate actions
     end
-    tsl(t) = toc(tsltic)*1000; %toc for state loop
-    disp([dispstr 'Par max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
+    if sim.debug_hpc
+        tsl(t) = toc(tsltic)*1000; %toc for state loop
+        disp([dispstr 'Par max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
+    end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
-    compare(:,:,t) = compare_sa;
-    state_evol(:,:,t) = state_evol_sa;
+    if sim.debug
+        compare(:,:,t) = compare_sa;
+        state_evol(:,:,t) = state_evol_sa;
+    end
 end
 
-disp([dispstr 'Par state loop mean RT = ' ...
-    num2str(round(mean(tsl),2)) 'ms.'])
-tocBytes(gcp)
+if sim.debug_hpc
+    disp([dispstr 'Par state loop mean RT = ' ...
+        num2str(round(mean(tsl),2)) 'ms.'])
+    tocBytes(gcp)
+end
 
 

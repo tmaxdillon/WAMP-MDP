@@ -55,6 +55,9 @@ if sim.multiple %sensitivity analysis
         if isequal(sim.tuned_parameter,'emx')
             amp.E_max = sim.tuning_array(i);
         end
+        if isequal(sim.tuned_parameter,'wcd')
+            wec.B = sim.tuning_array(i);
+        end
         disp('STOCHASTIC')
         output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot); %run simulation
         if sim.multiple_pb
