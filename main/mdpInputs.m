@@ -5,6 +5,24 @@ frc.sub = 3;                    %[hr] model spin up buffer
 frc.Flimit = false;              %to shorten runtime
 frc.Flimitval = 3;              %number of forecasts to simulate
 
+%SIM parameters:
+sim.pb = false;             %toggle for posterior bound in one sim
+sim.sl = false;              %toggle for simple logic in one sim
+sim.notif = 50;             %notifications every __ forecasts
+sim.debug = false;          %include debugging variables in output
+sim.debug_hpc = false;      %debug HPC runtime and overhead
+sim.multiple = true;       %multiple simulations?
+sim.multiple_pb = true;     %toggle for posterior bound comparison
+sim.multiple_sl = true;    %toggle for simple logic comparison
+sim.hr_on = false;          %toggle enabling high res state space
+sim.corelim = 2;            % numcores > corelim == using HPC
+if feature('numcores') > sim.corelim  %check to see if HPC
+    sim.hpc = true;
+else
+    sim.hpc = false;
+end
+sim.mw = 36;                %max workers
+
 %MDP parameters:
 mdp.n = 20;                       %number of states
 mdp.m = 4;                          %number of actions
@@ -34,24 +52,6 @@ wec.Hs_ra = 2;              %[m]
 wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
-
-%SIM parameters:
-sim.pb = false;             %toggle for posterior bound in one sim
-sim.sl = false;              %toggle for simple logic in one sim
-sim.notif = 50;             %notifications every __ forecasts
-sim.debug = false;          %include debugging variables in output
-sim.debug_hpc = false;      %debug HPC runtime and overhead
-sim.multiple = true;       %multiple simulations?
-sim.multiple_pb = true;     %toggle for posterior bound comparison
-sim.multiple_sl = true;    %toggle for simple logic comparison
-sim.hr_on = false;          %toggle enabling high res state space
-sim.corelim = 2;            % numcores > corelim == using HPC
-if feature('numcores') > sim.corelim  %check to see if HPC
-    sim.hpc = true;
-else
-    sim.hpc = false;
-end
-sim.mw = 36;                %max workers
 
 %sensitivity parameters
 % sim.tuned_parameter = 'eps'; %epsilon
