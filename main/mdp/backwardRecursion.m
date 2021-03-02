@@ -10,61 +10,43 @@ if sim.debug
     wec_power = zeros(1,mdp.T); %wec power for debugging
 end
 
-pb = sim.pb; %posterior bound toggle
-
 %find extent of forecast, Tf (which depends on how recent the forecast
 %is) by searching for start of NaN values
 Tf = find(~isnan(FM_P(:,f,2)),1,'last');
 for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
-%         %ORIGINAL LOOP
-%         for s=1:mdp.n %over all states
-%             for a=1:mdp.m %over all actions
-%                 %1: compute evolution of battery
-%                 if sim.pb == 0 % using forecast
-%                     if sim.debug
-%                         wec_power(t) = FM_P(t,f,2); %power produced by wec
-%                     end
-%                     [~,E_evolved] = powerToBattery(FM_P(t,f,2),amp.E(s), ...
-%                         amp.Ps(a),amp,mdp,wec);
-%                 elseif sim.pb == 1 % posterior bound
-%                     if sim.debug
-%                         wec_power(t) = FM_P(1,f+t-1,2); %power produced by wec
-%                     end
-%                     [~,E_evolved] = powerToBattery(FM_P(1,f+t-1,2), ...
-%                     amp.E(s),amp.Ps(a),amp,mdp,wec);
-%                 end
-%                 %2: find the state index of the evolved battery
-%                 [~,state_evol(s,a,t)] = min(abs(amp.E - E_evolved));
-%                 %3: compute the 'value' of this action via bellman's equation
-%                 compare(s,a,t) = beta(amp.E(s),amp,mdp) + mdp.mu(a) +  ...
-%                     Jstar(state_evol(s,a,t),t+1)*mdp.alpha^t;
-%             end
-%             %compare the value of the four actions, finding the optimal
-%             %value to go and the optimal policy
-%             [Jstar(s,t),policy(s,t)] = min(compare(s,:,t));
-%             %  ^ maybe divide Jstar by t as an alternative to discount factor?
-%         end
-    %PARALLELIZED EQUIVALENT
-    P_fc = FM_P(t,f,2); %forecast power
-    P_pb = FM_P(1,f+t-1,2); %posterior bound power
-    tsltic = tic;
-    for s=1:mdp.n
-        tic;
-        [Jstar_s(s),policy_s(s),compare_a,state_evol_a] = ...
-            evaluateActions(Jstar,P_fc,P_pb,amp,mdp,pb,wec,t,s);
-        compare_sa(s,:) = compare_a;
-        state_evol_sa(s,:) = state_evol_a;
-        tea(s) = toc*1000;
+    if sim.debug
+        wec_power(t) = FM_P(t,f,2); %power produced by wec
     end
-    tsl(t) = toc(tsltic)*1000;
-    disp(['nPar max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
+    %reduce overhead by unpacking variables from matrices and structs
+    Jstar_t1 = Jstar(:,t+1); %Jstar one time step ahead
+    P_fc = FM_P(t,f,2); %forecast power
+    if sim.pb == 1
+        P_pb = FM_P(1,f+t-1,2); %posterior bound power
+    else
+        P_pb = [];
+    end
+    E = amp.E; %discretized battery capacities
+    Ps = amp.Ps; %sensor loads
+    sdr = amp.sdr; %self discharge rate
+    E_max = amp.E_max; %maximum battery capacity
+    dt = mdp.dt; %time discretization
+    pb = sim.pb; %posterior bound toggle
+    FO = wec.FO; %fred olsen toggle
+    b = mdp.b; %b value for beta function
+    beta_lb = mdp.beta_lb; %lower bound for beta function
+    mu = mdp.mu; %sensing penalties
+    alpha = mdp.alpha; %discount factor
+    m = mdp.m; %number of states
+    for s = 1:mdp.n %over all states in parallel
+        [Jstar_s(s),policy_s(s),compare_sa(s,:),state_evol_sa(s,:)] = ...
+            evaluateActions(Jstar_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
+            dt,pb,FO,b,beta_lb,mu,alpha,m,t,s);
+    end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
-    compare(:,:,t) = compare_sa;
-    state_evol(:,:,t) = state_evol_sa;
+    if sim.debug
+        compare(:,:,t) = compare_sa;
+        state_evol(:,:,t) = state_evol_sa;
+    end
 end
-
-disp(['nPar state loop mean RT = ' num2str(round(mean(tsl),2)) 'ms.'])
-
-
 

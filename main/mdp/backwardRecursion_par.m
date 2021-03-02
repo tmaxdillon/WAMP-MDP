@@ -11,7 +11,7 @@ if sim.debug
 end
 
 %set parallelization settings and diagnostics
-if sim.debug_hpc
+if sim.debug_brpar
     ticBytes(gcp)
 end
 if sim.hpc
@@ -54,11 +54,9 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         [Jstar_s(s),policy_s(s),compare_sa(s,:),state_evol_sa(s,:)] = ...
             evaluateActions(Jstar_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
             dt,pb,FO,b,beta_lb,mu,alpha,m,t,s);
-        %compare_sa(s,:) = compare_a;
-        %state_evol_sa(s,:) = state_evol_a;
         tea(s) = toc*1000; %time for evaluate actions
     end
-    if sim.debug_hpc
+    if sim.debug_brpar
         tsl(t) = toc(tsltic)*1000; %toc for state loop
         disp([dispstr 'Par max ea RT = ' num2str(round(max(tea),2)) 'ms.'])
     end
@@ -70,7 +68,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     end
 end
 
-if sim.debug_hpc
+if sim.debug_brpar
     disp([dispstr 'Par state loop mean RT = ' ...
         num2str(round(mean(tsl),2)) 'ms.'])
     tocBytes(gcp)

@@ -2,8 +2,8 @@
 frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 10;         %[h] limit on stages
 frc.sub = 3;                    %[hr] model spin up buffer
-frc.Flimit = true;              %to shorten runtime
-frc.Flimitval = 500;              %number of forecasts to simulate
+frc.Flimit = false;              %to shorten runtime
+frc.Flimitval = 3;              %number of forecasts to simulate
 
 %SIM parameters:
 sim.multiple = true;       %multiple simulations?
@@ -12,10 +12,10 @@ sim.sl = false;              %toggle for simple logic in one sim
 sim.hr_on = false;          %toggle enabling high res state space
 sim.brpar = false;         %parallelized backward recursion
 sim.expar = true;           %parallelized multiple simulations
-sim.notif = 500;             %notifications every __ forecasts
+sim.notif = 10;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
-sim.corelim = 1;            % numcores > corelim == using HPC
+sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
     sim.mw = 36; %max workers
@@ -35,7 +35,7 @@ mdp.b = 1;                          %battery steepness
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:
-amp.E_max = 500;                       %[Wh], maximum battery capacity
+amp.E_max = 5000;                       %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate
@@ -46,7 +46,7 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 6;                  %[m]
+wec.B = 3;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m]
@@ -55,14 +55,10 @@ wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
 
 %sensitivity parameters
-if isfield(sim,'tuned_parameter')
-    sim = rmfield(sim,'tuned_parameter');
+if isfield(sim,{'tuned_parameter'})sim = rmfield(sim,'tuned_parameter');
 end
-if isfield(sim,'tuning_array')
-    sim = rmfield(sim,'tuning_array');
-end
-sim.tuning_array(:,1) = [450 500 550];
-sim.tuning_array(:,2) = [5.5 6 6.6];
+sim.tuning_array(1,:) = [500 2500 5000 7500];
+sim.tuning_array(2,:) = [3 4 5 6];
 sim.tuned_parameter{1} = 'emx'; %rated Hs
 sim.tuned_parameter{2} = 'wcd'; %rated Tp
 % sim.tuned_parameter = 'eps'; %epsilon

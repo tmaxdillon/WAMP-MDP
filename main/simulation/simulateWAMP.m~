@@ -4,12 +4,12 @@ function [output] = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i)
 
 %print status to command window
 if sim.multiple && ~sim.expar
-    disp(['Simulation ' num2str(i) ' beginning after ' ...
-        num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
+    disp(['Simulation ' num2str(sim.s) ' out of ' num2str(sim.S) ...
+        ' beginning after ' num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
         sim.tuned_parameter{1} ' tuned to ' ...
-        num2str(sim.S1(i)) ' and ' ...
+        num2str(sim.tuning_array(i,1)) ' and ' ...
         sim.tuned_parameter{2} ' tuned to ' ...
-        num2str(sim.S2(i)) '.'])
+        num2str(sim.tuning_array(i,2)) '.'])
 elseif ~sim.expar
     disp('Simulation beginning')
 end
@@ -17,9 +17,9 @@ tSim = tic;
 
 %update sensitivity analysis
 if isequal(sim.tuned_parameter{1},'emx') && ...
-        isequal(sim.tuned_parameter{2},'wcd') && sim.multiple
-    amp.E_max = sim.S1(i);
-    wec.B = sim.S2(i);
+        isequal(sim.tuned_parameter{2},'wcd')
+    S1 = sim.tuning_array(:,1);
+    S2 = sim.tuning_array(:,2);
 end
 
 %modify forecast matrix based on user settings for buffer and limit val
@@ -42,9 +42,7 @@ else %discretize to ensure there's a state lower than Ps(2)
     amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
     mdp.n = length(amp.E);
 end
-if ~sim.expar
-    disp(['n = ' num2str(mdp.n)])
-end
+disp(['n = ' num2str(mdp.n)])
 amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 
 %preallocate outputs
@@ -80,7 +78,7 @@ end
 %RUN SIMULATION
 for f=1:sim.F %over each forecast
     %print status to command window
-    if mod(f-1,sim.notif) == 0 && f-1 > 0
+    if mod(f-1,sim.notif) == 0 && f-1 > 0 && ~sim.multiple
         disp([num2str(f-1) ' out of ' num2str(sim.F) ...
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])
@@ -178,8 +176,8 @@ end
 
 %print status to command window
 if sim.multiple && ~sim.expar
-    disp(['Simulation ' num2str(i) ' complete after ' ...
-        num2str(round(toc(tSim)/60,2)) ' minutes.'])
+    disp(['Simulation ' num2str(sim.s) ' out of ' num2str(sim.S) ...
+        ' complete after ' num2str(round(toc(tSim)/60,2)) ' minutes.'])
 elseif ~sim.expar
     disp(['Simulation complete after ' num2str(round(toc(tTot)/60,2))  ...
         ' minutes.'])
@@ -194,8 +192,8 @@ output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
 
 %print results
-output.results.(sim.tuned_parameter{1}) = sim.S1(i);
-output.results.(sim.tuned_parameter{2}) = sim.S2(i);
+output.results.sim.tuning_array(i,1);
+output.results.sim.tuning_array(i,2);
 output.results.power_avg = output.power_avg;
 output.results.beta_avg = output.beta_avg;
 
