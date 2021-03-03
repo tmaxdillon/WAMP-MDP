@@ -2,7 +2,7 @@
 %code simulates Markov Decision Process algorithm of WAMP system
 %multiple or one-off simulations are enabled
 
-clearvars
+%clearvars
 
 %% to do
 
@@ -33,9 +33,9 @@ mdpInputs
 tTot = tic;
 if sim.multiple %sensitivity analysis
     %assemble array
-    m = length(sim.tuning_array(:,1));
-    n = length(sim.tuning_array(:,2));
-    [S1,S2] = meshgrid(sim.tuning_array(:,1),sim.tuning_array(:,2));
+    m = length(sim.tuning_array1);
+    n = length(sim.tuning_array2);
+    [S1,S2] = meshgrid(sim.tuning_array1,sim.tuning_array2);
     sim.S1 = reshape(S1,[m*n 1]);
     sim.S2 = reshape(S2,[m*n 1]);
     %set number of cores
@@ -66,12 +66,12 @@ if sim.multiple %sensitivity analysis
         multStruct(i).sim = sim;
         multStruct(i).wec = wec;
     end
-    disp([num2str(m*n) ' simulations complete after ' ...
-        num2str(round(toc(tTot)/60,2)) ' minutes. '])
     for i = 1:length(multStruct)
         multStruct(i).output.results
-    end    
+    end
     multStruct = reshape(multStruct,[m n])';
+    disp([num2str(m*n) ' simulations complete after ' ...
+        num2str(round(toc(tTot)/60,2)) ' minutes. '])
 else %single simulation
     sim.expar = false;
     output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot); %run simulation

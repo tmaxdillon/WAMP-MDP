@@ -1,14 +1,41 @@
-%forecast parameters
+%interactive job
 frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 10;         %[h] limit on stages
-frc.sub = 3;                    %[hr] model spin up buffer
-frc.Flimit = true;              %to shorten runtime
-frc.Flimitval = 500;              %number of forecasts to simulate
-
-%SIM parameters:
-sim.multiple = true;       %multiple simulations?
+frc.Flimit = false;              %to shorten runtime
+frc.Flimitval = 10;              %number of forecasts to simulate
+sim.multiple = false;       %multiple simulations?
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
+
+if ~exist('batchtype','var')
+    batchtype = [];
+    batchsim =[];
+    batchpar1 = [];
+    batcharr1 = [];
+    patchpar2 = [];    
+    batcharr2 = [];
+end
+if isequal(batchtype,'mult')
+    sim.multiple = true;
+    if isequal(batchsim,'mdp')
+        sim.pb = false;
+        sim.sl = false;
+    elseif isequal(batchsim,'pbo')
+        sim.pb = true;
+        sim.sl = false;
+    elseif isequal(batchsim,'slo')
+        sim.pb = false;
+        sim.sl = true;
+    end
+    if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
+        sim.tuning_array1 = 1000:2000:17000;
+        sim.tuning_array2 = [1 2 3 4 5 6];
+        sim.tuned_parameter{1} = 'emx'; %rated Hs
+        sim.tuned_parameter{2} = 'wcd'; %rated Tp
+    end
+end
+     
+%SIM parameters:
 sim.hr_on = false;          %toggle enabling high res state space
 sim.brpar = false;         %parallelized backward recursion
 sim.expar = true;           %parallelized multiple simulations
@@ -23,6 +50,9 @@ else
     sim.hpc = false;
     sim.mw = 0; %max workers
 end
+
+%FORECAST parameters:
+frc.sub = 3;                    %[hr] model spin up buffer
 
 %MDP parameters:
 mdp.n = 20;                       %number of states
@@ -54,25 +84,27 @@ wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
 
-%sensitivity parameters
-if isfield(sim,'tuned_parameter')
-    sim = rmfield(sim,'tuned_parameter');
+%sensitivity parameters, CLEAR IF NOT RUNNING
+% if isfield(sim,'tuned_parameter')
+%     sim = rmfield(sim,'tuned_parameter');
+% end
+% if isfield(sim,'tuning_array')
+%     sim = rmfield(sim,'tuning_array');
+% end
+if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter')
+    sim.tuning_array1 = [450 500 550];
+    sim.tuning_array2 = [5.5 6 6.6];
+    sim.tuned_parameter{1} = 'emx'; %rated Hs
+    sim.tuned_parameter{2} = 'wcd'; %rated Tp
+    % sim.tuned_parameter = 'eps'; %epsilon
+    % sim.tuning_array = [];
+    % sim.tuned_parameter = 'sub'; %spin up buffer
+    % sim.tuning_array = [];
+    % sim.tuned_parameter = 'slv'; %stage limit value
+    % sim.tuning_array = [180 130 80 60 40 20];
+    % sim.tuned_parameter = 'emx'; %maximum storage capacity
+    % sim.tuning_array = [500 2500 5000 7500];
+    % sim.tuned_parameter = 'ess'; %energy system size
+    % sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
 end
-if isfield(sim,'tuning_array')
-    sim = rmfield(sim,'tuning_array');
-end
-sim.tuning_array(:,1) = [450 500 550];
-sim.tuning_array(:,2) = [5.5 6 6.6];
-sim.tuned_parameter{1} = 'emx'; %rated Hs
-sim.tuned_parameter{2} = 'wcd'; %rated Tp
-% sim.tuned_parameter = 'eps'; %epsilon
-% sim.tuning_array = []; 
-% sim.tuned_parameter = 'sub'; %spin up buffer
-% sim.tuning_array = []; 
-% sim.tuned_parameter = 'slv'; %stage limit value
-% sim.tuning_array = [180 130 80 60 40 20]; 
-% sim.tuned_parameter = 'emx'; %maximum storage capacity
-% sim.tuning_array = [500 2500 5000 7500];
-% sim.tuned_parameter = 'ess'; %energy system size
-% sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
 
