@@ -1,8 +1,8 @@
 %interactive job
-frc.stagelimit = true;          %toggle limit on stages
+frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 10;         %[h] limit on stages
 frc.Flimit = true;              %to shorten runtime
-frc.Flimitval = 10;              %number of forecasts to simulate
+frc.Flimitval = 500;              %number of forecasts to simulate
 sim.multiple = true;       %multiple simulations?
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
@@ -57,7 +57,7 @@ frc.sub = 3;                    %[hr] model spin up buffer
 %MDP parameters:
 mdp.n = 20;                       %number of states
 mdp.m = 4;                          %number of actions
-mdp.eps = 100;                      %aggressiveness factor
+mdp.eps = 1000;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 mdp.beta_lb = 1;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
