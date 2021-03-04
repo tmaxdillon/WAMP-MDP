@@ -30,7 +30,7 @@ if isequal(batchtype,'mult')
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [1000 2500 5000:5000:25000]; %[Wh]
-        sim.tuning_array2 = [3 4 5 6];
+        sim.tuning_array2 = [2 3 4 5];
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     end
@@ -58,7 +58,7 @@ frc.sub = 3;                    %[hr] model spin up buffer
 %MDP parameters:
 mdp.n = 20;                       %number of states
 mdp.m = 4;                          %number of actions
-mdp.eps = 1000;                      %aggressiveness factor
+mdp.eps = 100000;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 mdp.beta_lb = 1;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
