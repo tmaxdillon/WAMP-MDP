@@ -51,7 +51,7 @@ plot(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'), ...
 % hold on
 % plot(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'),output.Pb_sim(f_pts)/1000, ...
 %     'g','LineWidth',2)
-ylim([-inf output.wec.rp+0.5])
+%ylim([-inf output.wec.rp+0.5])
 %yticks(0:0.5:5)
 %ylabel({'Power','Produced','[kW]'},'FontSize',20)
 ylh = get(gca,'ylabel');
@@ -91,7 +91,7 @@ scatter(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'), ...
     output.E_sim(f_pts)/1000,20,output.beta(f_pts),'Filled')
 colormap(gca,flipud(brewermap(50,'PiYG')))
 caxis([0 1])
-ylim([0 amp.E_max/1000+.25])
+%ylim([0 amp.E_max/1000+.25])
 %yticks(1:11)
 %ylabel({'Battery','State [kWh]'},'FontSize',20)
 ylh = get(gca,'ylabel');

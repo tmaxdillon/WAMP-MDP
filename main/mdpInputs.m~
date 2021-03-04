@@ -1,18 +1,19 @@
 %interactive job
 frc.stagelimit = true;          %toggle limit on stages
-frc.stagelimitval = 10;         %[h] limit on stages
+frc.stagelimitval = 1;         %[h] limit on stages
 frc.Flimit = true;              %to shorten runtime
-frc.Flimitval = 10;              %number of forecasts to simulate
+frc.Flimitval = 1;              %number of forecasts to simulate
 sim.multiple = true;       %multiple simulations?
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
+sim.exdist = true;                  %battery discretization set externally
 
 if ~exist('batchtype','var')
     batchtype = [];
     batchsim =[];
     batchpar1 = [];
     batcharr1 = [];
-    patchpar2 = [];    
+    patchpar2 = [];
     batcharr2 = [];
 end
 if isequal(batchtype,'mult')
@@ -28,10 +29,10 @@ if isequal(batchtype,'mult')
         sim.sl = true;
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
-        sim.tuning_array1 = 1000:2000:17000;
-        sim.tuning_array2 = [1 2 3 4 5 6];
-        sim.tuned_parameter{1} = 'emx'; %rated Hs
-        sim.tuned_parameter{2} = 'wcd'; %rated Tp
+        sim.tuning_array1 = [1000 2500 5000:5000:25000]; %[Wh]
+        sim.tuning_array2 = [3 4 5 6];
+        sim.tuned_parameter{1} = 'emx'; %E max
+        sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     end
 end
      
@@ -57,7 +58,7 @@ frc.sub = 3;                    %[hr] model spin up buffer
 %MDP parameters:
 mdp.n = 20;                       %number of states
 mdp.m = 4;                          %number of actions
-mdp.eps = 100;                      %aggressiveness factor
+mdp.eps = 1000;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 mdp.beta_lb = 1;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
@@ -93,7 +94,7 @@ wec.FO = false;             %toggle fred. olsen
 % end
 if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter')
     sim.tuning_array1 = 1000:2000:17000;
-    sim.tuning_array2 = [5.5 6 6.6];
+    sim.tuning_array2 = [1 2 3 4 5 6];
     sim.tuned_parameter{1} = 'emx'; %rated Hs
     sim.tuned_parameter{2} = 'wcd'; %rated Tp
     % sim.tuned_parameter = 'eps'; %epsilon

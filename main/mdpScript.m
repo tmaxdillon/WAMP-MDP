@@ -45,7 +45,7 @@ if sim.multiple %sensitivity analysis
             parpool(cores);
         end
     end
-    %preallocate
+    %preallocate and print simulation combinations
     clear multStruct
     multStruct(m*n) = struct();
     disp(['Beginning sensitivity analysis between ' ...
@@ -54,8 +54,19 @@ if sim.multiple %sensitivity analysis
     DT = table(sim.S1,sim.S2,'VariableNames', ...
         {sim.tuned_parameter{1},sim.tuned_parameter{2}});
     disp(DT)
+    %set non expar settings
     if ~sim.expar
         sim.mw = 0;
+    end
+    %set battery discretization
+    if isequal(sim.tuned_parameter{1},'emx') && sim.exdist
+        E_temp = 0:amp.Ps(2)-5:max(sim.S1); %[Wh] discretized battery state
+        mdp.n = length(E_temp);
+        disp(['n = ' num2str(mdp.n) ' max E = ' num2str(max(sim.S1))])
+    elseif isequal(sim.tuned_parameter{2},'emx') && sim.exdist
+        E_temp = 0:amp.Ps(2)-5:max(sim.S2); %[Wh] discretized battery state
+        mdp.n = length(E_temp);
+        disp(['n = ' num2str(mdp.n) ' max E = ' num2str(max(sim.S2))])
     end
     parfor (i = 1:m*n,sim.mw)
         output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i);

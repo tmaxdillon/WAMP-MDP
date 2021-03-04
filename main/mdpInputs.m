@@ -1,18 +1,19 @@
 %interactive job
 frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 10;         %[h] limit on stages
-frc.Flimit = true;              %to shorten runtime
-frc.Flimitval = 500;              %number of forecasts to simulate
+frc.Flimit = false;              %to shorten runtime
+frc.Flimitval = 10;              %number of forecasts to simulate
 sim.multiple = true;       %multiple simulations?
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
+sim.exdist = true;                  %battery discretization set externally
 
 if ~exist('batchtype','var')
     batchtype = [];
     batchsim =[];
     batchpar1 = [];
     batcharr1 = [];
-    patchpar2 = [];    
+    patchpar2 = [];
     batcharr2 = [];
 end
 if isequal(batchtype,'mult')
@@ -28,10 +29,10 @@ if isequal(batchtype,'mult')
         sim.sl = true;
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
-        sim.tuning_array1 = 1000:2000:17000;
-        sim.tuning_array2 = [1 2 3 4 5 6];
-        sim.tuned_parameter{1} = 'emx'; %rated Hs
-        sim.tuned_parameter{2} = 'wcd'; %rated Tp
+        sim.tuning_array1 = [1000 2500 5000:5000:25000]; %[Wh]
+        sim.tuning_array2 = [3 4 5 6];
+        sim.tuned_parameter{1} = 'emx'; %E max
+        sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     end
 end
      

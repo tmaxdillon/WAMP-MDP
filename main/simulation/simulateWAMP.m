@@ -36,9 +36,9 @@ else
 end
 
 %discretize battery
-if sim.hpc && sim.hr_on %high discretization
+if sim.hpc && sim.hr_on || sim.exdist %high discretization
     amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], discretized battery state
-else %discretize to ensure there's a state lower than Ps(2)
+elseif ~sim.exdist %discretize to ensure there's a state lower than Ps(2)
     amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
     mdp.n = length(amp.E);
 end
