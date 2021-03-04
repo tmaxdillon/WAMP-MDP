@@ -39,14 +39,14 @@ if isequal(mdp(1).sim.tuned_parameter,'mu0') || ...
     for i = 1:length(mdp)
         for j = 1:size(mdp,1)
             beta_avg(i,j,1) = mdp(j,i).output.beta_avg;
-            power_avg(i,j,1) = mdp(j,i).output.power_avg;
+            power_avg(i,j,1) = mdp(j,j).output.power_avg;
             if exist('pbo','var')
-                beta_avg(i,j,2) = pbo(j,i).output.beta_avg;
-                power_avg(i,j,2) = pbo(j,i).output.power_avg;
+                beta_avg(i,j,2) = pbo(i,j).output.beta_avg;
+                power_avg(i,j,2) = pbo(i,j).output.power_avg;
             end
             if exist('slo','var')
-                beta_avg(i,j,3) = slo(j,i).output.beta_avg;
-                power_avg(i,j,3) = slo(j,i).output.power_avg;
+                beta_avg(i,j,3) = slo(i,j).output.beta_avg;
+                power_avg(i,j,3) = slo(i,j).output.power_avg;
             end
             %         for j = 1:length(multStruct(1).output.apct)
             %             % simulation x opmode x stoc/pb

@@ -80,7 +80,7 @@ end
 %RUN SIMULATION
 for f=1:sim.F %over each forecast
     %print status to command window
-    if mod(f-1,sim.notif) == 0 && f-1 > 0
+    if mod(f-1,sim.notif) == 0 && f-1 > 0 && ~sim.expar
         disp([num2str(f-1) ' out of ' num2str(sim.F) ...
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])

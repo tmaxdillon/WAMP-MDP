@@ -69,7 +69,7 @@ if sim.multiple %sensitivity analysis
     for i = 1:length(multStruct)
         multStruct(i).output.results
     end
-    multStruct = reshape(multStruct,[m n])';
+    multStruct = reshape(multStruct,[n m]);
     disp([num2str(m*n) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
 else %single simulation

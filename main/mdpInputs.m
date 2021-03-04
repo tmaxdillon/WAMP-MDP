@@ -1,9 +1,9 @@
 %interactive job
-frc.stagelimit = false;          %toggle limit on stages
+frc.stagelimit = true;          %toggle limit on stages
 frc.stagelimitval = 10;         %[h] limit on stages
-frc.Flimit = false;              %to shorten runtime
+frc.Flimit = true;              %to shorten runtime
 frc.Flimitval = 10;              %number of forecasts to simulate
-sim.multiple = false;       %multiple simulations?
+sim.multiple = true;       %multiple simulations?
 sim.pb = false;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
 
@@ -92,8 +92,8 @@ wec.FO = false;             %toggle fred. olsen
 %     sim = rmfield(sim,'tuning_array');
 % end
 if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter')
-    sim.tuning_array1 = [450 500 550];
-    sim.tuning_array2 = [5.5 6 6.6];
+    sim.tuning_array1 = 1000:2000:17000;
+    sim.tuning_array2 = [1 2 3 4 5 6];
     sim.tuned_parameter{1} = 'emx'; %rated Hs
     sim.tuned_parameter{2} = 'wcd'; %rated Tp
     % sim.tuned_parameter = 'eps'; %epsilon
