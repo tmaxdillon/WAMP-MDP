@@ -85,6 +85,20 @@ for f=1:sim.F %over each forecast
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])
     end
+    %if multiple simulation, abridge at posterior bound limit
+    if f > size(FM_P,2) - (mdp.T-1) && sim.multiple
+        output.abridged = true; %simulation has been abridged
+        %print status to command window
+        if sim.multiple && ~sim.expar
+            disp(['Simulation ' num2str(sim.s) ' out of ' ...
+                num2str(sim.S) ' complete after ' ...
+                num2str(round(toc(tSim)/60,2)) ' minutes.'])
+        elseif ~sim.expar
+            disp(['Simulation complete after ' ...
+                num2str(round(toc(tTot)/60,2)) ' minutes.'])
+        end
+        break
+    end
     output.Pw_sim(f) = FM_P(1,f,2); %power produced by WEC
     if sim.sl %SIMPLE LOGIC
         if output.E_sim(f) > amp.fpr*amp.E_max
