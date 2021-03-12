@@ -138,7 +138,7 @@ for f=1:sim.F %over each forecast
             end
             %DOCUMENT BELLMANS (AND DEBUG) VALUES
             output.val_all(:,:,:,f) = compare(:,:,:); %all values
-            output.val_Jstar(f,:) = Jstar(ind_E_sim,1); %optimal value
+            output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
             output.val_togo(:,:,f) = Jstar; %value to go
             output.policy_all(:,:,f) = policy; %policy all
             output.state_evol_all(:,:,:,f) = state_evol; %state evolution
@@ -162,10 +162,13 @@ for f=1:sim.F %over each forecast
                 end
             else
                 if sim.brpar
-                    policy = backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+                    [policy,Jstar] = ...
+                        backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
                 else
-                    policy = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+                    [policy,Jstar] = ...
+                        backwardRecursion(FM_P,mdp,amp,sim,wec,f);
                 end
+                output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value               
             end
         end
         %EVOLVE SIMULATION:
@@ -208,10 +211,16 @@ output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
 
 %print results
-output.results.(sim.tuned_parameter{1}) = sim.S1(i);
-output.results.(sim.tuned_parameter{2}) = sim.S2(i);
-output.results.power_avg = output.power_avg;
-output.results.beta_avg = output.beta_avg;
+if sim.multiple
+    output.results.(sim.tuned_parameter{1}) = sim.S1(i);
+    output.results.(sim.tuned_parameter{2}) = sim.S2(i);
+    output.results.power_avg = output.power_avg;
+    output.results.beta_avg = output.beta_avg;
+else
+    results.power_avg = output.power_avg;
+    results.beta_avg = output.beta_avg;
+    results
+end
 
 
 

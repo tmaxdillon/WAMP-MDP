@@ -15,13 +15,13 @@ end
 B = mdpsim(1).sim.tuning_array2;
 nw = length(B);
 
-fixer = [1 2 3 4];
-for e = 1:size(mdpsim,2) %across all emx
-    for w = 1:size(mdpsim,1) %across all wcd
-        power_avg(e,fixer(w),1) = mdpsim(w,e).output.power_avg;
-        power_avg(e,fixer(w),2) = pbosim(w,e).output.power_avg;
-        power_avg(e,fixer(w),3) = slosim(w,e).output.power_avg;
+for w = 1:size(mdpsim,1) %across all wcd
+    for e = 1:size(mdpsim,2) %across all emx       
+        power_avg(e,w,1) = mdpsim(w,e).output.power_avg;
+        power_avg(e,w,2) = pbosim(w,e).output.power_avg;
+        power_avg(e,w,3) = slosim(w,e).output.power_avg;
     end
+    kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
 
 %x axis info
@@ -30,10 +30,10 @@ x = mdpsim(1).sim.tuning_array1./1000;
 
 
 %colors
-mc = brewermap(nw*2,'reds'); mc = mc(nw:end-1,:);
-pc = brewermap(nw*2,'greens'); pc = pc(nw:end-1,:);
-sc = brewermap(nw*2,'purples'); sc = sc(nw:end-1,:);
-c = 7;
+c = 10;
+mc = brewermap(c,'reds'); mc = mc(c-nw:end,:);
+pc = brewermap(c,'greens'); pc = pc(c-nw:end,:);
+sc = brewermap(c,'purples'); sc = sc(c-nw:end-1,:);
 col1 = flipud(brewermap(8,'reds')); %col(1,:) = col1(c,:);
 % col2 = brewermap(10,'oranges'); col(2,:) = col2(c,:);
 % col3 = brewermap(10,'YlOrBr'); col(3,:) = col3(4,:);
@@ -55,9 +55,9 @@ lw2 = 1;
 xoff = 1.25; %[in]
 yoff = .625; %[in]
 xdist = .95; %[in]
-ydist = 2.5; %[in]
+ydist = 2.4; %[in]
 xmarg = 0.4; %[in]
-ylims = flipud([560 620; 530 590; 420 480 ; 80 140]);
+ylims = flipud([570 620; 540 590; 430 480 ; 90 140]);
 
 %find max range
 for w = 1:size(mdpsim,1)
@@ -72,17 +72,18 @@ set(gcf, 'Position', [1, 1, 6.5, 3.75])
 for w = 1:size(mdpsim,1) %across all wcd
     ax(w) = subplot(1,4,w);
     hold on
-    mp(w) = plot(x,power_avg(:,w,1),'-o','MarkerEdgeColor',mc(w,:), ...
-        'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','MDP');
     pp(w) = plot(x,power_avg(:,w,2),'-*','MarkerEdgeColor',pc(w,:), ...
         'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Posterior Bound');
+    mp(w) = plot(x,power_avg(:,w,1),'-o','MarkerEdgeColor',mc(w,:), ...
+        'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','MDP');
     sp(w) = plot(x,power_avg(:,w,3),'-s','MarkerEdgeColor',sc(w,:), ...
         'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic');   
-    tt(w) = title([num2str(B(w)) ' m WEC'],'FontWeight','normal', ...
-        'Units','Normalized');
+    tt(w) = title({[num2str(B(w)) ' m WEC'], ...
+        ['(~' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
+        'FontWeight','normal','Units','Normalized');
     tt(w).Position(2) = tt(w).Position(2)*1.025;
     ylim(ylims(w,:))
     yline(600,'--k','Max Draw', ...

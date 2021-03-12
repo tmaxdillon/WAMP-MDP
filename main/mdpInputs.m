@@ -1,10 +1,10 @@
 %interactive job
-frc.stagelimit = false;          %toggle limit on stages
-frc.stagelimitval = 2;         %[h] limit on stages
-frc.Flimit = false;              %to shorten runtime
-frc.Flimitval = 2;              %number of forecasts to simulate
-sim.multiple = true;       %multiple simulations?
-sim.pb = false;             %toggle for posterior bound in one sim
+frc.stagelimit = true;          %toggle limit on stages
+frc.stagelimitval = 100;         %[h] limit on stages
+frc.Flimit = true;              %to shorten runtime
+frc.Flimitval = 300;              %number of forecasts to simulate
+sim.multiple = false;       %multiple simulations?
+sim.pb = true;             %toggle for posterior bound in one sim
 sim.sl = false;              %toggle for simple logic in one sim
 sim.exdist = true;                  %battery discretization set externally
 
@@ -41,7 +41,7 @@ sim.hr_on = false;          %toggle enabling high res state space
 sim.brpar = false;         %parallelized backward recursion
 sim.expar = true;           %parallelized multiple simulations
 sim.notif = 500;             %notifications every __ forecasts
-sim.debug = false;          %include debugging variables in output
+sim.debug = true;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
 sim.corelim = 1;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
@@ -77,10 +77,10 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 6;                  %[m]
+wec.B = 2;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
-wec.Hs_ra = 2;              %[m]
+wec.Hs_ra = 4;              %[m]
 wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
