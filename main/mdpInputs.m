@@ -1,7 +1,7 @@
 %interactive job
-frc.stagelimit = true;          %toggle limit on stages
+frc.stagelimit = false;          %toggle limit on stages
 frc.stagelimitval = 100;         %[h] limit on stages
-frc.Flimit = true;              %to shorten runtime
+frc.Flimit = false;              %to shorten runtime
 frc.Flimitval = 300;              %number of forecasts to simulate
 sim.multiple = false;       %multiple simulations?
 sim.pb = true;             %toggle for posterior bound in one sim
