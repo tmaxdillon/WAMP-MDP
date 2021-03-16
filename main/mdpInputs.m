@@ -41,9 +41,9 @@ sim.hr_on = false;          %toggle enabling high res state space
 sim.brpar = false;         %parallelized backward recursion
 sim.expar = true;           %parallelized multiple simulations
 sim.notif = 500;             %notifications every __ forecasts
-sim.debug = true;          %include debugging variables in output
+sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
-sim.corelim = 1;            % numcores > corelim == using HPC
+sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
     sim.mw = 36; %max workers
