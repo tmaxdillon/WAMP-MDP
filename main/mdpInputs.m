@@ -30,7 +30,7 @@ if isequal(batchtype,'mult')
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [1000 2500 5000:5000:25000]; %[Wh]
-        sim.tuning_array2 = [2 3 4 5];
+        sim.tuning_array2 = [3 4 5 6];
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     end
