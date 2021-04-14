@@ -53,7 +53,7 @@ lw2 = 1;
 
 %spacing
 xoff = 1.25; %[in]
-yoff = .625; %[in]
+yoff = .55; %[in]
 xdist = .95; %[in]
 ydist = 2.4; %[in]
 xmarg = 0.4; %[in]
@@ -82,8 +82,9 @@ for w = 1:size(mdpsim,1) %across all wcd
         'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic');   
     tt(w) = title({[num2str(B(w)) ' m WEC'], ...
-        ['(~' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
-        'FontWeight','normal','Units','Normalized');
+        ['(\sim' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
+        'FontWeight','normal','Units','Normalized', ...
+        'interpreter','tex');
     tt(w).Position(2) = tt(w).Position(2)*1.025;
     %ylim(ylims(w,:))
     yline(600,'--k','Max Draw', ...

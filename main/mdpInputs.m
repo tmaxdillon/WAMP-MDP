@@ -77,7 +77,7 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 2;                  %[m]
+wec.B = 5;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 4;              %[m]

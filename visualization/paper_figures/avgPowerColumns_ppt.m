@@ -2,8 +2,8 @@ clearvars -except mdpsim pbosim slosim
 close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
-set(0,'DefaultTextFontname', 'cmr10')
-set(0,'DefaultAxesFontName', 'cmr10')
+set(0,'DefaultTextFontname', 'calibri')
+set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('slosim','var')
@@ -47,16 +47,17 @@ c3 = [123,104,238]/256;
 
 %sizes
 ms = 6;
-fs = 10;
+fs1 = 13;
+fs2 = 11;
 lw = 1.2;
 lw2 = 1;
 
 %spacing
-xoff = 1.25; %[in]
-yoff = .625; %[in]
-xdist = .95; %[in]
-ydist = 2.5; %[in]
-xmarg = 0.4; %[in]
+xoff = 1.5; %[in]
+yoff = .85; %[in]
+xdist = 1.5; %[in]
+ydist = 3; %[in]
+xmarg = 0.5; %[in]
 ylims = flipud([570 620; 540 590; 430 480 ; 90 140]);
 
 %find max range
@@ -68,26 +69,30 @@ maxdist = max(round(ceil(maxdist.*1.2),-1));
 %average power
 results_pa = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 6.5, 3.75])
+set(gcf, 'Position', [1, 1, 10, 5])
 for w = 1:size(mdpsim,1) %across all wcd
     ax(w) = subplot(1,4,w);
     hold on
-    pp(w) = plot(x,power_avg(:,w,2),'-*','MarkerEdgeColor',pc(w,:), ...
-        'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Posterior Bound');
-    mp(w) = plot(x,power_avg(:,w,1),'-o','MarkerEdgeColor',mc(w,:), ...
-        'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','MDP');
     sp(w) = plot(x,power_avg(:,w,3),'-s','MarkerEdgeColor',sc(w,:), ...
         'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic');   
-    tt(w) = title([{num2str(B(w)) ' m WEC','~' num2str(,'FontWeight','normal', ...
-        'Units','Normalized');
+    mp(w) = plot(x,power_avg(:,w,1),'-o','MarkerEdgeColor',mc(w,:), ...
+        'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','MDP');
+    pp(w) = plot(x,power_avg(:,w,2),'-*','MarkerEdgeColor',pc(w,:), ...
+        'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','Posterior Bound');
+    tt(w) = title({[num2str(B(w)) ' m WEC'], ...
+        ['(\sim' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
+        'FontWeight','normal','Units','Normalized', ...
+        'interpreter','tex');
+    set(gca,'FontSize',fs2)
     tt(w).Position(2) = tt(w).Position(2)*1.025;
     ylim(ylims(w,:))
+    xlim([0 30])
     yline(600,'--k','Max Draw', ...
-        'LabelHorizontalAlignment','left','FontSize',fs, ...
-        'LineWidth',lw2,'FontName','cmr10'); 
+        'LabelHorizontalAlignment','left','FontSize',fs2, ...
+        'LineWidth',lw2,'FontName','calibri'); 
     %     ylim([ceil(max(max(power_avg(:,w,:))))-maxdist-1 ...
 %         ceil(max(max(power_avg(:,w,:)+1)))])
 %     if w == 1
@@ -103,30 +108,29 @@ for w = 1:size(mdpsim,1) %across all wcd
 %         xlabel(xlab)
 %     end
 %     grid on
-    set(gca,'FontSize',10)
     grid on
     %set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 end
 
 hL = legend([mp(2) pp(2) sp(2)],'location','northoutside','Box','on', ...
-    'Orientation','horizontal');
-newPosition = [0.325 .95 0.5 0];
+    'Orientation','horizontal','FontSize',fs1,'Color',[255 255 245]/256);
+newPosition = [0.375 .94 0.3 0];
 set(hL,'Position', newPosition,'Units', 'normalized');
 
 %add labels
 axes(ax(2))
-xlabdim = [1.1 -0.29*xoff];
+xlabdim = [1.7 -0.33*xoff];
 xlab = 'Battery Storage Capacity [kWh]';
 xl = text(0,0,xlab);
 set(xl,'Units','inches','Position',xlabdim, ...
-    'HorizontalAlignment','center','FontSize',fs, ... 
+    'HorizontalAlignment','center','FontSize',fs1, ... 
     'Rotation',0);
 axes(ax(1))
 ylabdim = [-0.6*xoff ydist/2];
-ylab = {'Average','Power','Consumed','[W]'};
+ylab = {'Average','Power','Consumed','for','Sensing','[W]'};
 yl = text(0,0,ylab);
 set(yl,'Units','inches','Position',ylabdim, ...
-    'HorizontalAlignment','center','FontSize',fs, ... 
+    'HorizontalAlignment','center','FontSize',fs1, ... 
     'VerticalAlignment','middle','Rotation',00);
 
 for w = 1:size(mdpsim,1)
@@ -135,6 +139,8 @@ for w = 1:size(mdpsim,1)
         [xoff+(xmarg+xdist)*(w-1) yoff xdist ydist])
 end
 
-print(results_pa,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
-    'paper_figures/results_pa'],'-dpng','-r600')
+set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
+set(ax,'Color',[255 255 245]/256)
+print(results_pa,'~/Dropbox (MREL)/Research/General Exam/pf/mdpresults_1',  ...
+    '-dpng','-r600')
 
