@@ -99,9 +99,7 @@ for f=1:sim.F %over each forecast
         end
         break
     end
-    %FIND POWER AND STATE for MDP and Simple Logic
     output.Pw_sim(f) = FM_P(1,f,2); %power produced by WEC
-    [~,ind_E_sim] = min(abs(amp.E-output.E_sim(f))); %index of state
     if sim.sl %SIMPLE LOGIC
         if output.E_sim(f) > amp.fpr*amp.E_max
             output.a_sim(f) = 4;
@@ -128,7 +126,9 @@ for f=1:sim.F %over each forecast
                     num2str(round(toc(tTot)/60,2)) ' minutes.'])
             end
             break
-        end       
+        end
+        %FIND CURRENT STATE
+        [~,ind_E_sim] = min(abs(amp.E-output.E_sim(f))); %index of state
         %BACKWARD RECURSION
         if sim.debug %if debugging mdp
 %             if sim.brpar

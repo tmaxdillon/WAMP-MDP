@@ -1,12 +1,12 @@
 %interactive job
-frc.stagelimit = false;          %toggle limit on stages
-frc.stagelimitval = 100;         %[h] limit on stages
-frc.Flimit = false;              %to shorten runtime
-frc.Flimitval = 300;              %number of forecasts to simulate
-sim.multiple = false;       %multiple simulations?
-sim.pb = true;             %toggle for posterior bound in one sim
-sim.sl = false;              %toggle for simple logic in one sim
-sim.exdist = true;                  %battery discretization set externally
+frc.stagelimit = false; %toggle limit on stages
+frc.stagelimitval = 100; %[h] limit on stages
+frc.Flimit = true; %to shorten runtime
+frc.Flimitval = 300; %number of forecasts to simulate
+sim.multiple = false; %multiple simulations?
+sim.pb = false; %toggle for posterior bound in one sim
+sim.sl = true; %toggle for simple logic in one sim
+sim.exdist = false; %battery discretization set externally (multiple only)
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -66,7 +66,7 @@ mdp.b = 1;                          %battery steepness
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:
-amp.E_max = 500;                       %[Wh], maximum battery capacity
+amp.E_max = 5000;                       %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate

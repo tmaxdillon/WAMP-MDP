@@ -54,11 +54,11 @@ if sim.multiple %sensitivity analysis
     DT = table(sim.S1,sim.S2,'VariableNames', ...
         {sim.tuned_parameter{1},sim.tuned_parameter{2}});
     disp(DT)
-    %set non expar settings
+    %set non expar (backward recursion par) settings
     if ~sim.expar
-        sim.mw = 0;
+        sim.mw = 0; %max number of workers
     end
-    %set battery discretization
+    %set battery discretization externallyfor multiple simulations
     if isequal(sim.tuned_parameter{1},'emx') && sim.exdist
         E_temp = 0:amp.Ps(2)-5:max(sim.S1); %[Wh] discretized battery state
         mdp.n = length(E_temp);

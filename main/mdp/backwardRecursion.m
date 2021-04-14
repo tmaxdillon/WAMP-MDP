@@ -4,7 +4,7 @@ function [policy,Jstar,compare,state_evol,wec_power] = ...
 %preallocate backward recursion matrices
 policy = zeros(mdp.n,mdp.T); %optimal action for each state and stage
 compare = zeros(mdp.n,mdp.m,mdp.T+1); %compares the value of each action
-Jstar = zeros(mdp.n,mdp.T+1);   %values to go for each state and stage
+Jstar = zeros(mdp.n,mdp.T+1); %values to go for each state and stage
 state_evol = zeros(mdp.n,mdp.m,mdp.T+1); %state evolution matrix
 if sim.debug
     wec_power = zeros(1,mdp.T); %wec power for debugging
