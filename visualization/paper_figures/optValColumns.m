@@ -12,25 +12,27 @@ if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
     load('slosim');
 end
 
-fixer = [4 3 2 1];
-for e = 1:size(mdpsim,2) %across all emx
-    for w = 1:size(mdpsim,1) %across all wcd
-        power_avg(e,fixer(w),1) = mdpsim(w,e).output.power_avg;
-        power_avg(e,fixer(w),2) = pbosim(w,e).output.power_avg;
-        power_avg(e,fixer(w),3) = slosim(w,e).output.power_avg;
+B = mdpsim(1).sim.tuning_array2;
+nw = length(B);
+
+for w = 1:size(mdpsim,1) %across all wcd
+    for e = 1:size(mdpsim,2) %across all emx       
+        J_avg(e,w,1) = mean(mdpsim(w,e).output.val_Jstar);
+        J_avg(e,w,2) = mean(pbosim(w,e).output.val_Jstar);
+        J_avg(e,w,3) = mean(slosim(w,e).output.val_Jstar);
     end
+    kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
 
 %x axis info
 x = mdpsim(1).sim.tuning_array1./1000;
-xlab = 'Battery Size [kWh]';
+%xlab = 'Battery Size [kWh]';
 
 %colors
-mc = brewermap(size(mdpsim,1),'reds');
-pc = brewermap(size(pbosim,1),'purples');
-sc = brewermap(size(slosim,1),'blues');
-cc = brewermap(size(slosim,1),'spectral');
-c = 7;
+c = 10;
+mc = brewermap(c,'reds'); mc = mc(c-nw:end,:);
+pc = brewermap(c,'greens'); pc = pc(c-nw:end,:);
+sc = brewermap(c,'purples'); sc = sc(c-nw:end-1,:);
 col1 = flipud(brewermap(8,'reds')); %col(1,:) = col1(c,:);
 % col2 = brewermap(10,'oranges'); col(2,:) = col2(c,:);
 % col3 = brewermap(10,'YlOrBr'); col(3,:) = col3(4,:);
@@ -50,35 +52,40 @@ lw2 = 1;
 
 %spacing
 xoff = 1.25; %[in]
-yoff = .75; %[in]
+yoff = .55; %[in]
 xdist = .95; %[in]
-ydist = 2.5; %[in]
+ydist = 2.4; %[in]
 xmarg = 0.4; %[in]
-ylims = [560 620; 530 590; 420 480 ; 80 140];
+ylims = flipud([570 620; 540 590; 430 480 ; 90 140]);
 
 %find max range
 for w = 1:size(mdpsim,1)
-    maxdist(w) = max(max(power_avg(:,w,:))) - min(min(power_avg(:,w,:)));
+    maxdist(w) = max(max(J_avg(:,w,:))) - min(min(J_avg(:,w,:)));
 end
 maxdist = max(round(ceil(maxdist.*1.2),-1));
 
 %average power
 results_pa = figure;
 set(gcf,'Units','inches')
-set(gcf, 'Position', [1, 1, 6.5, 4])
+set(gcf, 'Position', [1, 1, 6.5, 3.75])
 for w = 1:size(mdpsim,1) %across all wcd
     ax(w) = subplot(1,4,w);
     hold on
-    mp = plot(x,power_avg(:,w,1),'-o','MarkerEdgeColor',col(w,:), ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','MDP');
-    pp = plot(x,power_avg(:,w,2),'-*','MarkerEdgeColor',col(w,:), ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+    pp(w) = plot(x,J_avg(:,w,2),'-*','MarkerEdgeColor',pc(w,:), ...
+        'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Posterior Bound');
-    sp = plot(x,power_avg(:,w,3),'-s','MarkerEdgeColor',col(w,:), ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Simple Logic');
-    ylim(ylims(w,:))
+    mp(w) = plot(x,J_avg(:,w,1),'-o','MarkerEdgeColor',mc(w,:), ...
+        'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','MDP');
+    sp(w) = plot(x,J_avg(:,w,3),'-s','MarkerEdgeColor',sc(w,:), ...
+        'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','Simple Logic');   
+    tt(w) = title({[num2str(B(w)) ' m WEC'], ...
+        ['(\sim' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
+        'FontWeight','normal','Units','Normalized', ...
+        'interpreter','tex');
+    tt(w).Position(2) = tt(w).Position(2)*1.025;
+    %ylim(ylims(w,:))
     yline(600,'--k','Max Draw', ...
         'LabelHorizontalAlignment','left','FontSize',fs, ...
         'LineWidth',lw2,'FontName','cmr10'); 
@@ -102,14 +109,14 @@ for w = 1:size(mdpsim,1) %across all wcd
     %set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 end
 
-hL = legend([mp pp sp],'location','northoutside','Box','on', ...
+hL = legend([mp(2) pp(2) sp(2)],'location','northoutside','Box','on', ...
     'Orientation','horizontal');
-newPosition = [0.3 0.05 0.5 0];
+newPosition = [0.325 .95 0.5 0];
 set(hL,'Position', newPosition,'Units', 'normalized');
 
 %add labels
 axes(ax(2))
-xlabdim = [0.3 -0.2*xoff];
+xlabdim = [1.1 -0.29*xoff];
 xlab = 'Battery Storage Capacity [kWh]';
 xl = text(0,0,xlab);
 set(xl,'Units','inches','Position',xlabdim, ...
@@ -117,7 +124,7 @@ set(xl,'Units','inches','Position',xlabdim, ...
     'Rotation',0);
 axes(ax(1))
 ylabdim = [-0.6*xoff ydist/2];
-ylab = {'Average','Power','Consumed','[W]'};
+ylab = {'Average','Optimization','Value','[~]'};
 yl = text(0,0,ylab);
 set(yl,'Units','inches','Position',ylabdim, ...
     'HorizontalAlignment','center','FontSize',fs, ... 
@@ -129,5 +136,6 @@ for w = 1:size(mdpsim,1)
         [xoff+(xmarg+xdist)*(w-1) yoff xdist ydist])
 end
 
-
+print(results_pa,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+    'paper_figures/results_pa'],'-dpng','-r600')
 

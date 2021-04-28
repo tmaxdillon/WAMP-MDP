@@ -16,17 +16,16 @@ B = mdpsim(1).sim.tuning_array2;
 nw = length(B);
 
 power_avg = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_25 = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_75 = zeros(size(mdpsim,2),size(mdpsim,1),3);
+i_hh = zeros(size(mdpsim,2),size(mdpsim,1),3);
+i_ll = zeros(size(mdpsim,2),size(mdpsim,1),3);
+hh = 25;
+ll = 75;
 
 for w = 1:size(mdpsim,1) %across all wcd
-    for e = 1:size(mdpsim,2) %across all emx   
-        [power_avg(e,w,1),i_25(e,w,1),i_75(e,w,1)] = getPower(mdpsim(w,e));
-        [power_avg(e,w,2),i_25(e,w,2),i_75(e,w,2)] = getPower(pbosim(w,e));
-        [power_avg(e,w,3),i_25(e,w,3),i_75(e,w,3)] = getPower(slosim(w,e));
-%         power_avg(e,w,1) = mdpsim(w,e).output.power_avg;
-%         power_avg(e,w,2) = pbosim(w,e).output.power_avg;
-%         power_avg(e,w,3) = slosim(w,e).output.power_avg;
+    for e = 1:size(mdpsim,2) %across all emx       
+        power_avg(e,w,1) = mdpsim(w,e).output.power_avg;
+        power_avg(e,w,2) = pbosim(w,e).output.power_avg;
+        power_avg(e,w,3) = slosim(w,e).output.power_avg;
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -87,16 +86,7 @@ for w = 1:size(mdpsim,1) %across all wcd
         'DisplayName','MDP');
     sp(w) = plot(x,power_avg(:,w,3),'-s','MarkerEdgeColor',sc(w,:), ...
         'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Simple Logic');
-%     fill([x,flip(x)],[i_25(:,w,2)',flip(i_75(:,w,2)')], ...
-%         pc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
-%         'HandleVisibility','off');
-%     fill([x,flip(x)],[i_25(:,w,1)',flip(i_75(:,w,1)')], ...
-%         mc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
-%         'HandleVisibility','off');
-%     fill([x,flip(x)],[i_25(:,w,3)',flip(i_75(:,w,3)')], ...
-%         sc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
-%         'HandleVisibility','off');
+        'DisplayName','Simple Logic');   
     tt(w) = title({[num2str(B(w)) ' m WEC'], ...
         ['(\sim' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
         'FontWeight','normal','Units','Normalized', ...

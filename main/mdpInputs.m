@@ -1,11 +1,11 @@
 %interactive job
-frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 100; %[h] limit on stages
+frc.stagelimit = true; %toggle limit on stages
+frc.stagelimitval = 30; %[h] limit on stages
 frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 300; %number of forecasts to simulate
+frc.Flimitval = 30; %number of forecasts to simulate
 sim.multiple = false; %multiple simulations?
 sim.pb = false; %toggle for posterior bound in one sim
-sim.sl = true; %toggle for simple logic in one sim
+sim.sl = false; %toggle for simple logic in one sim
 sim.exdist = false; %battery discretization set externally (multiple only)
 
 if ~exist('batchtype','var')
@@ -30,7 +30,7 @@ if isequal(batchtype,'mult')
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [1000 2500 5000:5000:25000]; %[Wh]
-        sim.tuning_array2 = [3 4 5 6];
+        sim.tuning_array2 = [2 3 4 5];
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     end
@@ -80,7 +80,7 @@ wec.h = 0.10;               %percent of rated power as house load
 wec.B = 5;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
-wec.Hs_ra = 4;              %[m]
+wec.Hs_ra = 2;              %[m]
 wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
