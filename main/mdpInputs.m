@@ -1,9 +1,9 @@
 %interactive job
-frc.stagelimit = true; %toggle limit on stages
+frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 30; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
+frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 30; %number of forecasts to simulate
-sim.multiple = false; %multiple simulations?
+sim.multiple = true; %multiple simulations?
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.exdist = false; %battery discretization set externally (multiple only)
