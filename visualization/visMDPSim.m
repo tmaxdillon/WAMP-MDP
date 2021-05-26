@@ -1,6 +1,6 @@
 function [] = visMDPSim(simStruct)
 
-close all
+%close all
 yoff = 2.9;
 
 FM_P = simStruct.output.FM_P;
@@ -65,7 +65,7 @@ set(gca,'FontSize',fs2)
 grid on
 %POWER TIME SERIES
 ax(3) = subaxis(6,1,3);
-plot(datetime(FM_mod(1,f_pts,1),'ConvertFrom','datenum'),FM_mod(1,f_pts,2),'k');
+plot(datetime(FM_mod(1,f_pts,1),'ConvertFrom','datenum'),FM_P(1,f_pts,2)/1000,'k');
 % hold on
 % plot(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'),output.Pb_sim(f_pts)/1000, ...
 %     'g','LineWidth',2)
@@ -91,9 +91,9 @@ for i = 1:max(output.a_sim)
 end
 xlim(xl)
 xticks(xt)
-ylim([0.5 max(output.a_sim) + 0.5])
+ylim([0.5 4.5])
 yticks(1:max(output.a_sim))
-yticklabels({'Full Power','Medium Power','Low Power','Suvival Mode'})
+yticklabels(fliplr({'Full Power','Medium Power','Low Power','Suvival Mode'}))
 ylabel({'Sensing','Mode'},'FontSize',fs2)
 % ylh = get(gca,'ylabel');
 % ylp = get(ylh,'Position');

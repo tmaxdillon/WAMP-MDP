@@ -6,7 +6,7 @@ frc.Flimitval = 30; %number of forecasts to simulate
 sim.multiple = true; %multiple simulations?
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
-sim.exdist = true; %battery discretization set externally (multiple only)
+sim.exdist = false; %battery discretization set externally (multiple only)
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -62,7 +62,7 @@ mdp.eps = 100000;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 mdp.beta_lb = 0.5;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness
+mdp.b = 1;                          %battery steepness
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:

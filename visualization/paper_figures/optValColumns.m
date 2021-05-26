@@ -14,12 +14,20 @@ end
 
 B = mdpsim(1).sim.tuning_array2;
 nw = length(B);
+hh = 95;
+ll = 5;
 
 for w = 1:size(mdpsim,1) %across all wcd
     for e = 1:size(mdpsim,2) %across all emx       
         J_avg(e,w,1) = mean(mdpsim(w,e).output.val_Jstar);
+        J_hh(e,w,1) = prctile(mdpsim(w,e).output.val_Jstar,hh);
+        J_ll(e,w,1) = prctile(mdpsim(w,e).output.val_Jstar,ll);
         J_avg(e,w,2) = mean(pbosim(w,e).output.val_Jstar);
+        J_hh(e,w,2) = prctile(pbosim(w,e).output.val_Jstar,hh);
+        J_ll(e,w,2) = prctile(pbosim(w,e).output.val_Jstar,ll);
         J_avg(e,w,3) = mean(slosim(w,e).output.val_Jstar);
+        J_hh(e,w,3) = prctile(slosim(w,e).output.val_Jstar,hh);
+        J_ll(e,w,3) = prctile(slosim(w,e).output.val_Jstar,ll);
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -79,16 +87,22 @@ for w = 1:size(mdpsim,1) %across all wcd
         'DisplayName','MDP');
     sp(w) = plot(x,J_avg(:,w,3),'-s','MarkerEdgeColor',sc(w,:), ...
         'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Simple Logic');   
+        'DisplayName','Simple Logic');
     tt(w) = title({[num2str(B(w)) ' m WEC'], ...
         ['(\sim' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
         'FontWeight','normal','Units','Normalized', ...
         'interpreter','tex');
+    fill([x,flip(x)],[J_ll(:,w,2)',flip(J_hh(:,w,2)')], ...
+        pc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
+        'HandleVisibility','off');
+    fill([x,flip(x)],[J_ll(:,w,1)',flip(J_hh(:,w,1)')], ...
+        mc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
+        'HandleVisibility','off');
+    fill([x,flip(x)],[J_ll(:,w,3)',flip(J_hh(:,w,3)')], ...
+        sc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
+        'HandleVisibility','off');
     tt(w).Position(2) = tt(w).Position(2)*1.025;
     %ylim(ylims(w,:))
-    yline(600,'--k','Max Draw', ...
-        'LabelHorizontalAlignment','left','FontSize',fs, ...
-        'LineWidth',lw2,'FontName','cmr10'); 
     %     ylim([ceil(max(max(power_avg(:,w,:))))-maxdist-1 ...
 %         ceil(max(max(power_avg(:,w,:)+1)))])
 %     if w == 1
@@ -135,6 +149,18 @@ for w = 1:size(mdpsim,1)
     set(gca,'Units','Inches','Position', ...
         [xoff+(xmarg+xdist)*(w-1) yoff xdist ydist])
 end
+
+%plot difference
+figure
+m_J = mdpsim(3,7).output.val_Jstar;
+p_J = pbosim(3,7).output.val_Jstar;
+diff = m_J - p_J;
+plot(diff)
+xlabel('time')
+ylabel({'mdp J','greater than','pbo J'},'Rotation',00, ...
+    'HorizontalAlignment','center','units','normalized', ...
+    'position',[-0.1 .5 0])
+grid on
 
 print(results_pa,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
     'paper_figures/results_pa'],'-dpng','-r600')

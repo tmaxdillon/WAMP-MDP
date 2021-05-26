@@ -5,8 +5,8 @@ set(0,'defaulttextinterpreter','none')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-medmode = 3; %set median mode (1) versus mean mode
-plotmode = 1; %1: line, 2: shade, 3: errorbar
+medmode = 1; %set median mode versus mean mode
+plotmode = 2; %1: line, 2: shade, 3: errorbar
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('slosim','var')
@@ -17,35 +17,21 @@ end
 
 B = mdpsim(1).sim.tuning_array2;
 nw = length(B);
-
-i_av = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_hh = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_ll = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_me = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_25 = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_75 = zeros(size(mdpsim,2),size(mdpsim,1),3);
-i_mx = zeros(size(mdpsim,2),size(mdpsim,1),3);
-hh = 99;
-ll = 1;
-
-for w = 1:size(mdpsim,1) %across all wcd
-    for e = 1:size(mdpsim,2) %across all emx  
-        [i_av(e,w,1),i_hh(e,w,1),i_ll(e,w,1), ...
-            i_me(e,w,1),i_25(e,w,1),i_75(e,w,1),i_mx(e,w,1)] =  ...
-            calcIntermit(mdpsim(w,e).output.a_sim,hh,ll);
-        [i_av(e,w,2),i_hh(e,w,2),i_ll(e,w,2), ...
-            i_me(e,w,2),i_25(e,w,2),i_75(e,w,2),i_mx(e,w,2)] =  ...
-            calcIntermit(pbosim(w,e).output.a_sim,hh,ll);
-        [i_av(e,w,3),i_hh(e,w,3),i_ll(e,w,3), ...
-            i_me(e,w,3),i_25(e,w,3),i_75(e,w,3),i_mx(e,w,3)] =  ...
-            calcIntermit(slosim(w,e).output.a_sim,hh,ll);
-    end
-    kW(w) = mdpsim(w,e).output.wec.rp; %rated power
-end
-
 %x axis info
 x = mdpsim(1).sim.tuning_array1./1000;
 %xlab = 'Battery Size [kWh]';
+
+L = zeros(size(mdpsim,2),size(mdpsim,1),3);
+y = 10;
+
+for w = 1:size(mdpsim,1) %across all wcd
+    for e = 1:size(mdpsim,2) %across all emx  
+        [L(e,w,1)] = calcBatDeg(mdpsim(w,e),y,x(e)*1000)*100;
+        [L(e,w,2)] = calcBatDeg(pbosim(w,e),y,x(e)*1000)*100;
+        [L(e,w,3)] = calcBatDeg(slosim(w,e),y,x(e)*1000)*100;
+    end
+    kW(w) = mdpsim(w,e).output.wec.rp; %rated power
+end
 
 %colors
 c = 10;
@@ -83,24 +69,6 @@ ylims = flipud([570 620; 540 590; 430 480 ; 90 140]);
 % end
 % maxdist = max(round(ceil(maxdist.*1.2),-1));
 
-%set median or mean
-if medmode == 1
-    i = i_me;
-    i_low = i_hh;
-    i_high = i_ll;
-    avglab = 'Median';
-elseif medmode == 2
-    i = i_av;
-    i_low = i_hh;
-    i_high = i_ll;
-    avglab = 'Mean';
-elseif medmode == 3
-    i = i_mx;
-    i_low = [];
-    i_high = [];
-    avglab = 'Max';
-end
-
 %average power
 results_pa = figure;
 set(gcf,'Units','inches')
@@ -109,51 +77,25 @@ for w = 1:size(mdpsim,1) %across all wcd
     ax(w) = subplot(1,4,w);
     hold on
     %POSTERIOR BOUND
-    if plotmode == 1 || plotmode == 2
-        pp(w) = plot(x,i(:,w,2),'-','MarkerEdgeColor',pc(w,:), ...
-            'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-            'DisplayName','Posterior Bound');
-        mp(w) = plot(x,i(:,w,1),'-','MarkerEdgeColor',mc(w,:), ...
-            'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-            'DisplayName','MDP');
-        sp(w) = plot(x,i(:,w,3),'-','MarkerEdgeColor',sc(w,:), ...
-            'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-            'DisplayName','Simple Logic');
-        if plotmode == 2
-            fill([x,flip(x)],[i_low(:,w,2)',flip(i_high(:,w,2)')], ...
-                pc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
-                'HandleVisibility','off');
-            fill([x,flip(x)],[i_low(:,w,1)',flip(i_high(:,w,1)')], ...
-                mc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
-                'HandleVisibility','off');
-            fill([x,flip(x)],[i_low(:,w,3)',flip(i_high(:,w,3)')], ...
-                sc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
-                'HandleVisibility','off');
-        end
-    elseif plotmode == 3
-        pp(w) = errorbar(x,i(:,w,2),i(:,w,2)-i_low(:,w,2), ...
-            i_high(:,w,2)-i(:,w,2),'-o','MarkerEdgeColor',pc(w,:), ...
-            'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-            'DisplayName','Posterior Bound');
-        mp(w) = errorbar(x,i(:,w,1),i(:,w,1)-i_low(:,w,1), ...
-            i_high(:,w,1)-i(:,w,1),'-o','MarkerEdgeColor',mc(w,:), ...
-            'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-            'DisplayName','Posterior Bound');
-        sp(w) = errorbar(x,i(:,w,3),i(:,w,3)-i_low(:,w,3), ...
-            i_high(:,w,3)-i(:,w,3),'-o','MarkerEdgeColor',sc(w,:), ...
-            'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-            'DisplayName','Posterior Bound');
-    end
+    pp(w) = plot(x,L(:,w,2),'-','MarkerEdgeColor',pc(w,:), ...
+        'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','Posterior Bound');
+    mp(w) = plot(x,L(:,w,1),'-','MarkerEdgeColor',mc(w,:), ...
+        'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','MDP');
+    sp(w) = plot(x,L(:,w,3),'-','MarkerEdgeColor',sc(w,:), ...
+        'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName','Simple Logic');
     tt(w) = title({[num2str(B(w)) ' m WEC'], ...
         ['(\sim' num2str(round(kW(w)/1000,2)) 'kW)']}, ...
         'FontWeight','normal','Units','Normalized', ...
         'interpreter','tex');
     tt(w).Position(2) = tt(w).Position(2)*1.025;
-    ylim([0 inf])
+    ylim([0 25])
     %ylim(ylims(w,:))
-%     yline(600,'--k','Max Draw', ...
-%         'LabelHorizontalAlignment','left','FontSize',fs, ...
-%         'LineWidth',lw2,'FontName','cmr10'); 
+    yline(20,'--k','\sigma_{EoL}', ...
+        'LabelHorizontalAlignment','left','FontSize',fs, ...
+        'LineWidth',lw2,'FontName','cmr10'); 
     %     ylim([ceil(max(max(power_avg(:,w,:))))-maxdist-1 ...
 %         ceil(max(max(power_avg(:,w,:)+1)))])
 %     if w == 1
@@ -189,7 +131,7 @@ set(xl,'Units','inches','Position',xlabdim, ...
     'Rotation',0);
 axes(ax(1))
 ylabdim = [-0.6*xoff ydist/2];
-ylab = {avglab,'Intermittency','Duration','[h]'};
+ylab = {'Capacity','Fade','[%]'};
 yl = text(0,0,ylab);
 set(yl,'Units','inches','Position',ylabdim, ...
     'HorizontalAlignment','center','FontSize',fs, ... 
