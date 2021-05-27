@@ -3,9 +3,10 @@ frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 30; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 30; %number of forecasts to simulate
-sim.multiple = true; %multiple simulations?
+sim.multiple = false; %multiple simulations?
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
+sim.slv2 = true; %toggle for simple logic v2 in one sim
 sim.exdist = true; %battery discretization set externally (multiple only)
 
 if ~exist('batchtype','var')
@@ -21,12 +22,19 @@ if isequal(batchtype,'mult')
     if isequal(batchsim,'mdp')
         sim.pb = false;
         sim.sl = false;
+        sim.slv2 = false;
     elseif isequal(batchsim,'pbo')
         sim.pb = true;
         sim.sl = false;
+        sim.slv2 = false;
     elseif isequal(batchsim,'slo')
         sim.pb = false;
         sim.sl = true;
+        sim.slv2 = false;
+    elseif isequal(batchsim,'sv2')
+        sim.pb = false;
+        sim.sl = false;
+        sim.slv2 = true;
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [1000 2500 5000:5000:25000]; %[Wh]
@@ -66,18 +74,19 @@ mdp.b = 0;                          %battery steepness
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:
-amp.E_max = 5000;                       %[Wh], maximum battery capacity
+amp.E_max = 15000;                       %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate
 amp.fpr = 0.70;                         %simple logic full power ratio
 amp.mpr = 0.65;                         %simple logic medium power ratio
 amp.lpr = 0.15;                         %simple logic low power ratio
+amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 5;                  %[m]
+wec.B = 3;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m]

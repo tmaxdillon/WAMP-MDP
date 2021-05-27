@@ -1,5 +1,5 @@
 function [Jstar] = ...
-    simpleLogicRecursion(FM_P,mdp,amp,sim,wec,f)
+    simpleLogicRecursion(FM_P,mdp,amp,sim,wec,v,f)
 
 Jstar = zeros(mdp.n,mdp.T+1); %values to go for each state and stage
 
@@ -23,24 +23,35 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     mu = mdp.mu; %sensing penalties
     alpha = mdp.alpha; %discount factor
     m = mdp.m; %number of states
+    tt = amp.tt; %time til depletion thresholds
     for s = 1:mdp.n %over all states in parallel
-%         [Jstar_s(s),policy_s(s),compare_sa(s,:),state_evol_sa(s,:)] = ...
-%             evaluateActions(Jstar_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
-%             dt,pb,FO,b,beta_lb,mu,alpha,m,t,s);
         %1: find action given battery state
-        if E(s) > amp.fpr*E_max
-            a = 4;
-        elseif E(s) > amp.mpr*E_max
-            a = 3;
-        elseif E(s) > amp.lpr*E_max
-            a = 2;
-        else
-            a = 1;
+        if v == 1 %version 1
+            if E(s) > amp.fpr*E_max
+                a = 4;
+            elseif E(s) > amp.mpr*E_max
+                a = 3;
+            elseif E(s) > amp.lpr*E_max
+                a = 2;
+            else
+                a = 1;
+            end
+        else %version 2
+            tte = E(s)/(amp.Ps(3) - P_pb + E(s)*sdr/(100*30*24)); %[h]
+            if tte < 0 %producing more power than consuming, full power
+                a = 4;
+            elseif tte > tt(1) %more than tt(1) hours to deplation, med power
+                a = 3;
+            elseif tte > tt(2) %more than tt(2) hours to depletion, low power
+                a = 2;
+            else %less than three hours to deplation, survival mode
+                a = 1;
+            end
         end
         %2: compute evolution of battery
         [~,E_evolved] = powerToBattery(P_pb, ...
             E(s),Ps(a),sdr,E_max,dt,FO);
-            %do I use P_pb or P_fc?
+        %do I use P_pb or P_fc?, ask Archis
         %3: find the state index of the evolved battery
         [~,state_evol_a(a)] = min(abs(E - E_evolved));
         %4: compute the 'value' of this action via bellman's equation

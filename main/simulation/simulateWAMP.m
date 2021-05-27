@@ -73,7 +73,7 @@ output.beta(1) = beta(amp.E_start, ...
 
 %set default values
 output.abridged = false; %default: not posterior bound abridged
-if sim.sl %simple logic
+if sim.sl || sim.slv2 %simple logic
     sim.pb = false;
 end
 
@@ -86,7 +86,7 @@ for f=1:sim.F %over each forecast
             ' minutes.'])
     end
     %if multiple simulation, abridge at posterior bound limit
-    if f > size(FM_P,2) - (mdp.T-1) && sim.multiple
+    if f > size(FM_P,2) - (mdp.T-1) && (sim.multiple || sim.sl || sim.slv2)
         output.abridged = true; %simulation has been abridged
         %print status to command window
         if sim.multiple && ~sim.expar
@@ -112,8 +112,22 @@ for f=1:sim.F %over each forecast
         else
             output.a_sim(f) = 1;
         end
-        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,f);
-        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value        
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
+        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value   
+    elseif sim.slv2 %SIMPLE LOGIC v2
+        tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
+            output.E_sim(f)*amp.sdr/(100*30*24)); %[h]
+        if tte < 0 %producing more power than consuming, full power
+            output.a_sim(f) = 4;
+        elseif tte > 12 %more than twelve hours to deplation, medium power
+            output.a_sim(f) = 3;
+        elseif tte > 3 %more than three hours to depletion, low power
+            output.a_sim(f) = 2;
+        else %less than three hours to deplation, survival mode
+            output.a_sim(f) = 1;
+        end
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,2,f);
+        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value 
     else %MDP LOGIC
         %abridge simulation if using posterior bound to full duration
         if f > size(FM_P,2) - (mdp.T-1) && sim.pb

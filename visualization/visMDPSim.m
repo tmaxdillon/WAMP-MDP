@@ -109,7 +109,7 @@ scatter(datetime(FM_P(1,f_pts,1),'ConvertFrom','datenum'), ...
     output.E_sim(f_pts)/1000,20,output.beta(f_pts),'Filled')
 colormap(gca,flipud(brewermap(50,'PiYG')))
 caxis([0 1])
-%ylim([0 amp.E_max/1000+.25])
+ylim([0 (max(output.E_sim)/1000)*1.1])
 %yticks(1:11)
 ylabel({'Battery','[kWh]'})
 % ylh = get(gca,'ylabel');
