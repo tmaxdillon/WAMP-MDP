@@ -1,6 +1,6 @@
 %interactive job
 frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 30; %[h] limit on stages
+frc.stagelimitval = 1; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 100; %number of forecasts to simulate
 sim.multiple = false; %multiple simulations?
@@ -39,6 +39,7 @@ if isequal(batchtype,'mult')
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [1000 2500 5000:5000:35000]; %[Wh]
+        %sim.tuning_array1 = [1000 2500]; %[Wh]
         sim.tuning_array2 = [2 3 4 5];
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
@@ -85,7 +86,7 @@ end
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:
-amp.E_max = 5000;                       %[Wh], maximum battery capacity
+amp.E_max = 1000;                       %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate
@@ -97,7 +98,7 @@ amp.tt = [12 3];                        %[h], time til depletion thresholds
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 3;                  %[m]
+wec.B = 2;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m]
