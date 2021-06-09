@@ -32,7 +32,7 @@ if isequal(batchtype,'mult')
         sim.pb = false;
         sim.sl = true;
         sim.slv2 = false;
-    elseif isequal(batchsim,'sv2')
+    elseif isequal(batchsim,'sl2')
         sim.pb = false;
         sim.sl = false;
         sim.slv2 = true;
@@ -75,7 +75,7 @@ frc.sub = 3;                    %[hr] model spin up buffer
 mdp.n = 40;                       %number of states
 mdp.d_n = 40;                       %[kWh] energy between states
 mdp.m = 4;                          %number of actions
-mdp.eps = 100000;                      %aggressiveness factor
+mdp.eps = 10;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 mdp.beta_lb = 0.5;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages

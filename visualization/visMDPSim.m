@@ -119,7 +119,7 @@ grid on
 %J Star Values
 ax(7) = subplot(8,1,7);
 plot(datetime(FM_mod(1,f_pts,1),'ConvertFrom','datenum'), ...
-    output.val_Jstar,'m');
+    output.val_Jstar(f_pts),'m');
 %ylim([0 output.wec.rp*1.1/1000])
 %yticks(linspace(0,output.wec.rp/1000,3))
 ylabel({'J Star','[~]'},'FontSize',fs2)
