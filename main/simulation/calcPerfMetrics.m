@@ -16,20 +16,20 @@ E_sim_ind = zeros(1,length(output.E_sim));
 for i = 1:length(output.E_sim)
     [~,E_sim_ind(i)] =  min(abs(amp.E - output.E_sim(i)));
 end
-%reconstructed E timeseries
+%find f extent based on action timeseries
+f_ext = find(output.a_sim > 0,1,'last');
+%reconstructed E timeseries and J timesries
 E_recon = zeros(length(output.E_sim),1);
+J_recon = zeros(length(output.E_sim),1);
 E_recon(1) = amp.E_start;
-disp(['length E_sim = ' num2str(length(output.E_sim))])
+disp(['length f_ext = ' num2str(f_ext)])
 disp(['WEC B = ' num2str(wec.B) ' and E_max = ' num2str(amp.E_max)])
-for f = 1:length(output.E_sim)-1
+for f = 1:f_ext
     [~,E_recon(f+1)] = powerToBattery(output.Pw_sim(f), ...
         E_recon(f),amp.Ps(output.a_sim(f)), ...
         amp.sdr,amp.E_max,mdp.dt,wec.FO);
-end
-%reconstructed J timeseries
-J_recon = zeros(length(output.E_sim),1);
-for f = 1:length(output.E_sim)-1
     J_recon(f) = ...
         beta(output.E_sim(f),amp.E,amp.E_max,mdp.b,mdp.beta_lb) + ...
         mdp.mu(output.a_sim(f));
 end
+
