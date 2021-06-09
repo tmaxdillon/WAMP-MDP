@@ -20,6 +20,9 @@ if isequal(sim.tuned_parameter{1},'emx') && ...
         isequal(sim.tuned_parameter{2},'wcd') && sim.multiple
     amp.E_max = sim.S1(i);
     wec.B = sim.S2(i);
+elseif isequal(sim.tuned_parameter{1},'emx') && ...
+        isequal(sim.tuned_parameter{2},'nll') && sim.multiple
+    mdp.eps = sim.S1(i);
 end
 
 %modify forecast matrix based on user settings for buffer and limit val
@@ -36,14 +39,20 @@ else
 end
 
 %discretize battery
-if sim.hpc && sim.hr_on || sim.exdist %high discretization
-    amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], discretized battery state
-elseif ~sim.exdist %discretize to ensure there's a state lower than Ps(2)
-    amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
+if ~sim.use_d_n %not discretizing consistent elements
+    if sim.hpc && sim.hr_on || sim.exdist %high discretization
+        amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], disc. battery states
+    elseif ~sim.exdist %discretize so there's a state lower than Ps(2)
+        amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
+        mdp.n = length(amp.E);
+    end
+    if ~sim.expar
+        disp(['n = ' num2str(mdp.n)])
+    end
+else %battery discretization set by element size
+    amp.E = 0:mdp.d_n:amp.E_max;
     mdp.n = length(amp.E);
-end
-if ~sim.expar
-    disp(['n = ' num2str(mdp.n)])
+    disp(['n = ' num2str(mdp.n) ' and d_n = ' num2str(mdp.d_n)])
 end
 amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 
@@ -56,8 +65,8 @@ output.wec.cw = zeros(sim.F,1); %capture width
 output.wec.cwr = zeros(sim.F,1); %capture width ratio
 output.Pw_error = zeros(ceil((mdp.T-1)/24),sim.F); %error matrix
 output.beta = zeros(sim.F,1); %beta time series
+output.val_Jstar = zeros(sim.F,1); %Jstar time series
 if sim.debug
-    output.val_Jstar = zeros(sim.F,1); %Jstar time series
     output.val_all = zeros(mdp.n,mdp.m,mdp.T+1,sim.F); %all J
     output.val_togo = zeros(mdp.n,mdp.T+1,sim.F); %val to go matrix
     output.policy_all = zeros(mdp.n,mdp.T,sim.F); %policy all matrix
@@ -203,11 +212,12 @@ for f=1:sim.F %over each forecast
     if f > 1
         output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
     end
-    %PERFORMANCE METRICS
-    %percent for each operational state and average output power
-    [output.apct,output.power_avg,output.beta_avg,output.E_sim_ind] = ...
-        calcPerfMetrics(amp,mdp,output);
 end
+
+%PERFORMANCE METRICS
+%percent for each operational state and average output power
+[output.apct,output.power_avg,output.beta_avg,output.E_sim_ind, ...
+    output.E_recon,output.J_recon] = calcPerfMetrics(amp,mdp,wec,output);
 
 %print status to command window
 if sim.multiple && ~sim.expar
@@ -225,6 +235,7 @@ output.wec.rp = (wec.B*wec.F(wec.Tp_ra,wec.Hs_ra,wec.B)*wec.eta_ct* ...
 output.wec.cw_avg = mean(output.wec.cw); %average capture width
 output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
+output.wec.E_max = amp.E_max; %battery size
 
 %print results
 if sim.multiple

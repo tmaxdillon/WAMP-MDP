@@ -26,7 +26,7 @@ for f = 1:length(output.E_sim)-1
 end
 %reconstructed J timeseries
 J_recon = zeros(length(output.E_sim),1);
-for f = 1:length(output.E_sim)-1
+for f = 1:length(output.E_sim)
     J_recon(f) = ...
         beta(output.E_sim(f),amp.E,amp.E_max,mdp.b,mdp.beta_lb) + ...
         mdp.mu(output.a_sim(f));

@@ -59,11 +59,13 @@ if sim.multiple %sensitivity analysis
         sim.mw = 0; %max number of workers
     end
     %set battery discretization externally for multiple simulations
-    if isequal(sim.tuned_parameter{1},'emx') && sim.exdist
+    if isequal(sim.tuned_parameter{1},'emx') && sim.exdist && ...
+            ~sim.use_d_n
         E_temp = 0:amp.Ps(2)-5:max(sim.S1); %[Wh] discretized battery state
         mdp.n = length(E_temp);
         disp(['n = ' num2str(mdp.n) ' max E = ' num2str(max(sim.S1))])
-    elseif isequal(sim.tuned_parameter{2},'emx') && sim.exdist
+    elseif isequal(sim.tuned_parameter{2},'emx') && sim.exdist && ...
+            ~sim.use_d_n
         E_temp = 0:amp.Ps(2)-5:max(sim.S2); %[Wh] discretized battery state
         mdp.n = length(E_temp);
         disp(['n = ' num2str(mdp.n) ' max E = ' num2str(max(sim.S2))])

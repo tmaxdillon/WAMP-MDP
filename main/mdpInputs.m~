@@ -1,8 +1,8 @@
 %interactive job
-frc.stagelimit = false; %toggle limit on stages
+frc.stagelimit = true; %toggle limit on stages
 frc.stagelimitval = 30; %[h] limit on stages
-frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 100; %number of forecasts to simulate
+frc.Flimit = true; %to shorten runtime
+frc.Flimitval = 600; %number of forecasts to simulate
 sim.multiple = false; %multiple simulations?
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
@@ -47,7 +47,6 @@ if isequal(batchtype,'mult')
         sim.tuning_array2 = 1;
         sim.tuned_parameter{1} = 'eps'; %epsilon
         sim.tuned_parameter{2} = 'nll';
-        beta_on = true;
     end
 end
      
@@ -55,7 +54,7 @@ end
 sim.hr_on = false;          %toggle enabling high res state space
 sim.brpar = false;         %parallelized backward recursion (def false)
 sim.expar = true;           %parallelized multiple simulations
-sim.notif = 5;             %notifications every __ forecasts
+sim.notif = 100;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
 sim.corelim = 2;            % numcores > corelim == using HPC
@@ -78,14 +77,11 @@ mdp.eps = 100000;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 mdp.beta_lb = 0.5;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness [1: on, 0: off]
-if exist('beta_on','var')
-    mdp.b = 1;
-end
+mdp.b = 0;                          %battery steepness
 mdp.alpha = .99;                    %discount factor
 
 %AMP parameters:
-amp.E_max = 5000;                       %[Wh], maximum battery capacity
+amp.E_max = 15000;                       %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate

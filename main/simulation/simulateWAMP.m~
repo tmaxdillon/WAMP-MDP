@@ -36,14 +36,20 @@ else
 end
 
 %discretize battery
-if sim.hpc && sim.hr_on || sim.exdist %high discretization
-    amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], discretized battery state
-elseif ~sim.exdist %discretize to ensure there's a state lower than Ps(2)
-    amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
+if ~sim.use_d_n
+    if sim.hpc && sim.hr_on || sim.exdist %high discretization
+        amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], discretized battery state
+    elseif ~sim.exdist %discretize to ensure there's a state lower than Ps(2)
+        amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
+        mdp.n = length(amp.E);
+    end
+    if ~sim.expar
+        disp(['n = ' num2str(mdp.n)])
+    end
+else
+    amp.E = 0:mdp.d_n:amp.E_max;
     mdp.n = length(amp.E);
-end
-if ~sim.expar
-    disp(['n = ' num2str(mdp.n)])
+    disp(['n  
 end
 amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 
@@ -56,8 +62,8 @@ output.wec.cw = zeros(sim.F,1); %capture width
 output.wec.cwr = zeros(sim.F,1); %capture width ratio
 output.Pw_error = zeros(ceil((mdp.T-1)/24),sim.F); %error matrix
 output.beta = zeros(sim.F,1); %beta time series
+output.val_Jstar = zeros(sim.F,1); %Jstar time series
 if sim.debug
-    output.val_Jstar = zeros(sim.F,1); %Jstar time series
     output.val_all = zeros(mdp.n,mdp.m,mdp.T+1,sim.F); %all J
     output.val_togo = zeros(mdp.n,mdp.T+1,sim.F); %val to go matrix
     output.policy_all = zeros(mdp.n,mdp.T,sim.F); %policy all matrix
@@ -73,7 +79,7 @@ output.beta(1) = beta(amp.E_start, ...
 
 %set default values
 output.abridged = false; %default: not posterior bound abridged
-if sim.sl %simple logic
+if sim.sl || sim.slv2 %simple logic
     sim.pb = false;
 end
 
@@ -86,7 +92,7 @@ for f=1:sim.F %over each forecast
             ' minutes.'])
     end
     %if multiple simulation, abridge at posterior bound limit
-    if f > size(FM_P,2) - (mdp.T-1) && sim.multiple
+    if f > size(FM_P,2) - (mdp.T-1) && (sim.multiple || sim.sl || sim.slv2)
         output.abridged = true; %simulation has been abridged
         %print status to command window
         if sim.multiple && ~sim.expar
@@ -112,15 +118,22 @@ for f=1:sim.F %over each forecast
         else
             output.a_sim(f) = 1;
         end
-        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,f);
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value   
     elseif sim.slv2 %SIMPLE LOGIC v2
-        tte = output.E_sim(f)/(amp.Ps(4) - output.Pw_sim(f) + ...
-            output.E_sim(f)*amp.sdr*(100*30*24)); %[h]
+        tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
+            output.E_sim(f)*amp.sdr/(100*30*24)); %[h]
         if tte < 0 %producing more power than consuming, full power
             output.a_sim(f) = 4;
         elseif tte > 12 %more than twelve hours to deplation, medium power
-            
+            output.a_sim(f) = 3;
+        elseif tte > 3 %more than three hours to depletion, low power
+            output.a_sim(f) = 2;
+        else %less than three hours to deplation, survival mode
+            output.a_sim(f) = 1;
+        end
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,2,f);
+        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value 
     else %MDP LOGIC
         %abridge simulation if using posterior bound to full duration
         if f > size(FM_P,2) - (mdp.T-1) && sim.pb
@@ -196,11 +209,12 @@ for f=1:sim.F %over each forecast
     if f > 1
         output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
     end
-    %PERFORMANCE METRICS
-    %percent for each operational state and average output power
-    [output.apct,output.power_avg,output.beta_avg,output.E_sim_ind] = ...
-        calcPerfMetrics(amp,mdp,output);
 end
+
+%PERFORMANCE METRICS
+%percent for each operational state and average output power
+[output.apct,output.power_avg,output.beta_avg,output.E_sim_ind, ...
+    output.E_recon] = calcPerfMetrics(amp,mdp,wec,output);
 
 %print status to command window
 if sim.multiple && ~sim.expar
@@ -218,6 +232,7 @@ output.wec.rp = (wec.B*wec.F(wec.Tp_ra,wec.Hs_ra,wec.B)*wec.eta_ct* ...
 output.wec.cw_avg = mean(output.wec.cw); %average capture width
 output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
+output.wec.E_max = amp.E_max; %battery size
 
 %print results
 if sim.multiple
