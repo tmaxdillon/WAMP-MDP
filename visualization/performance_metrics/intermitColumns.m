@@ -1,18 +1,22 @@
-clearvars -except mdpsim pbosim slosim
-close all
+clearvars -except mdpsim pbosim slosim mdpsim_bz pbosim_bz sl2sim
+%close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-medmode = 3; %set median mode (1) versus mean mode
+medmode = 3; %set median mode (1) versus mean mode (2) vs max (3)
 plotmode = 1; %1: line, 2: shade, 3: errorbar
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var')
+        ~exist('slosim','var') || ~exist('mdpsim_bz','var') || ...
+        ~exist('pbosim_bz','var') || ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
+    load('mdpsim_bz');
+    load('pbosim_bz');
+    load('sl2sim');
 end
 
 B = mdpsim(1).sim.tuning_array2;
@@ -39,6 +43,15 @@ for w = 1:size(mdpsim,1) %across all wcd
         [i_av(e,w,3),i_hh(e,w,3),i_ll(e,w,3), ...
             i_me(e,w,3),i_25(e,w,3),i_75(e,w,3),i_mx(e,w,3)] =  ...
             calcIntermit(slosim(w,e).output.a_sim,hh,ll);
+        [i_av(e,w,4),i_hh(e,w,4),i_ll(e,w,4), ...
+            i_me(e,w,4),i_25(e,w,4),i_75(e,w,4),i_mx(e,w,4)] =  ...
+            calcIntermit(mdpsim_bz(w,e).output.a_sim,hh,ll);
+        [i_av(e,w,5),i_hh(e,w,5),i_ll(e,w,5), ...
+            i_me(e,w,5),i_25(e,w,5),i_75(e,w,5),i_mx(e,w,5)] =  ...
+            calcIntermit(pbosim_bz(w,e).output.a_sim,hh,ll);
+        [i_av(e,w,6),i_hh(e,w,6),i_ll(e,w,6), ...
+            i_me(e,w,6),i_25(e,w,6),i_75(e,w,6),i_mx(e,w,6)] =  ...
+            calcIntermit(sl2sim(w,e).output.a_sim,hh,ll);
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -49,19 +62,25 @@ x = mdpsim(1).sim.tuning_array1./1000;
 
 %colors
 c = 10;
-mc = brewermap(c,'reds'); mc = mc(c-nw:end,:);
-pc = brewermap(c,'greens'); pc = pc(c-nw:end,:);
-sc = brewermap(c,'purples'); sc = sc(c-nw:end-1,:);
-col1 = flipud(brewermap(8,'reds')); %col(1,:) = col1(c,:);
+% mc = brewermap(c,'reds'); mc = mc(c-nw:end,:);
+% pc = brewermap(c,'greens'); pc = pc(c-nw:end,:);
+% sc = brewermap(c,'purples'); sc = sc(c-nw:end-1,:);
+mdpc = [205 0 0]/256;
+mbzc = [255	49 83]/256;
+pboc = [0 110 78]/256;
+pbzc = [105, 255, 105]/256;
+sloc = [64, 32, 96]/256;
+sl2c = [147, 112, 219]/256;
+%col1 = flipud(brewermap(8,'reds')); %col(1,:) = col1(c,:);
 % col2 = brewermap(10,'oranges'); col(2,:) = col2(c,:);
 % col3 = brewermap(10,'YlOrBr'); col(3,:) = col3(4,:);
 % col4 = brewermap(10,'greens'); col(4,:) = col4(c,:);
 % col5 = brewermap(10,'blues'); col(5,:) = col5(c,:);
 % col6 = brewermap(10,'purples'); col(6,:) = col6(c,:);
-col = col1(1:size(mdpsim,1),:);
-c1 = [220,20,60]/256;
-c2 = [0,0,205]/256;
-c3 = [123,104,238]/256;
+% col = col1(1:size(mdpsim,1),:);
+% c1 = [220,20,60]/256;
+% c2 = [0,0,205]/256;
+% c3 = [123,104,238]/256;
 
 %sizes
 ms = 6;
@@ -110,15 +129,24 @@ for w = 1:size(mdpsim,1) %across all wcd
     hold on
     %POSTERIOR BOUND
     if plotmode == 1 || plotmode == 2
-        pp(w) = plot(x,i(:,w,2),'-','MarkerEdgeColor',pc(w,:), ...
-            'Color',pc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        pbop(w) = plot(x,i(:,w,2),'-','MarkerEdgeColor',pboc, ...
+            'Color',pboc,'MarkerSize',ms,'LineWidth',lw, ...
             'DisplayName','Posterior Bound');
-        mp(w) = plot(x,i(:,w,1),'-','MarkerEdgeColor',mc(w,:), ...
-            'Color',mc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        mdpp(w) = plot(x,i(:,w,1),'-','MarkerEdgeColor',mdpc, ...
+            'Color',mdpc,'MarkerSize',ms,'LineWidth',lw, ...
             'DisplayName','MDP');
-        sp(w) = plot(x,i(:,w,3),'-','MarkerEdgeColor',sc(w,:), ...
-            'Color',sc(w,:),'MarkerSize',ms,'LineWidth',lw, ...
+        slop(w) = plot(x,i(:,w,3),'-','MarkerEdgeColor',sloc, ...
+            'Color',sloc,'MarkerSize',ms,'LineWidth',lw, ...
             'DisplayName','Simple Logic');
+        pbzp(w) = plot(x,i(:,w,5),'-','MarkerEdgeColor',pbzc, ...
+            'Color',pbzc,'MarkerSize',ms,'LineWidth',lw, ...
+            'DisplayName','PB (no beta)');
+        mbzp(w) = plot(x,i(:,w,4),'-','MarkerEdgeColor',mbzc, ...
+            'Color',mbzc,'MarkerSize',ms,'LineWidth',lw, ...
+            'DisplayName','MDP (no beta)');
+        sl2p(w) = plot(x,i(:,w,6),'-','MarkerEdgeColor',sl2c, ...
+            'Color',sl2c,'MarkerSize',ms,'LineWidth',lw, ...
+            'DisplayName','Simple Logic 2');
         if plotmode == 2
             fill([x,flip(x)],[i_low(:,w,2)',flip(i_high(:,w,2)')], ...
                 pc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
@@ -174,7 +202,8 @@ for w = 1:size(mdpsim,1) %across all wcd
     %set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 end
 
-hL = legend([mp(2) pp(2) sp(2)],'location','northoutside','Box','on', ...
+hL = legend([mdpp(2) pbop(2) slop(2) mbzp(2) pbzp(2) sl2p(2)], ...
+    'location','northoutside','Box','on','NumColumns',3, ...
     'Orientation','horizontal');
 newPosition = [0.325 .95 0.5 0];
 set(hL,'Position', newPosition,'Units', 'normalized');
