@@ -3,7 +3,7 @@ frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 1; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 100; %number of forecasts to simulate
-sim.multiple = false; %multiple simulations?
+sim.multiple = true; %multiple simulations?
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.slv2 = false; %toggle for simple logic v2 in one sim
@@ -88,13 +88,13 @@ mdp.m = 4;                          %number of actions
 mdp.eps = 1;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode start - enter this into simulate wamp (post sensitivity update)
-mdp.mu_mult = 5;
-mdp.mu = 1/(mdp.mu_mult)* ...
-    beta(mdp.d_n,0:mdp.d_n:amp.E_max,amp.E_max,mdp,b,mdp_lb);     
+% mdp.mu_mult = 5;
+% mdp.mu = 1/(mdp.mu_mult)* ...
+%     beta(mdp.d_n,0:mdp.d_n:amp.E_max,amp.E_max,mdp,b,mdp_lb);     
 %pseudocode end - above goes in simulate wamp post sensitivity update
 mdp.beta_lb = 0.5;                    %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness [1: on, 0: off]
+mdp.b = 1;                          %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
     mdp.b = 1;
 end
