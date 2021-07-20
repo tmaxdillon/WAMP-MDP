@@ -53,7 +53,7 @@ if ~sim.use_d_n %not discretizing consistent elements (outdated)
 else %battery discretization set by element size (default)
     amp.E = 0:mdp.d_n:amp.E_max;
     mdp.n = length(amp.E);
-    if ~sim.par
+    if ~sim.expar
         disp(['n = ' num2str(mdp.n) ' and d_n = ' num2str(mdp.d_n)])
     end
 end
