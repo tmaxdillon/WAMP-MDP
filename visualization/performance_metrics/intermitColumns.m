@@ -1,4 +1,4 @@
-clearvars -except mdpsim pbosim slosim mdpsim_bz pbosim_bz sl2sim
+clearvars -except mdpsim pbosim slosim mbzsim pbzsim sl2sim
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -9,13 +9,13 @@ medmode = 3; %set median mode (1) versus mean mode (2) vs max (3)
 plotmode = 1; %1: line, 2: shade, 3: errorbar
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('mdpsim_bz','var') || ...
-        ~exist('pbosim_bz','var') || ~exist('sl2sim','var')
+        ~exist('slosim','var') || ~exist('mbzsim','var') || ...
+        ~exist('pbzsim','var') || ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
-    load('mdpsim_bz');
-    load('pbosim_bz');
+    load('mbzsim');
+    load('pbzsim');
     load('sl2sim');
 end
 
@@ -45,10 +45,10 @@ for w = 1:size(mdpsim,1) %across all wcd
             calcIntermit(slosim(w,e).output.a_sim,hh,ll);
         [i_av(e,w,4),i_hh(e,w,4),i_ll(e,w,4), ...
             i_me(e,w,4),i_25(e,w,4),i_75(e,w,4),i_mx(e,w,4)] =  ...
-            calcIntermit(mdpsim_bz(w,e).output.a_sim,hh,ll);
+            calcIntermit(mbzsim(w,e).output.a_sim,hh,ll);
         [i_av(e,w,5),i_hh(e,w,5),i_ll(e,w,5), ...
             i_me(e,w,5),i_25(e,w,5),i_75(e,w,5),i_mx(e,w,5)] =  ...
-            calcIntermit(pbosim_bz(w,e).output.a_sim,hh,ll);
+            calcIntermit(pbzsim(w,e).output.a_sim,hh,ll);
         [i_av(e,w,6),i_hh(e,w,6),i_ll(e,w,6), ...
             i_me(e,w,6),i_25(e,w,6),i_75(e,w,6),i_mx(e,w,6)] =  ...
             calcIntermit(sl2sim(w,e).output.a_sim,hh,ll);

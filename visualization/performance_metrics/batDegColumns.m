@@ -1,4 +1,4 @@
-clearvars -except mdpsim pbosim slosim mdpsim_bz pbosim_bz sl2sim
+clearvars -except mdpsim pbosim slosim mbzsim pbzsim sl2sim
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -9,13 +9,13 @@ medmode = 1; %set median mode versus mean mode
 plotmode = 2; %1: line, 2: shade, 3: errorbar
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('mdpsim_bz','var') || ...
-        ~exist('pbosim_bz','var') || ~exist('sl2sim','var')
+        ~exist('slosim','var') || ~exist('mbzsim','var') || ...
+        ~exist('pbzsim','var') || ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
-    load('mdpsim_bz');
-    load('pbosim_bz');
+    load('mbzsim');
+    load('pbzsim');
     load('sl2sim');
 end
 
@@ -33,8 +33,8 @@ for w = 1:size(mdpsim,1) %across all wcd
         [L(e,w,1)] = calcBatDeg(mdpsim(w,e),y,x(e)*1000)*100;
         [L(e,w,2)] = calcBatDeg(pbosim(w,e),y,x(e)*1000)*100;
         [L(e,w,3)] = calcBatDeg(slosim(w,e),y,x(e)*1000)*100;
-        [L(e,w,4)] = calcBatDeg(mdpsim_bz(w,e),y,x(e)*1000)*100;
-        [L(e,w,5)] = calcBatDeg(pbosim_bz(w,e),y,x(e)*1000)*100;
+        [L(e,w,4)] = calcBatDeg(mbzsim(w,e),y,x(e)*1000)*100;
+        [L(e,w,5)] = calcBatDeg(pbzsim(w,e),y,x(e)*1000)*100;
         [L(e,w,6)] = calcBatDeg(sl2sim(w,e),y,x(e)*1000)*100;
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power

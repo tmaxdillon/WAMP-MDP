@@ -126,7 +126,7 @@ for f=1:sim.F %over each forecast
         end
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
-    %SIMPLE LOGIC v2
+        %SIMPLE LOGIC v2
     elseif sim.slv2
         tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
             output.E_sim(f)*amp.sdr/(100*30*24)); %[h]
@@ -141,7 +141,7 @@ for f=1:sim.F %over each forecast
         end
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,2,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
-    %MDP AND POSTERIOR BOUND
+        %MDP AND POSTERIOR BOUND
     else
         %abridge simulation if using posterior bound to full duration
         if f > size(FM_P,2) - (mdp.T-1) && sim.pb
@@ -200,7 +200,7 @@ for f=1:sim.F %over each forecast
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
-    %
+    %COMPUTE ERROR IN FORECAST
     if f > 1
         output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
     end

@@ -1,19 +1,15 @@
-%interactive job - set values
-%limits
+%interactive job
 frc.stagelimit = true; %toggle limit on stages
 frc.stagelimitval = 1; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
+frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 100; %number of forecasts to simulate
-%one simulation types
+sim.tdsens = false; %2-D sensitivity analysis
+sim.senssm = false; %sensitivity small multiple
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.slv2 = false; %toggle for simple logic v2 in one sim
-%multiple simulation types
-sim.tdsens = true; %2-D sensitivity analysis
-sim.senssm = false; %sensitivity small multiple
-%battery discretization
+sim.exdist = false; %batt disc set externally (multiple only)
 sim.use_d_n = true; %battery discretization set by constant delta
-sim.exdist = false; %batt disc set externally (multiple only, outdated)
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -61,18 +57,16 @@ end
 sim.hr_on = false;          %toggle enabling high res state space
 sim.brpar = false;         %parallelized backward recursion (def false)
 sim.expar = true;           %parallelized multiple simulations
-sim.notif = 50;             %notifications every __ forecasts
+sim.notif = 500;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
 sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
     sim.mw = 36; %max workers
-else %not using an HPC
+else
     sim.hpc = false;
     sim.mw = 0; %max workers
-    sim.expar = false;
-    sim.brpar = false;
 end
 
 %FORECAST parameters:

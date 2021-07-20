@@ -22,8 +22,8 @@ f_ext = find(output.a_sim > 0,1,'last');
 E_recon = zeros(length(output.E_sim),1);
 J_recon = zeros(length(output.E_sim),1);
 E_recon(1) = amp.E_start;
-disp(['length f_ext = ' num2str(f_ext)])
-disp(['WEC B = ' num2str(wec.B) ' and E_max = ' num2str(amp.E_max)])
+% disp(['length f_ext = ' num2str(f_ext)])
+% disp(['WEC B = ' num2str(wec.B) ' and E_max = ' num2str(amp.E_max)])
 for f = 1:f_ext
     [~,E_recon(f+1)] = powerToBattery(output.Pw_sim(f), ...
         E_recon(f),amp.Ps(output.a_sim(f)), ...

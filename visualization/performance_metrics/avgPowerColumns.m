@@ -1,4 +1,4 @@
-clearvars -except mdpsim pbosim slosim mdpsim_bz pbosim_bz sl2sim
+clearvars -except mdpsim pbosim slosim mbzsim pbzsim sl2sim
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -6,13 +6,13 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('mdpsim_bz','var') || ...
-        ~exist('pbosim_bz','var') || ~exist('sl2sim','var')
+        ~exist('slosim','var') || ~exist('mbzsim','var') || ...
+        ~exist('pbzsim','var') || ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
-    load('mdpsim_bz');
-    load('pbosim_bz');
+    load('mbzsim');
+    load('pbzsim');
     load('sl2sim');
 end
 
@@ -33,9 +33,9 @@ for w = 1:size(mdpsim,1) %across all wcd
         [power_avg(e,w,3),i_25(e,w,3),i_75(e,w,3),sd(e,w,3)] = ...
             getPower(slosim(w,e));
         [power_avg(e,w,4),i_25(e,w,4),i_75(e,w,4),sd(e,w,4)] = ...
-            getPower(mdpsim_bz(w,e));
+            getPower(mbzsim(w,e));
         [power_avg(e,w,5),i_25(e,w,5),i_75(e,w,5),sd(e,w,5)] = ...
-            getPower(pbosim_bz(w,e));
+            getPower(pbzsim(w,e));
         [power_avg(e,w,6),i_25(e,w,6),i_75(e,w,6),sd(e,w,6)] = ...
             getPower(sl2sim(w,e));
 %         power_avg(e,w,1) = mdpsim(w,e).output.power_avg;

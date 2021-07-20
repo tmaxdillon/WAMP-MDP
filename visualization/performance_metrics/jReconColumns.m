@@ -1,4 +1,4 @@
-clearvars -except mdpsim pbosim slosim mdpsim_bz pbosim_bz sl2sim
+clearvars -except mdpsim pbosim slosim mbzsim pbzsim sl2sim
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -6,13 +6,13 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('mdpsim_bz','var') || ...
-        ~exist('pbosim_bz','var') || ~exist('sl2sim','var')
+        ~exist('slosim','var') || ~exist('mbzsim','var') || ...
+        ~exist('pbzsim','var') || ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
-    load('mdpsim_bz');
-    load('pbosim_bz');
+    load('mbzsim');
+    load('pbzsim');
     load('sl2sim');
 end
 
@@ -32,12 +32,12 @@ for w = 1:size(mdpsim,1) %across all wcd
         J_avg(e,w,3) = mean(slosim(w,e).output.J_recon);
         J_hh(e,w,3) = prctile(slosim(w,e).output.J_recon,hh);
         J_ll(e,w,3) = prctile(slosim(w,e).output.J_recon,ll);
-        J_avg(e,w,4) = mean(mdpsim_bz(w,e).output.J_recon);
-        J_hh(e,w,4) = prctile(mdpsim_bz(w,e).output.J_recon,hh);
-        J_ll(e,w,4) = prctile(mdpsim_bz(w,e).output.J_recon,ll);
-        J_avg(e,w,5) = mean(pbosim_bz(w,e).output.J_recon);
-        J_hh(e,w,5) = prctile(pbosim_bz(w,e).output.J_recon,hh);
-        J_ll(e,w,5) = prctile(pbosim_bz(w,e).output.J_recon,ll);
+        J_avg(e,w,4) = mean(mbzsim(w,e).output.J_recon);
+        J_hh(e,w,4) = prctile(mbzsim(w,e).output.J_recon,hh);
+        J_ll(e,w,4) = prctile(mbzsim(w,e).output.J_recon,ll);
+        J_avg(e,w,5) = mean(pbzsim(w,e).output.J_recon);
+        J_hh(e,w,5) = prctile(pbzsim(w,e).output.J_recon,hh);
+        J_ll(e,w,5) = prctile(pbzsim(w,e).output.J_recon,ll);
         J_avg(e,w,6) = mean(sl2sim(w,e).output.J_recon);
         J_hh(e,w,6) = prctile(sl2sim(w,e).output.J_recon,hh);
         J_ll(e,w,6) = prctile(sl2sim(w,e).output.J_recon,ll);
