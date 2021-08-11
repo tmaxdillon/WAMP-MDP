@@ -24,9 +24,9 @@ ta(7,:) = linspace(1,19,n);
 tp{8} = 'ebs'; %energy between states
 ta(8,:) = linspace(17.5,40,n);
 tp{9} = 'dfr'; %discount factor
-ta(9,:) = linspace(.8,.99,n);
+ta(9,:) = linspace();
 tp{10} = 'sub'; %spin up buffer
-ta(10,:) = linspace(0,9,n);
+ta(10,:) = linspace();
 
 
 %preallocate and print simulation combinations

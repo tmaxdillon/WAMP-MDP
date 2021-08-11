@@ -18,19 +18,14 @@ end
 
 %SENSITIVITY ANALYSIS
 %update sensitivity analysis
-if isequal(sim.tuned_parameter{1},'emx') && ...
-        isequal(sim.tuned_parameter{2},'wcd') && sim.tdsens
-    amp.E_max = sim.S1(i);
-    wec.B = sim.S2(i);
-elseif isequal(sim.tuned_parameter{1},'emx') && ...
-        isequal(sim.tuned_parameter{2},'nll') && sim.tdsens
-    mdp.eps = sim.S1(i);
+if sim.tdsens || sim.senssm
+    [FM,amp,frc,mdp,sim,wec] = updateSensitivity(FM,amp,frc,mdp,sim,wec,i);
 end
 
 %VARIOUS SETUP ITEMS
 %1: modify forecast matrix based on user settings for buffer and limit val
 [FM_P,FM_mod] = modifyFM(FM,frc,wec);
-mdp.T = size(FM_P,1); %number of stages
+mdp.T = floor(size(FM_P,1)/mdp.dt); %number of stages
 output.FM_P = FM_P;
 output.FM_mod = FM_mod;
 %2: simulation extent (number of forecasts)
@@ -87,7 +82,7 @@ if sim.sl || sim.slv2 %simple logic
 end
 
 %RUN SIMULATION
-for f=1:sim.F %over each forecast
+for f=1:mdp.dt:sim.F %over each forecast
     %print status to command window
     if mod(f-1,sim.notif) == 0 && f-1 > 0 && ~sim.expar
         disp([num2str(f-1) ' out of ' num2str(sim.F) ...
@@ -95,7 +90,7 @@ for f=1:sim.F %over each forecast
             ' minutes.'])
     end
     %if multiple simulation, abridge at posterior bound limit
-    if f > size(FM_P,2) - (mdp.T-1) && sim.tdsens
+    if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.tdsens
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
         if ~sim.expar
@@ -132,11 +127,11 @@ for f=1:sim.F %over each forecast
             output.E_sim(f)*amp.sdr/(100*30*24)); %[h]
         if tte < 0 %producing more power than consuming, full power
             output.a_sim(f) = 4;
-        elseif tte > 12 %more than twelve hours to deplation, medium power
+        elseif tte > amp.tt(1) %more than tt_1 hrs to empty, medium power
             output.a_sim(f) = 3;
-        elseif tte > 3 %more than three hours to depletion, low power
+        elseif tte > amp.tt(2) %more than tt_2 hrs to empty, low power
             output.a_sim(f) = 2;
-        else %less than three hours to deplation, survival mode
+        else %less than tt_2 hours to empty, survival mode
             output.a_sim(f) = 1;
         end
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,2,f);
@@ -144,7 +139,7 @@ for f=1:sim.F %over each forecast
     %MDP AND POSTERIOR BOUND
     else
         %abridge simulation if using posterior bound to full duration
-        if f > size(FM_P,2) - (mdp.T-1) && sim.pb
+        if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
             output.abridged = true; %simulation has been abridged
             %print status to command window
             if ~sim.expar
@@ -211,6 +206,7 @@ end
 [output.apct,output.power_avg,output.beta_avg,output.E_sim_ind, ...
     output.E_recon,output.J_recon] = calcPerfMetrics(amp,mdp,wec,output);
 
+%PRINT END
 %print status to command window
 if ~sim.expar
     if sim.tdsens
@@ -218,7 +214,6 @@ if ~sim.expar
             num2str(round(toc(tSim)/60,2)) ' minutes.'])
     end
 end
-
 %store wec info
 output.wec.rp = (wec.B*wec.F(wec.Tp_ra,wec.Hs_ra,wec.B)*wec.eta_ct* ...
     (1/(16*4*pi))*wec.rho*wec.g^2* ...
@@ -227,7 +222,6 @@ output.wec.cw_avg = mean(output.wec.cw); %average capture width
 output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
 output.wec.E_max = amp.E_max; %battery size
-
 %print results
 if sim.tdsens
     output.results.(sim.tuned_parameter{1}) = sim.S1(i);

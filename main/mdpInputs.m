@@ -1,15 +1,15 @@
 %interactive job - set values
 %limits
-frc.stagelimit = true; %toggle limit on stages
-frc.stagelimitval = 1; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 100; %number of forecasts to simulate
+frc.stagelimit = false; %toggle limit on stages
+frc.stagelimitval = 10; %[h] limit on stages
+frc.Flimit = false; %to shorten runtime
+frc.Flimitval = 10; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.slv2 = false; %toggle for simple logic v2 in one sim
 %multiple simulation types
-sim.tdsens = true; %2-D sensitivity analysis
+sim.tdsens = false; %2-D sensitivity analysis
 sim.senssm = false; %sensitivity small multiple
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
@@ -23,8 +23,8 @@ if ~exist('batchtype','var')
     patchpar2 = [];
     batcharr2 = [];
 end
-if isequal(batchtype,'mult')
-    sim.multiple = true;
+if isequal(batchtype,'tds')
+    sim.tdsens = true;
     if isequal(batchsim,'mdp')
         sim.pb = false;
         sim.sl = false;
@@ -49,18 +49,36 @@ if isequal(batchtype,'mult')
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     elseif isequal(batchpar1,'eps') && isequal(batchpar2,'nll')
-        sim.tuning_array1 = linspace(10,200000,10); %[]
+        sim.tuning_array1 = [0.1 0.5 1 2.5 5 10 20 50 100 1000 10000]; %[~]
         sim.tuning_array2 = 1;
         sim.tuned_parameter{1} = 'eps'; %epsilon
         sim.tuned_parameter{2} = 'nll';
         beta_on = true;
     end
+elseif isequal(batchtype,'ssm')
+    sim.multiple = true;
+    if isequal(batchsim,'mdp')
+        sim.pb = false;
+        sim.sl = false;
+        sim.slv2 = false;
+    elseif isequal(batchsim,'pbo')
+        sim.pb = true;
+        sim.sl = false;
+        sim.slv2 = false;
+    elseif isequal(batchsim,'slo')
+        sim.pb = false;
+        sim.sl = true;
+        sim.slv2 = false;
+    elseif isequal(batchsim,'sl2')
+        sim.pb = false;
+        sim.sl = false;
+        sim.slv2 = true;
+    end
 end
      
 %SIM parameters:
-sim.hr_on = false;          %toggle enabling high res state space
-sim.brpar = false;         %parallelized backward recursion (def false)
-sim.expar = true;           %parallelized multiple simulations
+sim.brpar = false;         %parallelizing backward recursions (outdated)
+sim.expar = true;           %parallelizing simulations (def true)
 sim.notif = 50;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
@@ -79,7 +97,7 @@ end
 frc.sub = 3;                    %[hr] model spin up buffer
 
 %AMP parameters:
-amp.E_max = 1000;                       %[Wh], maximum battery capacity
+amp.E_max = 20000;                      %[Wh], maximum battery capacity
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate
@@ -99,7 +117,7 @@ mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 % mdp.mu = 1/(mdp.mu_mult)* ...
 %     beta(mdp.d_n,0:mdp.d_n:amp.E_max,amp.E_max,mdp,b,mdp_lb);     
 %pseudocode end - above goes in simulate wamp post sensitivity update
-mdp.beta_lb = 0.5;                    %lower bound % (of starting charge) for beta()
+mdp.beta_lb = 0.5;           %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
 mdp.b = 1;                          %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
@@ -110,7 +128,7 @@ mdp.alpha = .99;                    %discount factor
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 4;                  %[m]
+wec.B = 3;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m]
