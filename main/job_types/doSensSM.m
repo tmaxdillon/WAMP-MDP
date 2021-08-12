@@ -2,7 +2,7 @@ function [s1,s2,s3,s4,s5,s6] = ...
     doSensSM(FM,amp,frc,mdp,sim,wec,tTot)
 
 n = 10; %sensitivity discretization
-p = 6; %number of sensitivity parameters
+p = 10; %number of sensitivity parameters
 f = 2; %factor
 
 %POWER SYSTEM PARAMETERS
@@ -18,7 +18,7 @@ tp{5} = 'sdr'; %self discharge rate
 ta(5,:) = linspace(0,9,n);
 %MARKOV DECISION PROCESS PARAMETERS
 tp{6} = 'slt'; %stage limit
-ta(6,:) = llinspace(18,180,n);
+ta(6,:) = linspace(18,180,n);
 tp{7} = 'tbs'; %time between stages
 ta(7,:) = linspace(1,19,n);
 tp{8} = 'ebs'; %energy between states
@@ -27,7 +27,6 @@ tp{9} = 'dfr'; %discount factor
 ta(9,:) = linspace(.8,.99,n);
 tp{10} = 'sub'; %spin up buffer
 ta(10,:) = linspace(0,9,n);
-
 
 %preallocate and print simulation combinations
 clear multStruct
@@ -43,8 +42,9 @@ else
 end
 disp(['Beginning sensitivity small multiple using' sim_type ...
     '. There are ' num2str(p*n) ' combinations:'])
-DT = table(ta(1,:),ta(2,:),ta(3,:),ta(4,:),ta(5,:),ta(6,:), ...
-    'VariableNames',{tp{1},tp{2},tp{3},tp{4},tp{5},tp{6}});
+DT = table(ta(1,:),ta(2,:),ta(3,:),ta(4,:),ta(5,:),ta(6,:),ta(7,:), ...
+    ta(8,:),ta(9,:),ta(10,:),'VariableNames',{tp{1},tp{2},tp{3},tp{4}, ...
+    tp{5},tp{6},tp{7},tp{8},tp{9},tp{10}});
 disp(DT)
 
 %this block of code can (probably) eventually be commented out
@@ -65,11 +65,11 @@ end
 %assemble sensitivity array
 sim.p = p; %number of parameters
 sim.n = n; %number of discrete elements of each parameter
-sim.S1 = reshape(ta',[p*n,1]); %sensitivity array
+sim.S1 = reshape(ta',[p*n 1]); %sensitivity array
 sim.tp = tp; %parameter names
 
 %parallization loop
-parfor (i = 1:p*n,sim.mw)
+parfor (i = 1:(p*n),sim.mw)
     output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i);
     multStruct(i).amp = amp;
     multStruct(i).frc = frc;
@@ -78,6 +78,8 @@ parfor (i = 1:p*n,sim.mw)
     multStruct(i).sim = sim;
     multStruct(i).wec = wec;
 end
+
+%unpack multstruct into s1, s2, etc.
 
 %print results to screen
 for i = 1:length(multStruct)

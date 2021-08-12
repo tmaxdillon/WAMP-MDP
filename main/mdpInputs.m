@@ -3,7 +3,7 @@
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 10; %number of forecasts to simulate
+frc.Flimitval = 200; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
@@ -19,9 +19,7 @@ if ~exist('batchtype','var')
     batchtype = [];
     batchsim =[];
     batchpar1 = [];
-    batcharr1 = [];
     patchpar2 = [];
-    batcharr2 = [];
 end
 if isequal(batchtype,'tds')
     sim.tdsens = true;
@@ -56,7 +54,7 @@ if isequal(batchtype,'tds')
         beta_on = true;
     end
 elseif isequal(batchtype,'ssm')
-    sim.multiple = true;
+    sim.senssm = true;
     if isequal(batchsim,'mdp')
         sim.pb = false;
         sim.sl = false;
@@ -74,6 +72,10 @@ elseif isequal(batchtype,'ssm')
         sim.sl = false;
         sim.slv2 = true;
     end
+    batchpar1 = [];
+    batcharr1 = [];
+    patchpar2 = [];
+    batcharr2 = [];
 end
      
 %SIM parameters:
@@ -98,6 +100,9 @@ frc.sub = 3;                    %[hr] model spin up buffer
 
 %AMP parameters:
 amp.E_max = 20000;                      %[Wh], maximum battery capacity
+if ~sim.hpc 
+    amp.E_max = 20000; %shorten runtime if using laptop
+end
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate
@@ -119,7 +124,7 @@ mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode end - above goes in simulate wamp post sensitivity update
 mdp.beta_lb = 0.5;           %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 1;                          %battery steepness [1: on, 0: off]
+mdp.b = 0;                          %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
     mdp.b = 1;
 end

@@ -12,6 +12,10 @@ if ~sim.expar
             num2str(sim.S1(i)) ' and ' ...
             sim.tuned_parameter{2} ' tuned to ' ...
             num2str(sim.S2(i)) '.'])
+    elseif sim.senssm
+        disp(['Simulation ' num2str(i) ' beginning after ' ...
+            num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
+            sim.tp{ceil(i/sim.n)} ' tuned to ' num2str(sim.S1(i))'.'])
     end
     tSim = tic;
 end
@@ -26,6 +30,7 @@ end
 %1: modify forecast matrix based on user settings for buffer and limit val
 [FM_P,FM_mod] = modifyFM(FM,frc,wec);
 mdp.T = size(FM_P,1); %number of stages
+%mdp.T_arr = 1:mdp.dt:size(FM_P,1); %stage array
 output.FM_P = FM_P;
 output.FM_mod = FM_mod;
 %2: simulation extent (number of forecasts)
@@ -82,7 +87,7 @@ if sim.sl || sim.slv2 %simple logic
 end
 
 %RUN SIMULATION
-for f=1:mdp.dt:sim.F %over each forecast
+for f=1:1:sim.F %over each forecast
     %print status to command window
     if mod(f-1,sim.notif) == 0 && f-1 > 0 && ~sim.expar
         disp([num2str(f-1) ' out of ' num2str(sim.F) ...
@@ -90,7 +95,7 @@ for f=1:mdp.dt:sim.F %over each forecast
             ' minutes.'])
     end
     %if multiple simulation, abridge at posterior bound limit
-    if f > size(FM_P,2) - (mdp.T-1) && sim.tdsens
+    if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.tdsens || sim.senssm
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
         if ~sim.expar
@@ -139,7 +144,7 @@ for f=1:mdp.dt:sim.F %over each forecast
     %MDP AND POSTERIOR BOUND
     else
         %abridge simulation if using posterior bound to full duration
-        if f > size(FM_P,2) - (mdp.T-1) && sim.pb
+        if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
             output.abridged = true; %simulation has been abridged
             %print status to command window
             if ~sim.expar
@@ -152,38 +157,35 @@ for f=1:mdp.dt:sim.F %over each forecast
             break
         end
         %BACKWARD RECURSION
-        if sim.debug %if debugging mdp
-            if sim.brpar
-                [policy,Jstar,compare,state_evol,wec_power] = ...
-                    backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
-            else
-                [policy,Jstar,compare,state_evol,wec_power] = ...
-                    backwardRecursion(FM_P,mdp,amp,sim,wec,f);
-            end
-            %DOCUMENT BELLMANS (AND DEBUG) VALUES
-            output.val_all(:,:,:,f) = compare(:,:,:); %all values
-            output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
-            output.val_togo(:,:,f) = Jstar; %value to go
-            output.policy_all(:,:,f) = policy; %policy all
-            output.state_evol_all(:,:,:,f) = state_evol; %state evolution
-            output.wec_power_mdp(:,f) = wec_power; %power from wec (mdp)
-            output.wec_power_sim(f) = FM_P(1,f,2); %power from wec (sim)
-        else %not debugging mdp
-            %parallelization setup if backwared recursion parallelization
-            if isempty(gcp('nocreate')) && sim.hpc && sim.brpar
-                cores = feature('numcores'); %find number of cores
-                parpool(cores);
-            end
-            if sim.brpar
-                [policy,Jstar] = ...
-                    backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
-            else
+        if rem(f-1,mdp.dt) == 0 %time to make a decision based on stage
+            if sim.debug %if debugging mdp
+                if sim.brpar
+                    [policy,Jstar,compare,state_evol,wec_power] = ...
+                        backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+                else
+                    [policy,Jstar,compare,state_evol,wec_power] = ...
+                        backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+                end
+                %DOCUMENT BELLMANS (AND DEBUG) VALUES
+                output.val_all(:,:,:,f) = compare(:,:,:); %all values
+                output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
+                output.val_togo(:,:,f) = Jstar; %value to go
+                output.policy_all(:,:,f) = policy; %policy all
+                output.state_evol_all(:,:,:,f) = state_evol; %state evol
+                output.wec_power_mdp(:,f) = wec_power; %P from wec (mdp)
+                output.wec_power_sim(f) = FM_P(1,f,2); %P from wec (sim)
+            else %not debugging mdp
                 [policy,Jstar] = ...
                     backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+                output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
             end
-            output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
+            %determine action over next few time steps based on polic
+            if f+mdp.dt < sim.F
+                output.a_sim(f:f+mdp.dt) = policy(ind_E_sim,1); %action
+            else
+                output.a_sim(f:end) = policy(ind_E_sim,1);
+            end
         end
-        output.a_sim(f) = policy(ind_E_sim,1); %action given current state
     end
     %EVOLVE SIMULATION:
     [output.Pb_sim(f),E_evolved] = powerToBattery(output.Pw_sim(f), ...
