@@ -81,7 +81,7 @@ end
 %SIM parameters:
 sim.brpar = false;         %parallelizing backward recursions (outdated)
 sim.expar = true;           %parallelizing simulations (def true)
-sim.notif = 500;             %notifications every __ forecasts
+sim.notif = 25;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
 sim.corelim = 2;            % numcores > corelim == using HPC
@@ -99,7 +99,7 @@ end
 frc.sub = 3;                    %[hr] model spin up buffer
 
 %AMP parameters:
-amp.E_max = 20000;                      %[Wh], maximum battery capacity
+amp.E_max = 10000;                      %[Wh], maximum battery capacity
 if ~sim.hpc 
     amp.E_max = 2000; %shorten runtime if using laptop
 end
@@ -115,7 +115,7 @@ amp.tt = [12 3];                        %[h], time til depletion thresholds
 mdp.n = 40;                       %number of states [outdated]
 mdp.d_n = 40;                       %[kWh] energy between states
 mdp.m = 4;                          %number of actions
-mdp.eps = 1;                      %aggressiveness factor
+mdp.eps = 100;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode start - enter this into simulate wamp (post sensitivity update)
 % mdp.mu_mult = 5;
@@ -124,7 +124,7 @@ mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode end - above goes in simulate wamp post sensitivity update
 mdp.beta_lb = 0.5;           %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness [1: on, 0: off]
+mdp.b = 1;                          %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
     mdp.b = 1;
 end

@@ -92,6 +92,8 @@ s8 = multStruct(7*p+1:8*p);
 s9 = multStruct(8*p+1:9*p);
 s10 = multStruct(9*p+1:10*p);
 
+%TBD: baseline results, s0 - will need to code this into the parfor loop
+
 %print results to screen
 if sim.expar
     for i = 1:length(multStruct)
