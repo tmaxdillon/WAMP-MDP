@@ -3,7 +3,7 @@
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 5; %number of forecasts to simulate
+frc.Flimitval = 300; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
@@ -81,7 +81,7 @@ end
 %SIM parameters:
 sim.brpar = false;         %parallelizing backward recursions (outdated)
 sim.expar = true;           %parallelizing simulations (def true)
-sim.notif = 10;             %notifications every __ forecasts
+sim.notif = 500;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
 sim.corelim = 2;            % numcores > corelim == using HPC
