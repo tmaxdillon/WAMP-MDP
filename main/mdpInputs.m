@@ -2,7 +2,7 @@
 %limits
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
-frc.Flimit = false; %to shorten runtime
+frc.Flimit = true; %to shorten runtime
 frc.Flimitval = 100; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
@@ -115,7 +115,7 @@ amp.tt = [12 3];                        %[h], time til depletion thresholds
 mdp.n = 40;                       %number of states [outdated]
 mdp.d_n = 40;                       %[kWh] energy between states
 mdp.m = 4;                          %number of actions
-mdp.eps = 1;                      %aggressiveness factor
+mdp.eps = 1000;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode start - enter this into simulate wamp (post sensitivity update)
 % mdp.mu_mult = 5;
@@ -124,7 +124,7 @@ mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode end - above goes in simulate wamp post sensitivity update
 mdp.beta_lb = 0.5;           %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness [1: on, 0: off]
+mdp.b = 1;                          %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
     mdp.b = 1;
 end

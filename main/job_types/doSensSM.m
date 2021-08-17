@@ -67,6 +67,13 @@ sim.p = p; %number of parameters
 sim.n = n; %number of discrete elements of each parameter
 sim.S1 = reshape(ta',[p*n 1]); %sensitivity array
 sim.tp = tp; %parameter names
+%set number of cores
+if isempty(gcp('nocreate')) && sim.hpc && ~sim.brpar
+    cores = feature('numcores'); %find number of cores
+    if cores > sim.corelim %only start if using HPC
+        parpool(cores);
+    end
+end
 
 %parallization loop
 multStruct(p*n) = struct();
