@@ -2,8 +2,8 @@
 %limits
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
-frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 200; %number of forecasts to simulate
+frc.Flimit = true; %to shorten runtime
+frc.Flimitval = 100; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
@@ -47,7 +47,7 @@ if isequal(batchtype,'tds')
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     elseif isequal(batchpar1,'eps') && isequal(batchpar2,'nll')
-        sim.tuning_array1 = [0.1 0.5 1 2.5 5 10 20 50 100 1000 10000]; %[~]
+        sim.tuning_array1 = [0.1 0.5 1 5 10 100 1000 10000 100000]; %[~]
         sim.tuning_array2 = 1;
         sim.tuned_parameter{1} = 'eps'; %epsilon
         sim.tuned_parameter{2} = 'nll';
@@ -81,7 +81,7 @@ end
 %SIM parameters:
 sim.brpar = false;         %parallelizing backward recursions (outdated)
 sim.expar = true;           %parallelizing simulations (def true)
-sim.notif = 50;             %notifications every __ forecasts
+sim.notif = 25;             %notifications every __ forecasts
 sim.debug = false;          %include debugging variables in output
 sim.debug_brpar = false;      %debug HPC runtime and overhead
 sim.corelim = 2;            % numcores > corelim == using HPC
@@ -101,7 +101,7 @@ frc.sub = 3;                    %[hr] model spin up buffer
 %AMP parameters:
 amp.E_max = 20000;                      %[Wh], maximum battery capacity
 if ~sim.hpc 
-    amp.E_max = 20000; %shorten runtime if using laptop
+    amp.E_max = 2000; %shorten runtime if using laptop
 end
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
@@ -112,10 +112,10 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
-mdp.n = 40;                       %number of states
+mdp.n = 40;                       %number of states [outdated]
 mdp.d_n = 40;                       %[kWh] energy between states
 mdp.m = 4;                          %number of actions
-mdp.eps = 1;                      %aggressiveness factor
+mdp.eps = 100;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode start - enter this into simulate wamp (post sensitivity update)
 % mdp.mu_mult = 5;
@@ -124,7 +124,7 @@ mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
 %pseudocode end - above goes in simulate wamp post sensitivity update
 mdp.beta_lb = 0.5;           %lower bound % (of starting charge) for beta()
 mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness [1: on, 0: off]
+mdp.b = 1;                          %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
     mdp.b = 1;
 end

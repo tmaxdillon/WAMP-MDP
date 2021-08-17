@@ -61,11 +61,14 @@ amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 %4: preallocate outputs
 output.E_sim = zeros(sim.F,1); %battery time series
 output.a_sim = zeros(sim.F,1); %action time series
+output.a_act_sim = zeros(sim.F,1); %actual action time series
 output.Pw_sim = zeros(sim.F,1); %power from WEC time series
-output.Pb_sim = zeros(sim.F,1); %net power sent to battery time series
+output.P_sim = zeros(sim.F,1); %power for sensing time series
+output.D_sim = zeros(sim.F,1); %power discarded time series
+%output.Pb_sim = zeros(sim.F,1); %net power sent to battery time series
 output.wec.cw = zeros(sim.F,1); %capture width
 output.wec.cwr = zeros(sim.F,1); %capture width ratio
-output.Pw_error = zeros(ceil((mdp.T-1)/24),sim.F); %error matrix
+output.Pw_error = zeros(ceil((mdp.T*mdp.dt-1)/24),sim.F); %error matrix
 output.beta = zeros(sim.F,1); %beta time series
 output.val_Jstar = zeros(sim.F,1); %Jstar time series
 if sim.debug
@@ -95,7 +98,7 @@ for f=1:1:sim.F %over each forecast
             ' minutes.'])
     end
     %if multiple simulation, abridge at posterior bound limit
-    if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.tdsens || sim.senssm
+    if f > size(FM_P,2) - (size(FM_P,1)-1) && (sim.tdsens || sim.senssm)
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
         if ~sim.expar
@@ -188,18 +191,21 @@ for f=1:1:sim.F %over each forecast
         end
     end
     %EVOLVE SIMULATION:
-    [output.Pb_sim(f),E_evolved] = powerToBattery(output.Pw_sim(f), ...
-        output.E_sim(f),amp.Ps(output.a_sim(f)), ...
-        amp.sdr,amp.E_max,mdp.dt,wec.FO); %net power sent to battery
+    %find power for sensing, power discarded and battery evolution
+    [output.P_sim(f),output.a_act_sim(f),output.D_sim(f),E_evolved] = ...
+        powerBalance(output.Pw_sim(f),output.E_sim(f), ...
+        output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1); 
     output.beta(f+1) = beta(E_evolved,amp.E,amp.E_max, ...
         mdp.b,mdp.beta_lb); %document beta value
     [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
-    %
-    if f > 1
-        output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
+    %calculate forecast error
+    if f > mdp.dt
+        %output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
+        %figure this out later so that it works with tbs and mdp.dt > 1
+        output.Pw_error(:,f) = nan;
     end
 end
 
@@ -230,6 +236,18 @@ if sim.tdsens
     output.results.(sim.tuned_parameter{2}) = sim.S2(i);
     output.results.power_avg = output.power_avg;
     output.results.beta_avg = output.beta_avg;
+elseif sim.senssm
+    if sim.expar
+        output.results.(sim.tp{ceil(i/sim.n)}) = sim.S1(i);
+        output.results.power_avg = output.power_avg;
+        output.results.beta_avg = output.beta_avg;
+    else
+        results.rp = output.wec.rp;
+        results.E_max = output.wec.E_max;
+        results.power_avg = output.power_avg;
+        results.beta_avg = output.beta_avg;
+        results
+    end
 else
     results.rp = output.wec.rp;
     results.E_max = output.wec.E_max;

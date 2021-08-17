@@ -28,7 +28,7 @@ end
 
 %VARIOUS SETUP ITEMS
 %1: modify forecast matrix based on user settings for buffer and limit val
-[FM_P,FM_mod] = modifyFM(FM,frc,wec);
+[FM_P,FM_mod] = modifyFM(FM,frc,mdp,wec);
 mdp.T = size(FM_P,1); %number of stages
 %mdp.T_arr = 1:mdp.dt:size(FM_P,1); %stage array
 output.FM_P = FM_P;
@@ -62,10 +62,12 @@ amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 output.E_sim = zeros(sim.F,1); %battery time series
 output.a_sim = zeros(sim.F,1); %action time series
 output.Pw_sim = zeros(sim.F,1); %power from WEC time series
-output.Pb_sim = zeros(sim.F,1); %net power sent to battery time series
+output.P_sim = zeros(sim.F,1); %power for sensing time series
+output.D_sim = zeros(sim.F,1); %power discarded time series
+%output.Pb_sim = zeros(sim.F,1); %net power sent to battery time series
 output.wec.cw = zeros(sim.F,1); %capture width
 output.wec.cwr = zeros(sim.F,1); %capture width ratio
-output.Pw_error = zeros(ceil((mdp.T-1)/24),sim.F); %error matrix
+output.Pw_error = zeros(ceil((mdp.T*mdp.dt-1)/24),sim.F); %error matrix
 output.beta = zeros(sim.F,1); %beta time series
 output.val_Jstar = zeros(sim.F,1); %Jstar time series
 if sim.debug
@@ -95,7 +97,7 @@ for f=1:1:sim.F %over each forecast
             ' minutes.'])
     end
     %if multiple simulation, abridge at posterior bound limit
-    if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.tdsens || sim.senssm
+    if f > size(FM_P,2) - (size(FM_P,1)-1) && (sim.tdsens || sim.senssm)
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
         if ~sim.expar
@@ -175,29 +177,34 @@ for f=1:1:sim.F %over each forecast
                 output.wec_power_mdp(:,f) = wec_power; %P from wec (mdp)
                 output.wec_power_sim(f) = FM_P(1,f,2); %P from wec (sim)
             else %not debugging mdp
-                [policy,Jstar] = ...
-                    backwardRecursion(FM_P,mdp,amp,sim,wec,f);
-                output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
+                [policy,Jstar] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
             end
-            %determine action over next few time steps based on polic
+            %set action and opt val over next dt time steps based on policy
             if f+mdp.dt < sim.F
-                output.a_sim(f:f+mdp.dt) = policy(ind_E_sim,1); %action
+                output.a_sim(f:f+mdp.dt) = policy(ind_E_sim,1);
+                output.val_Jstar(f:f+mdp.dt) = Jstar(ind_E_sim,1);
             else
                 output.a_sim(f:end) = policy(ind_E_sim,1);
+                output.val_Jstar(f:end) = Jstar(ind_E_sim,1);              
             end
         end
     end
     %EVOLVE SIMULATION:
-    [output.Pb_sim(f),E_evolved] = powerToBattery(output.Pw_sim(f), ...
+    [output.P_sim(f),output.D_sim(f),E_evolved] = ...
+        powerBalance(output.Pw_sim(f),output.E_sim(f), ...
+        amp.Ps(output.a_sim(f)),amp.sdr,amp.E_max,amp.Ps,1); %power 
+    
+    ...
+        powerToBattery(output.Pw_sim(f), ...
         output.E_sim(f),amp.Ps(output.a_sim(f)), ...
-        amp.sdr,amp.E_max,mdp.dt,wec.FO); %net power sent to battery
+        amp.sdr,amp.E_max,1,wec.FO); %net power sent to battery
     output.beta(f+1) = beta(E_evolved,amp.E,amp.E_max, ...
         mdp.b,mdp.beta_lb); %document beta value
     [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
-    %
+    %calculate forecast error
     if f > 1
         output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
     end
@@ -230,6 +237,18 @@ if sim.tdsens
     output.results.(sim.tuned_parameter{2}) = sim.S2(i);
     output.results.power_avg = output.power_avg;
     output.results.beta_avg = output.beta_avg;
+elseif sim.senssm
+    if sim.expar
+        output.results.(sim.tp{ceil(i/sim.n)}) = sim.S1(i);
+        output.results.power_avg = output.power_avg;
+        output.results.beta_avg = output.beta_avg;
+    else
+        results.rp = output.wec.rp;
+        results.E_max = output.wec.E_max;
+        results.power_avg = output.power_avg;
+        results.beta_avg = output.beta_avg;
+        results
+    end
 else
     results.rp = output.wec.rp;
     results.E_max = output.wec.E_max;

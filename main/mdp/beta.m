@@ -19,6 +19,9 @@ lb = beta_lb*E_max;
 %COMPUTE BETA
 if E_disc < lb
     beta = b*(lb/E_disc - 1);
+    if isnan(beta) && b == 0
+        beta = 0;
+    end
 else
     beta = 0;
 end

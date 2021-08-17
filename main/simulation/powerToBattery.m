@@ -1,4 +1,5 @@
-function [power_batt,E_evolved] = powerToBattery(power_wec,E,draw,sdr, ...
+function [power_batt_net,E_evolved] = ...
+    powerToBattery(power_wec,E,draw,sdr, ...
     E_max,dt,FO)
 
 if FO
@@ -15,12 +16,13 @@ end
 
 sd = E*(sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
 E_evolved = dt*(power_amp - draw) + E - sd;
+%power_batt_gross = (E_evolved - E + sd)/dt; %gross power to battery bank
 if E_evolved > E_max %dump power
     E_evolved = E_max;
 elseif E_evolved <= 0 %bottom out
     E_evolved = 0;
 end
-power_batt = (E_evolved - E + sd)/dt; %net power sent to battery bank
+power_batt_net = (E_evolved - E + sd)/dt; %net power sent to battery bank
     
 end
 

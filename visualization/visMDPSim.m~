@@ -65,13 +65,13 @@ grid on
 %OPERATIONAL STATE TIME SERIES
 ax(4) = subaxis(8,1,4);
 for i = 1:max(output.a_sim)
+    scatter(datetime(FM_P(1,(output.a_act_sim==i),1),'ConvertFrom', ...
+        'datenum'),output.a_sim(output.a_act)sim==i),'.', ...
+        'MarkerEdgeColor',[51 255 51]/256)
+    hold on
     scatter(datetime(FM_P(1,(output.a_sim==i),1),'ConvertFrom', ...
         'datenum'),output.a_sim(output.a_sim==i),'.', ...
         'MarkerEdgeColor',[255 51 51]/256)
-    hold on
-    scatter(datetime(FM_P(1,(output.a_act_sim==i),1),'ConvertFrom', ...
-        'datenum'),output.a_sim(output.a_act_sim==i),'.', ...
-        'MarkerEdgeColor',[51 255 51]/256)
 end
 xlim(xl)
 xticks(xt)
@@ -112,7 +112,7 @@ colormap(gca,redblue(11))
 c = colorbar('Location','east');
 c.Label.String = 'Overestimate [kW]';
 caxis([-max(abs(output.Pw_error(:)/1000)) ...
-    max(abs(output.Pw_error(:)/1000))]);
+    max(abs(output.Pw_error(:)/1000))])
 ylabel({'Forecast','Extent [days]'})
 ylim([1 inf])
 xlabel('Time')

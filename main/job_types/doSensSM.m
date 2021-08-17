@@ -1,4 +1,4 @@
-function [s1,s2,s3,s4,s5,s6] = ...
+function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10] = ...
     doSensSM(FM,amp,frc,mdp,sim,wec,tTot)
 
 n = 10; %sensitivity discretization
@@ -24,7 +24,7 @@ ta(7,:) = linspace(1,19,n);
 tp{8} = 'ebs'; %energy between states
 ta(8,:) = linspace(17.5,40,n);
 tp{9} = 'dfr'; %discount factor
-ta(9,:) = linspace(.8,.99,n);
+ta(9,:) = linspace(.5,.99,n);
 tp{10} = 'sub'; %spin up buffer
 ta(10,:) = linspace(0,9,n);
 
@@ -69,6 +69,7 @@ sim.S1 = reshape(ta',[p*n 1]); %sensitivity array
 sim.tp = tp; %parameter names
 
 %parallization loop
+multStruct(p*n) = struct();
 parfor (i = 1:(p*n),sim.mw)
     output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i);
     multStruct(i).amp = amp;
@@ -80,10 +81,22 @@ parfor (i = 1:(p*n),sim.mw)
 end
 
 %unpack multstruct into s1, s2, etc.
+s1 = multStruct(1:1*p);
+s2 = multStruct(1*p+1:2*p);
+s3 = multStruct(2*p+1:3*p);
+s4 = multStruct(3*p+1:4*p);
+s5 = multStruct(4*p+1:5*p);
+s6 = multStruct(5*p+1:6*p);
+s7 = multStruct(6*p+1:7*p);
+s8 = multStruct(7*p+1:8*p);
+s9 = multStruct(8*p+1:9*p);
+s10 = multStruct(9*p+1:10*p);
 
 %print results to screen
-for i = 1:length(multStruct)
-    multStruct(i).output.results
+if sim.expar
+    for i = 1:length(multStruct)
+        multStruct(i).output.results
+    end
 end
 multStruct = reshape(multStruct,[n p]);
 disp([num2str(n*p) ' simulations complete after ' ...
