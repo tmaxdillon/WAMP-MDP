@@ -1,5 +1,5 @@
 function [apct,power_avg,beta_avg,E_sim_ind,E_recon,J_recon] = ...
-    calcPerfMetrics(amp,mdp,wec,output)
+    calcPerfMetrics(amp,mdp,sim,wec,output,i)
 
 %percent of each operational state and average output power
 power_avg = 0; %preallocate
@@ -10,8 +10,9 @@ for i = 1:mdp.m
     power_avg = power_avg + apct(i)*amp.Ps(i);
 end
 power_avg2 = mean(output.P_sim);
-if ~isequal(power_avg2,power_avg)
-    error('average of P_sim and average of a_act_sim are not equal')
+if ~isequal(power_avg2,power_avg) && sim.senssm
+    disp(['power averages not equal. parameter = ' ...
+        sim.tp{ceil(i/sim.n)} ' and value = ' num2str(sim.S1(i))])
 end
 %average beta value
 beta_avg = mean(output.beta);

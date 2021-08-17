@@ -2,15 +2,15 @@
 %limits
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 100; %number of forecasts to simulate
+frc.Flimit = false; %to shorten runtime
+frc.Flimitval = 5; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.slv2 = false; %toggle for simple logic v2 in one sim
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
-sim.senssm = false; %sensitivity small multiple
+sim.senssm = true; %sensitivity small multiple
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 sim.exdist = false; %batt disc set externally (multiple only, outdated)
