@@ -3,7 +3,7 @@
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 300; %number of forecasts to simulate
+frc.Flimitval = 200; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim

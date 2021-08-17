@@ -12,7 +12,7 @@ end
 power_avg2 = mean(output.P_sim);
 if ~isequal(power_avg2,power_avg) && sim.senssm
     disp(['power averages not equal. parameter = ' ...
-        sim.tp{ceil(i/sim.n)} ' and value = ' num2str(sim.S1(i))])
+        sim.tp{ceil(j/sim.n)} ' and value = ' num2str(sim.S1(j))])
 end
 %average beta value
 beta_avg = mean(output.beta);
@@ -27,9 +27,9 @@ f_ext = find(output.a_act_sim > 0,1,'last');
 E_recon = zeros(length(output.E_sim),1);
 J_recon = zeros(length(output.E_sim),1);
 E_recon(1) = amp.E_start;
-disp(['length f_ext = ' num2str(f_ext)])
-disp(['power averages not equal. parameter = ' ...
-        sim.tp{ceil(j/sim.n)} ' and value = ' num2str(sim.S1(j))])
+% disp(['length f_ext = ' num2str(f_ext)])
+% disp(['power averages not equal. parameter = ' ...
+%         sim.tp{ceil(j/sim.n)} ' and value = ' num2str(sim.S1(j))])
 for f = 1:f_ext
 %     [~,E_recon(f+1)] = powerToBattery(output.Pw_sim(f), ...
 %         E_recon(f),amp.Ps(output.a_sim(f)), ...
