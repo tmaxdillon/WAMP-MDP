@@ -166,3 +166,12 @@ if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter') ...
     % sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
 end
 
+%override batch variables
+if exist('batchbeta','var')
+    mdp.b = batchbeta;
+end
+if exist('batcheps','var')
+    mdp.eps = batcheps;
+    mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
+end
+
