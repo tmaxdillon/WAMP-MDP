@@ -112,7 +112,7 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
-mdp.n = 40;                       %number of states [outdated]
+mdp.n = 25;                       %number of states [outdated]
 mdp.d_n = 40;                       %[kWh] energy between states
 mdp.m = 4;                          %number of actions
 mdp.eps = 1;                      %aggressiveness factor
