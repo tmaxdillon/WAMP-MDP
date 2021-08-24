@@ -24,6 +24,8 @@ end
 %update sensitivity analysis
 if sim.tdsens || sim.senssm
     [FM,amp,frc,mdp,sim,wec] = updateSensitivity(FM,amp,frc,mdp,sim,wec,i);
+else %not sensitivity, set i value for calcPerfMetrics
+    i = nan;
 end
 
 %VARIOUS SETUP ITEMS
@@ -61,6 +63,7 @@ amp.E_start = amp.E(round(length(amp.E)/2)); %[Wh], starting battery level
 %4: preallocate outputs
 output.E_sim = zeros(sim.F,1); %battery time series
 output.a_sim = zeros(sim.F,1); %action time series
+output.a_act_sim = zeros(sim.F,1); %actual action time series
 output.Pw_sim = zeros(sim.F,1); %power from WEC time series
 output.P_sim = zeros(sim.F,1); %power for sensing time series
 output.D_sim = zeros(sim.F,1); %power discarded time series
@@ -190,14 +193,10 @@ for f=1:1:sim.F %over each forecast
         end
     end
     %EVOLVE SIMULATION:
-    [output.P_sim(f),output.D_sim(f),E_evolved] = ...
+    %find power for sensing, power discarded and battery evolution
+    [output.P_sim(f),output.a_act_sim(f),output.D_sim(f),E_evolved] = ...
         powerBalance(output.Pw_sim(f),output.E_sim(f), ...
-        amp.Ps(output.a_sim(f)),amp.sdr,amp.E_max,amp.Ps,1); %power 
-    
-    ...
-        powerToBattery(output.Pw_sim(f), ...
-        output.E_sim(f),amp.Ps(output.a_sim(f)), ...
-        amp.sdr,amp.E_max,1,wec.FO); %net power sent to battery
+        output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1); 
     output.beta(f+1) = beta(E_evolved,amp.E,amp.E_max, ...
         mdp.b,mdp.beta_lb); %document beta value
     [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
@@ -205,15 +204,18 @@ for f=1:1:sim.F %over each forecast
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
     %calculate forecast error
-    if f > 1
-        output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
+    if f > mdp.dt
+        %output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
+        %figure this out later so that it works with tbs and mdp.dt > 1
+        output.Pw_error(:,f) = nan;
     end
 end
 
 %PERFORMANCE METRICS
 %percent for each operational state and average output power
 [output.apct,output.power_avg,output.beta_avg,output.E_sim_ind, ...
-    output.E_recon,output.J_recon] = calcPerfMetrics(amp,mdp,wec,output);
+    output.E_recon,output.J_recon] = ...
+    calcPerfMetrics(amp,mdp,sim,wec,output,i);
 
 %PRINT END
 %print status to command window
@@ -238,6 +240,8 @@ if sim.tdsens
     output.results.power_avg = output.power_avg;
     output.results.beta_avg = output.beta_avg;
 elseif sim.senssm
+    output.tuned_parameter = sim.tp{ceil(i/sim.n)};
+    output.tuning_array = sim.S1(
     if sim.expar
         output.results.(sim.tp{ceil(i/sim.n)}) = sim.S1(i);
         output.results.power_avg = output.power_avg;

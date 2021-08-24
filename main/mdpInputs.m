@@ -9,8 +9,8 @@ sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.slv2 = false; %toggle for simple logic v2 in one sim
 %multiple simulation types
-sim.tdsens = false; %2-D sensitivity analysis
-sim.senssm = true; %sensitivity small multiple
+sim.tdsens = true; %2-D sensitivity analysis
+sim.senssm = false; %sensitivity small multiple
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 sim.exdist = false; %batt disc set externally (multiple only, outdated)
@@ -136,7 +136,7 @@ wec.h = 0.10;               %percent of rated power as house load
 wec.B = 3;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
-wec.Hs_ra = 2;              %[m]
+wec.Hs_ra = 4.5;              %[m] - 2 is default
 wec.Tp_ra = 9;              %[s]
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
@@ -148,7 +148,8 @@ wec.FO = false;             %toggle fred. olsen
 % if isfield(sim,'tuning_array')
 %     sim = rmfield(sim,'tuning_array');
 % end
-if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter')
+if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter') ...
+        && ~sim.senssm && sim.tdsens
     sim.tuning_array1 = 1000:2000:17000;
     sim.tuning_array2 = [1 2 3 4 5 6];
     sim.tuned_parameter{1} = 'emx'; %rated Hs

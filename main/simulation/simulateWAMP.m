@@ -24,6 +24,8 @@ end
 %update sensitivity analysis
 if sim.tdsens || sim.senssm
     [FM,amp,frc,mdp,sim,wec] = updateSensitivity(FM,amp,frc,mdp,sim,wec,i);
+else %not sensitivity, set i value for calcPerfMetrics
+    i = nan;
 end
 
 %VARIOUS SETUP ITEMS
@@ -198,6 +200,7 @@ for f=1:1:sim.F %over each forecast
     output.beta(f+1) = beta(E_evolved,amp.E,amp.E_max, ...
         mdp.b,mdp.beta_lb); %document beta value
     [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
+    %could add counter of whether E_evolved rounded up or down ^^
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
@@ -238,6 +241,9 @@ if sim.tdsens
     output.results.power_avg = output.power_avg;
     output.results.beta_avg = output.beta_avg;
 elseif sim.senssm
+    %store sensitivity parameter and array for visualization
+    output.tuned_parameter = sim.tp{ceil(i/sim.n)};
+    output.tuning_array = sim.S1(ceil(i/sim.n)*10-9,ceil(i/sim.n));
     if sim.expar
         output.results.(sim.tp{ceil(i/sim.n)}) = sim.S1(i);
         output.results.power_avg = output.power_avg;

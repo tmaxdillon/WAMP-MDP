@@ -10,8 +10,8 @@ for i = 1:mdp.m
     power_avg = power_avg + apct(i)*amp.Ps(i);
 end
 power_avg2 = mean(output.P_sim);
-if ~isequal(power_avg2,power_avg) && sim.senssm
-    disp(['power averages not equal. parameter = ' ...
+if abs(power_avg2 - power_avg) > 1 && sim.senssm
+    warning(['power averages not within 1 W. parameter = ' ...
         sim.tp{ceil(j/sim.n)} ' and value = ' num2str(sim.S1(j))])
 end
 %average beta value

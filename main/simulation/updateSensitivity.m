@@ -25,7 +25,7 @@ elseif ~sim.tdsens && sim.senssm %sensitivity small multiple
     elseif isequal(sim.tp{ceil(i/sim.n)},'sdr') %self discharge rate
         amp.sdr = sim.S1(i);
     elseif isequal(sim.tp{ceil(i/sim.n)},'slt') %stage limit
-        frc.stagelimit = true; frc.stagelimiit = sim.S1(i);
+        frc.stagelimit = true; frc.stagelimit = sim.S1(i);
     elseif isequal(sim.tp{ceil(i/sim.n)},'tbs') %time between stages
         mdp.dt = sim.S1(i);
     elseif isequal(sim.tp{ceil(i/sim.n)},'ebs') %energy between stages
