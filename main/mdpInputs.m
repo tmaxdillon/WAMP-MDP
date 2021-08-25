@@ -3,7 +3,7 @@
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 10; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 200; %number of forecasts to simulate
+frc.Flimitval = 3; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
@@ -112,8 +112,8 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
-mdp.n = 25;                       %number of states [outdated]
-mdp.d_n = 40;                       %[kWh] energy between states
+mdp.n = 40;                       %number of states [outdated]
+mdp.d_n = 25;                       %[kWh] energy between states
 mdp.m = 4;                          %number of actions
 mdp.eps = 1;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
