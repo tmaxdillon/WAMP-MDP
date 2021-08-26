@@ -136,8 +136,8 @@ wec.h = 0.10;               %percent of rated power as house load
 wec.B = 3;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
-wec.Hs_ra = 4.5;              %[m] - 2 is default
-wec.Tp_ra = 9;              %[s]
+wec.Hs_ra = 2;              %[m] - 2 is default
+wec.Tp_ra = 9;              %[s] - 9 is default
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
 
