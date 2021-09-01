@@ -3,30 +3,46 @@ function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10] = ...
 
 n = 10; %sensitivity discretization
 p = 10; %number of sensitivity parameters
-f = 2; %factor
+%set up tuning capacity array
+if sim.ssm_ca %capacity analysis turned on
+    batts = [1000 2500 5000:5000:35000]; %[Wh]
+    wecs = [2 3 4 5]; %[m]
+    c = length(batts)*length(wecs); %number of capacity combinations    
+    [W,B] = meshgrid(batts,wecs); 
+    tc = [reshape(B,[c 1]) reshape(W,[c 1])]; %tuning capacity array
+else %just analyzing one capacity combination
+    c = 1; %number of capacity combinations
+    tc = [wec.B amp.E_max]; %tuning capacity array
+end
 
-%POWER SYSTEM PARAMETERS
-tp{1} = 'eta'; %conversion and transmission efficiency
-ta(1,:) = linspace(0.4,1,n);
-tp{2} = 'whl'; %wec hotel load
-ta(2,:) = linspace(0,.18,n);
-tp{3} = 'rhs'; %rated significant wave height
-ta(3,:) = linspace(0.5,5,n);
-tp{4} = 'rtp'; %rated peak period
-ta(4,:) = linspace(5,14,n);
-tp{5} = 'sdr'; %self discharge rate
-ta(5,:) = linspace(0,9,n);
-%MARKOV DECISION PROCESS PARAMETERS
-tp{6} = 'slt'; %stage limit
-ta(6,:) = linspace(18,180,n);
-tp{7} = 'tbs'; %time between stages
-ta(7,:) = linspace(1,19,n);
-tp{8} = 'ebs'; %energy between states
-ta(8,:) = linspace(17.5,40,n);
-tp{9} = 'dfr'; %discount factor
-ta(9,:) = linspace(.5,.99,n);
-tp{10} = 'sub'; %spin up buffer
-ta(10,:) = linspace(0,9,n);
+%preallocate ta
+ta = zeros(n,p,c);
+
+%set up tuning matrix and tuned parameter names
+for i = 1:c
+    %POWER SYSTEM PARAMETERS
+    tp{1} = 'eta'; %conversion and transmission efficiency
+    ta(1,:,i) = linspace(0.4,1,n);
+    tp{2} = 'whl'; %wec hotel load
+    ta(2,:,i) = linspace(0,.18,n);
+    tp{3} = 'rhs'; %rated significant wave height
+    ta(3,:,i) = linspace(0.5,5,n);
+    tp{4} = 'rtp'; %rated peak period
+    ta(4,:,i) = linspace(5,14,n);
+    tp{5} = 'sdr'; %self discharge rate
+    ta(5,:,i) = linspace(0,9,n);
+    %MARKOV DECISION PROCESS PARAMETERS
+    tp{6} = 'slt'; %stage limit
+    ta(6,:,i) = linspace(18,180,n);
+    tp{7} = 'tbs'; %time between stages
+    ta(7,:,i) = linspace(1,19,n);
+    tp{8} = 'ebs'; %energy between states
+    ta(8,:,i) = linspace(17.5,40,n);
+    tp{9} = 'dfr'; %discount factor
+    ta(9,:,i) = linspace(.5,.99,n);
+    tp{10} = 'sub'; %spin up buffer
+    ta(10,:,i) = linspace(0,9,n);
+end
 
 %preallocate and print simulation combinations
 clear multStruct
@@ -41,35 +57,39 @@ else
     sim_type = ' [Markov Decision Process] ';
 end
 disp(['Beginning sensitivity small multiple using' sim_type ...
-    '. There are ' num2str(p*n) ' combinations:'])
-DT = table(ta(1,:),ta(2,:),ta(3,:),ta(4,:),ta(5,:),ta(6,:),ta(7,:), ...
-    ta(8,:),ta(9,:),ta(10,:),'VariableNames',{tp{1},tp{2},tp{3},tp{4}, ...
+    '. There are ' num2str(p*n*c) ' combinations.'])
+if sim.ssm_ca
+    disp('(capacity analysis turned on)')
+end
+disp('Paramater ranges:')
+DT = table([ta(1,1,1) ta(1,end,1)],[ta(2,1,1) ta(2,end,1)], ...
+    [ta(3,1,1) ta(3,end,1)],[ta(4,1,1) ta(4,end,1)], ...
+    [ta(5,1,1) ta(5,end,1)],[ta(6,1,1) ta(6,end,1)], ...
+    [ta(7,1,1) ta(7,end,1)],[ta(8,1,1) ta(8,end,1)], ...
+    [ta(9,1,1) ta(9,end,1)],[ta(10,1,1) ta(10,end,1)], ...
+    'VariableNames',{tp{1},tp{2},tp{3},tp{4}, ...
     tp{5},tp{6},tp{7},tp{8},tp{9},tp{10}});
 disp(DT)
 
-%this block of code can (probably) eventually be commented out
-%set non expar (backward recursion par) settings
-if ~sim.expar
-    sim.mw = 0; %max number of workers
-end
-%set battery discretization externally for multiple simulations, not
-%default because sim.use_d_n is default
-for i = 1:p
-    if isequal(tp{i},'emx') && sim.exdist && ~sim.use_d_n
-        E_temp = 0:amp.Ps(2)-5:max(tp{i,:}); %[Wh] discretized battery state
-        mdp.n = length(E_temp);
-        disp(['n = ' num2str(mdp.n) ' max E = ' num2str(max(tp{i,:}))])
+%assemble tuning cell S1
+sim.p = p; %number of parameters
+sim.n = n; %number of discrete elements of each parameter
+sim.c = c; %number of wec/battery capacity combinations
+sim.S1{:,1} = reshape(permute(ta,[2 1 3]),[p*n*c 1]); %parameter value
+sim.S1{:,2} = repmat(repelem(tp',p),[c 1]); %parameter name
+sim.S1{:,3} = repelem(tc(:,1),p*n); %WEC size
+sim.S1{:,4} = repelem(tc(:,2),p*n); %battery capacity
+%set number of cores
+if isempty(gcp('nocreate')) && sim.hpc && ~sim.brpar
+    cores = feature('numcores'); %find number of cores
+    if cores > sim.corelim %only start if using HPC
+        parpool(cores);
     end
 end
 
-%assemble sensitivity array
-sim.p = p; %number of parameters
-sim.n = n; %number of discrete elements of each parameter
-sim.S1 = reshape(ta',[p*n 1]); %sensitivity array
-sim.tp = tp; %parameter names
-
 %parallization loop
-parfor (i = 1:(p*n),sim.mw)
+multStruct(p*n) = struct();
+parfor (i = 1:(p*n*c),sim.mw)
     output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i);
     multStruct(i).amp = amp;
     multStruct(i).frc = frc;
@@ -83,13 +103,15 @@ end
 s1 = multStruct(1:1*p);
 s2 = multStruct(1*p+1:2*p);
 s3 = multStruct(2*p+1:3*p);
-s4 = multStruct(4*p);
-s5 = multStruct(5*p);
-s6 = multStruct(6*p);
-s7 = multStruct(7*p);
-s8 = multStruct(8*p);
-s9 = multStruct(9*p);
-s10 = multStruct(10*p);
+s4 = multStruct(3*p+1:4*p);
+s5 = multStruct(4*p+1:5*p);
+s6 = multStruct(5*p+1:6*p);
+s7 = multStruct(6*p+1:7*p);
+s8 = multStruct(7*p+1:8*p);
+s9 = multStruct(8*p+1:9*p);
+s10 = multStruct(9*p+1:10*p);
+
+%TBD: baseline results, s0 - will need to code this into the parfor loop
 
 %print results to screen
 if sim.expar

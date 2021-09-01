@@ -1,16 +1,17 @@
 %interactive job - set values
 %limits
 frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 10; %[h] limit on stages
-frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 3; %number of forecasts to simulate
+frc.stagelimitval = 30; %[h] limit on stages
+frc.Flimit = true; %to shorten runtime
+frc.Flimitval = 2; %number of forecasts to simulate
 %one simulation types
 sim.pb = false; %toggle for posterior bound in one sim
 sim.sl = false; %toggle for simple logic in one sim
 sim.slv2 = false; %toggle for simple logic v2 in one sim
 %multiple simulation types
-sim.tdsens = true; %2-D sensitivity analysis
-sim.senssm = false; %sensitivity small multiple
+sim.tdsens = false; %2-D sensitivity analysis
+sim.senssm = true; %sensitivity small multiple
+sim.ssm_ca = true; %sensitivity small multiple capacity analysis
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 sim.exdist = false; %batt disc set externally (multiple only, outdated)
@@ -42,7 +43,6 @@ if isequal(batchtype,'tds')
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [1000 2500 5000:5000:35000]; %[Wh]
-        %sim.tuning_array1 = [1000 2500]; %[Wh]
         sim.tuning_array2 = [2 3 4 5];
         sim.tuned_parameter{1} = 'emx'; %E max
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
@@ -113,7 +113,7 @@ amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
 mdp.n = 40;                       %number of states [outdated]
-mdp.d_n = 25;                       %[kWh] energy between states
+mdp.d_n = 40;                       %[kWh] energy between states - 25
 mdp.m = 4;                          %number of actions
 mdp.eps = 1;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
@@ -131,7 +131,7 @@ end
 mdp.alpha = .99;                    %discount factor
 
 %WEC parameters:
-wec.eta_ct = 0.6;           %[~], electrical efficiency
+wec.eta_ct = 0.6;           %[~], electrical efficiency, 0.6
 wec.h = 0.10;               %percent of rated power as house load
 wec.B = 3;                  %[m]
 wec.rho = 1020;             %[kg/m^3]
@@ -148,23 +148,23 @@ wec.FO = false;             %toggle fred. olsen
 % if isfield(sim,'tuning_array')
 %     sim = rmfield(sim,'tuning_array');
 % end
-if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter') ...
-        && ~sim.senssm && sim.tdsens
-    sim.tuning_array1 = 1000:2000:17000;
-    sim.tuning_array2 = [1 2 3 4 5 6];
-    sim.tuned_parameter{1} = 'emx'; %rated Hs
-    sim.tuned_parameter{2} = 'wcd'; %rated Tp
-    % sim.tuned_parameter = 'eps'; %epsilon
-    % sim.tuning_array = [];
-    % sim.tuned_parameter = 'sub'; %spin up buffer
-    % sim.tuning_array = [];
-    % sim.tuned_parameter = 'slv'; %stage limit value
-    % sim.tuning_array = [180 130 80 60 40 20];
-    % sim.tuned_parameter = 'emx'; %maximum storage capacity
-    % sim.tuning_array = [500 2500 5000 7500];
-    % sim.tuned_parameter = 'ess'; %energy system size
-    % sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
-end
+% if ~isfield(sim,'tuning_array') && ~isfield(sim,'tuned_parameter') ...
+%         && ~sim.senssm && sim.tdsens
+%     sim.tuning_array1 = 1000:2000:17000;
+%     sim.tuning_array2 = [1 2 3 4 5 6];
+%     sim.tuned_parameter{1} = 'emx'; %rated Hs
+%     sim.tuned_parameter{2} = 'wcd'; %rated Tp
+%     % sim.tuned_parameter = 'eps'; %epsilon
+%     % sim.tuning_array = [];
+%     % sim.tuned_parameter = 'sub'; %spin up buffer
+%     % sim.tuning_array = [];
+%     % sim.tuned_parameter = 'slv'; %stage limit value
+%     % sim.tuning_array = [180 130 80 60 40 20];
+%     % sim.tuned_parameter = 'emx'; %maximum storage capacity
+%     % sim.tuning_array = [500 2500 5000 7500];
+%     % sim.tuned_parameter = 'ess'; %energy system size
+%     % sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
+% end
 
 %override batch variables
 if exist('batchbeta','var')

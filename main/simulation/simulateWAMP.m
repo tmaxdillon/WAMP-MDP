@@ -9,13 +9,14 @@ if ~sim.expar
         disp(['Simulation ' num2str(i) ' beginning after ' ...
             num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
             sim.tuned_parameter{1} ' tuned to ' ...
-            num2str(sim.S1(i)) ' and ' ...
+            num2str(sim.S1{1}(i)) ' and ' ...
             sim.tuned_parameter{2} ' tuned to ' ...
             num2str(sim.S2(i)) '.'])
     elseif sim.senssm
         disp(['Simulation ' num2str(i) ' beginning after ' ...
             num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
-            sim.tp{ceil(i/sim.n)} ' tuned to ' num2str(sim.S1(i))'.'])
+            char(sim.S1{2}(i)) ' tuned to ' ...
+            num2str(sim.S1{1}(i))'.'])
     end
     tSim = tic;
 end
@@ -235,27 +236,34 @@ output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
 output.wec.E_max = amp.E_max; %battery size
 %print results
-if sim.tdsens
+if sim.tdsens %two dimensional sensitivity analysis - print after
     output.results.(sim.tuned_parameter{1}) = sim.S1(i);
     output.results.(sim.tuned_parameter{2}) = sim.S2(i);
     output.results.power_avg = output.power_avg;
     output.results.beta_avg = output.beta_avg;
 elseif sim.senssm
+    %clean up large uneccessary variables
+    output = rmfield(output,'FM_P');
+    output = rmfield(output,'FM_mod');
+    output = rmfield(output,'Pw_error');
     %store sensitivity parameter and array for visualization
-    output.tuned_parameter = sim.tp{ceil(i/sim.n)};
-    output.tuning_array = sim.S1(ceil(i/sim.n)*10-9,ceil(i/sim.n));
-    if sim.expar
-        output.results.(sim.tp{ceil(i/sim.n)}) = sim.S1(i);
+    output.tuned_parameter = sim.S1{2}(i);
+    output.tuning_array = ...
+        sim.S1{1}(i-rem(i-1,n):i+(rem(n-(i-ceil(i/n)*n),n)));
+    if sim.expar %save outputs for post-parellization
+        output.results.(sim.tp{ceil(i/(sim.n*sim.c))}) = sim.S1{1}(i);
+        output.results.rp = output.wec.rp;
+        output.results.E_max = output.wec.E_max;
         output.results.power_avg = output.power_avg;
         output.results.beta_avg = output.beta_avg;
-    else
+    else %not parallelized, print outputs
         results.rp = output.wec.rp;
         results.E_max = output.wec.E_max;
         results.power_avg = output.power_avg;
         results.beta_avg = output.beta_avg;
         results
     end
-else
+else %single simulation, print results now
     results.rp = output.wec.rp;
     results.E_max = output.wec.E_max;
     results.power_avg = output.power_avg;
@@ -263,6 +271,8 @@ else
     results
 end
 
-
+for i = 1:100
+    disp([num2str(i) ' = ' num2str(i-rem(i-1,n):i+(rem(n-(i-ceil(i/n)*n),n)))])
+end
 
 
