@@ -249,7 +249,8 @@ elseif sim.senssm
     %store sensitivity parameter and array for visualization
     output.tuned_parameter = sim.S1{2}(i);
     output.tuning_array = ...
-        sim.S1{1}(i-rem(i-1,n):i+(rem(n-(i-ceil(i/n)*n),n)));
+        sim.S1{1}(i-rem(i-1,sim.n): ...
+        i+(rem(sim.n-(i-ceil(i/sim.n)*sim.n),sim.n)));
     if sim.expar %save outputs for post-parellization
         output.results.(sim.tp{ceil(i/(sim.n*sim.c))}) = sim.S1{1}(i);
         output.results.rp = output.wec.rp;
@@ -269,10 +270,6 @@ else %single simulation, print results now
     results.power_avg = output.power_avg;
     results.beta_avg = output.beta_avg;
     results
-end
-
-for i = 1:100
-    disp([num2str(i) ' = ' num2str(i-rem(i-1,n):i+(rem(n-(i-ceil(i/n)*n),n)))])
 end
 
 
