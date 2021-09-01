@@ -252,7 +252,7 @@ elseif sim.senssm
         sim.S1{1}(i-rem(i-1,sim.n): ...
         i+(rem(sim.n-(i-ceil(i/sim.n)*sim.n),sim.n)));
     if sim.expar %save outputs for post-parellization
-        output.results.(sim.S1{2}(i)) = sim.S1{1}(i);
+        output.results.(char(sim.S1{2}(i))) = sim.S1{1}(i);
         output.results.rp = output.wec.rp;
         output.results.E_max = output.wec.E_max;
         output.results.power_avg = output.power_avg;
