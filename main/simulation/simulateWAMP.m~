@@ -95,7 +95,8 @@ end
 %RUN SIMULATION
 for f=1:1:sim.F %over each forecast
     %print status to command window
-    if mod(f-1,sim.notif) == 0 && f-1 > 0 && ~sim.expar
+    if mod(f-1,sim.notif) == 0 && f-1 > 0 && ...
+            (~sim.expar  && ~exist('hpc_debug','var'))
         disp([num2str(f-1) ' out of ' num2str(sim.F) ...
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])
@@ -242,11 +243,17 @@ if sim.tdsens %two dimensional sensitivity analysis - print after
     output.results.power_avg = output.power_avg;
     output.results.beta_avg = output.beta_avg;
 elseif sim.senssm
+    %clean up large uneccessary variables
+    output = rmfield(output,'FM_P');
+    output = rmfield(output,'FM_mod');
+    output = rmfield(output,'Pw_error');
     %store sensitivity parameter and array for visualization
     output.tuned_parameter = sim.S1{2}(i);
-    output.tuning_array = sim.S1{1}(i-(sim.n-1):i);
+    output.tuning_array = ...
+        sim.S1{1}(i-rem(i-1,sim.n): ...
+        i+(rem(sim.n-(i-ceil(i/sim.n)*sim.n),sim.n)));
     if sim.expar %save outputs for post-parellization
-        output.results.(sim.tp{ceil(i/(sim.n*sim.c))}) = sim.S1{1}(i);
+        output.results.(char(sim.S1{2}(i))) = sim.S1{1}(i);
         output.results.rp = output.wec.rp;
         output.results.E_max = output.wec.E_max;
         output.results.power_avg = output.power_avg;
@@ -265,7 +272,5 @@ else %single simulation, print results now
     results.beta_avg = output.beta_avg;
     results
 end
-
-
 
 
