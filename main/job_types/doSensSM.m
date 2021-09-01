@@ -109,6 +109,10 @@ if sim.expar
     end
 end
 
+%TBD: baseline results, s0 - will need to code this into the parfor loop
+disp([num2str(n*p*c) ' simulations complete after ' ...
+        num2str(round(toc(tTot)/60,2)) ' minutes. '])
+
 %organize data output
 multStruct = squeeze(reshape(multStruct,[n p length(wecs) length(batts)]));
 %unpack multstruct into s1, s2, etc.
@@ -133,9 +137,6 @@ s8 = squeeze(multStruct(:,8,:,:));
 s9 = squeeze(multStruct(:,9,:,:));
 s10 = squeeze(multStruct(:,10,:,:));
 
-%TBD: baseline results, s0 - will need to code this into the parfor loop
-disp([num2str(n*p*c) ' simulations complete after ' ...
-        num2str(round(toc(tTot)/60,2)) ' minutes. '])
     
 end
 
