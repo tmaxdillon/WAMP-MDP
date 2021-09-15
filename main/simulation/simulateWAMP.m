@@ -167,10 +167,10 @@ for f=1:1:sim.F %over each forecast
             if sim.debug %if debugging mdp
                 if sim.brpar
                     [policy,Jstar,compare,state_evol,wec_power] = ...
-                        backwardRecursion_par(FM_P,mdp,amp,sim,wec,f);
+                        backwardRecursion_par(FM_P,mdp,amp,sim,wec,frc,f);
                 else
                     [policy,Jstar,compare,state_evol,wec_power] = ...
-                        backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+                        backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
                 end
                 %DOCUMENT BELLMANS (AND DEBUG) VALUES
                 output.val_all(:,:,:,f) = compare(:,:,:); %all values
@@ -181,7 +181,8 @@ for f=1:1:sim.F %over each forecast
                 output.wec_power_mdp(:,f) = wec_power; %P from wec (mdp)
                 output.wec_power_sim(f) = FM_P(1,f,2); %P from wec (sim)
             else %not debugging mdp
-                [policy,Jstar] = backwardRecursion(FM_P,mdp,amp,sim,wec,f);
+                [policy,Jstar] = ...
+                    backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
             end
             %set action and opt val over next dt time steps based on policy
             if f+mdp.dt < sim.F

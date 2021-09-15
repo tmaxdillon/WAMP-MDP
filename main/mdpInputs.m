@@ -1,16 +1,18 @@
 %interactive job - set values
-%limits
+%forecast settings
 frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 30; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 2; %number of forecasts to simulate
-%one simulation types
-sim.pb = false; %toggle for posterior bound in one sim
-sim.sl = false; %toggle for simple logic in one sim
-sim.slv2 = false; %toggle for simple logic v2 in one sim
+frc.stagelimitval = 3; %[h] limit on stages
+frc.Flimit = false; %to shorten runtime
+frc.Flimitval = 5; %number of forecasts to simulate
+frc.add_err = false; %add error to forecast
+frc.err_type = 1; %1: randomness multiplier 2: sinusoid
+%simulation types
+sim.pb = false; %toggle for posterior bound
+sim.sl = false; %toggle for simple logic
+sim.slv2 = false; %toggle for simple logic v2
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
-sim.senssm = true; %sensitivity small multiple
+sim.senssm = false; %sensitivity small multiple
 sim.ssm_ca = true; %sensitivity small multiple capacity analysis
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
@@ -97,6 +99,10 @@ end
 
 %FORECAST parameters:
 frc.sub = 3;                    %[hr] model spin up buffer
+Stemp = load('forecast_randomizer.mat'); %load forecast randomizer array
+frc.rand = Stemp.forecast_randomizer; %store forecast randomizer array
+Stemp = load('forecast_sinusoid.mat'); %load forecast sinusoid array
+frc.sinu = Stemp.forecast_sinusoid; %store forecast sinusoid array
 
 %AMP parameters:
 amp.E_max = 10000;                      %[Wh], maximum battery capacity
@@ -113,7 +119,7 @@ amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
 mdp.n = 40;                       %number of states [outdated]
-mdp.d_n = 40;                       %[kWh] energy between states - 25
+mdp.d_n = 25;                       %[kWh] energy between states - 25
 mdp.m = 4;                          %number of actions
 mdp.eps = 1;                      %aggressiveness factor
 mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties

@@ -1,5 +1,5 @@
 function [policy,Jstar,compare,state_evol,wec_power] = ...
-    backwardRecursion(FM_P,mdp,amp,sim,wec,f)
+    backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f)
 
 %preallocate backward recursion matrices
 policy = zeros(mdp.n,mdp.T); %optimal action for each state and stage
@@ -19,9 +19,17 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     end
     %reduce overhead by unpacking variables from matrices and structs
     Jstar_t1 = Jstar(:,t+1); %Jstar one time step ahead
-    P_fc = FM_P(t,f,2); %forecast power
-    if sim.pb == 1
-        P_pb = FM_P(1,f+t-1,2); %posterior bound power
+    if frc.add_err %add error to forecasted (mdp) power
+        if frc.err_type == 1 %randomizer
+            P_fc = FM_P(t,f,2)*frc.rand(f);
+        elseif frc.err_type == 2 %sinusoidal error
+            P_fc = FM_P(t,f,2)*frc.sinu(f);
+        end
+    else %no error to forecasted power
+        P_fc = FM_P(t,f,2);
+    end
+    if sim.pb == 1  %posterior bound power
+        P_pb = FM_P(1,f+t-1,2);
     else
         P_pb = [];
     end
