@@ -23,6 +23,9 @@ if ~exist('batchtype','var')
     batchsim =[];
     batchpar1 = [];
     patchpar2 = [];
+    batchbeta = [];
+    batcheps = [];
+    batcherr = [];
 end
 if isequal(batchtype,'tds')
     sim.tdsens = true;
@@ -55,6 +58,10 @@ if isequal(batchtype,'tds')
         sim.tuned_parameter{2} = 'nll';
         beta_on = true;
     end
+    if exist('batcherr','var')
+        frc.add_err = true; %add error to forecast
+        frc.err_type = batcherr; %1: randomness multiplier 2: sinusoid
+    end
 elseif isequal(batchtype,'ssm')
     sim.senssm = true;
     if isequal(batchsim,'mdp')
@@ -79,6 +86,7 @@ elseif isequal(batchtype,'ssm')
     patchpar2 = [];
     batcharr2 = [];
 end
+
      
 %SIM parameters:
 sim.brpar = false;         %parallelizing backward recursions (outdated)

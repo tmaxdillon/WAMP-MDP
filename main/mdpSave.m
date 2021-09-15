@@ -1,5 +1,5 @@
 function [] = mdpSave(prepath,name,batchtype,batchsim, ...
-    batchpar1,batchpar2,batchbeta,batcheps)
+    batchpar1,batchpar2,batchbeta,batcheps,batcherr)
 
 %clearvars -except name prepath batchtype scen loc c
 mdpScript
