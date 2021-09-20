@@ -1,9 +1,9 @@
 %interactive job - set values
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 3; %[h] limit on stages
+frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 5; %number of forecasts to simulate
+frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 %simulation types
@@ -87,7 +87,6 @@ elseif isequal(batchtype,'ssm')
     batcharr2 = [];
 end
 
-     
 %SIM parameters:
 sim.brpar = false;         %parallelizing backward recursions (outdated)
 sim.expar = true;           %parallelizing simulations (def true)
@@ -130,7 +129,7 @@ mdp.n = 40;                       %number of states [outdated]
 mdp.d_n = 25;                       %[kWh] energy between states - 25
 mdp.m = 4;                          %number of actions
 mdp.eps = 1;                      %aggressiveness factor
-mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
+mdp.mu = mdp.eps.*[1 .8 .2 0];       %functional penalties
 %pseudocode start - enter this into simulate wamp (post sensitivity update)
 % mdp.mu_mult = 5;
 % mdp.mu = 1/(mdp.mu_mult)* ...
@@ -181,11 +180,11 @@ wec.FO = false;             %toggle fred. olsen
 % end
 
 %override batch variables
-if exist('batchbeta','var')
+if ~isempty(batchbeta)
     mdp.b = batchbeta;
 end
-if exist('batcheps','var')
+if ~isempty(batcheps)
     mdp.eps = batcheps;
-    mdp.mu = mdp.eps*[1 .8 .2 0];       %functional penalties
+    mdp.mu = mdp.eps.*[1 .8 .2 0];       %functional penalties
 end
 

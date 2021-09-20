@@ -64,13 +64,16 @@ yoff = .55; %[in]
 xdist = .95; %[in]
 ydist = 2.4; %[in]
 xmarg = 0.4; %[in]
-ylims = flipud([570 620; 540 590; 430 480 ; 90 140]);
+ylims = flipud([110 650; 80 590; 60 480 ; 20 140]);
 
 %find max range
 for w = 1:size(sim1,1)
     maxdist(w) = max(max(power_avg(:,w,:))) - min(min(power_avg(:,w,:)));
 end
 maxdist = max(round(ceil(maxdist.*1.2),-1));
+
+%find maximum power no flexibility
+mpnf = maxPowerNoFlex(B,x.*1000);
 
 %average power
 results_pa = figure;
@@ -91,6 +94,7 @@ for w = 1:size(sim1,1) %across all wcd
     s4p(w) = plot(x,power_avg(:,w,4),'-*','MarkerEdgeColor',s4c, ...
         'Color',s4c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName',inputname(4));
+    s5p(w) = plot(x,mpnf(w,:),'k','LineWidth',lw,'DisplayName','MPNF');
 %     fill([x,flip(x)],[i_25(:,w,2)',flip(i_75(:,w,2)')], ...
 %         pc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
 %         'HandleVisibility','off');
@@ -117,7 +121,7 @@ for w = 1:size(sim1,1) %across all wcd
         'FontWeight','normal','Units','Normalized', ...
         'interpreter','tex');
     tt(w).Position(2) = tt(w).Position(2)*1.025;
-    %ylim(ylims(w,:))
+    ylim(ylims(w,:))
     yline(600,'--k','Max Draw', ...
         'LabelHorizontalAlignment','left','FontSize',fs, ...
         'LineWidth',lw2,'FontName','cmr10'); 

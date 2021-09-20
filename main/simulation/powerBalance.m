@@ -12,7 +12,7 @@ E_evolved = dt*(power_wec - draw_att) + E - sd; %next battery state
 if E_evolved > E_max %topped out, discard power
     power_disc = E_evolved - E_max; %[Wh], power discarded
     E_evolved = E_max;
-elseif E_evolved <= 0 %bottomed out, find actual draw
+elseif E_evolved < 0 %bottomed out, find actual draw
     draw_exact = (E - sd)/dt + power_wec; %[W], exact draw possible
     Ps_temp = Ps - draw_exact;
     if sum(Ps_temp(:) < 0) == 0 %Ps_temp is all positive
