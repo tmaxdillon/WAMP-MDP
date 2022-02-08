@@ -1,10 +1,12 @@
-function [] = avgPowerFunction(sim1,sim2,sim3,sim4)
+function [] = avgPowerFunction(sim1,sim2,sim3,sim4,flexcomp)
 
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
+
+pbodelta = true;
 
 B = sim1(1,1).sim.tuning_array2;
 nw = length(B);
@@ -64,16 +66,27 @@ yoff = .55; %[in]
 xdist = .95; %[in]
 ydist = 2.4; %[in]
 xmarg = 0.4; %[in]
-ylims = flipud([110 650; 80 590; 60 480 ; 20 140]);
+%ylims = flipud([110 650; 80 590; 60 480 ; 20 140]);
+ylims = flipud([1 2 ;3 4 ;5 6;7 8 ]);
 
-%find max range
-for w = 1:size(sim1,1)
-    maxdist(w) = max(max(power_avg(:,w,:))) - min(min(power_avg(:,w,:)));
-end
-maxdist = max(round(ceil(maxdist.*1.2),-1));
+% %find max range
+% for w = 1:size(sim1,1)
+%     maxdist(w) = max(max(power_avg(:,w,:))) - min(min(power_avg(:,w,:)));
+% end
+% maxdist = max(round(ceil(maxdist.*1.2),-1));
 
 %find maximum power no flexibility
-mpnf = maxPowerNoFlex(B,x.*1000);
+if flexcomp
+    mpnf = maxPowerNoFlex(B,x.*1000);
+    apfl_3 = avgPowerFixedLoad(B,x.*1000,450);
+    apfl_4 = avgPowerFixedLoad(B,x.*1000,600);
+end
+
+if pbodelta
+    adj = power_avg(:,:,2);
+else
+    adj = zeros(size(power_avg(:,:,2)));
+end
 
 %average power
 results_pa = figure;
@@ -82,19 +95,32 @@ set(gcf, 'Position', [1, 1, 6.5, 3.75])
 for w = 1:size(sim1,1) %across all wcd
     ax(w) = subplot(1,4,w);
     hold on
-    s2p(w) = plot(x,power_avg(:,w,2),'-*','MarkerEdgeColor',s2c, ...
-        'Color',s2c,'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName',inputname(2));
-    s1p(w) = plot(x,power_avg(:,w,1),'-*','MarkerEdgeColor',s1c, ...
+    s1p(w) = plot(x,power_avg(:,w,1)-adj(:,w) ...
+        ,'-*','MarkerEdgeColor',s1c, ...
         'Color',s1c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName',inputname(1));
-    s3p(w) = plot(x,power_avg(:,w,3),'-*','MarkerEdgeColor',s3c, ...
+    s2p(w) = plot(x,power_avg(:,w,2)-adj(:,w), ...
+        '-*','MarkerEdgeColor',s2c, ...
+        'Color',s2c,'MarkerSize',ms,'LineWidth',lw, ...
+        'DisplayName',inputname(2));
+    s3p(w) = plot(x,power_avg(:,w,3)-adj(:,w), ...
+        '-*','MarkerEdgeColor',s3c, ...
         'Color',s3c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName',inputname(3));
-    s4p(w) = plot(x,power_avg(:,w,4),'-*','MarkerEdgeColor',s4c, ...
+    s4p(w) = plot(x,power_avg(:,w,4)-adj(:,w), ...
+        '-*','MarkerEdgeColor',s4c, ...
         'Color',s4c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName',inputname(4));
-    s5p(w) = plot(x,mpnf(w,:),'k','LineWidth',lw,'DisplayName','MPNF');
+    if flexcomp
+        s5p(w) = plot(x,mpnf(w,:)-adj(:,w), ...
+            'k','LineWidth',lw,'DisplayName','MPNF');
+        s6p(w) = plot(x,apfl_3(w,:)-adj(:,w) ...
+            ,'m','LineWidth',lw,'DisplayName', ...
+            'APFL450');
+        s7p(w) = plot(x,apfl_4(w,:)-adj(:,w) ...
+            ,'c','LineWidth',lw,'DisplayName', ...
+            'APFL600');
+    end
 %     fill([x,flip(x)],[i_25(:,w,2)',flip(i_75(:,w,2)')], ...
 %         pc(w,:),'FaceAlpha',0.3,'EdgeColor','none', ...
 %         'HandleVisibility','off');
@@ -121,10 +147,12 @@ for w = 1:size(sim1,1) %across all wcd
         'FontWeight','normal','Units','Normalized', ...
         'interpreter','tex');
     tt(w).Position(2) = tt(w).Position(2)*1.025;
-    ylim(ylims(w,:))
-    yline(600,'--k','Max Draw', ...
-        'LabelHorizontalAlignment','left','FontSize',fs, ...
-        'LineWidth',lw2,'FontName','cmr10'); 
+    %ylim(ylims(w,:))
+    if w == 4 && ~pbodelta
+        yline(600,'--k','Max Draw', ...
+            'LabelHorizontalAlignment','left','FontSize',fs, ...
+            'LineWidth',lw2,'FontName','cmr10');
+    end
     %     ylim([ceil(max(max(power_avg(:,w,:))))-maxdist-1 ...
 %         ceil(max(max(power_avg(:,w,:)+1)))])
 %     if w == 1
@@ -145,11 +173,19 @@ for w = 1:size(sim1,1) %across all wcd
     %set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 end
 
-hL = legend([s1p(2) s2p(2) s3p(2) s4p(2)], ...
-    'location','northoutside','Box','on','NumColumns',4, ...
-    'Orientation','horizontal');
-newPosition = [0.325 .95 0.5 0];
-set(hL,'Position', newPosition,'Units', 'normalized');
+if flexcomp
+    hL = legend([s1p(2) s2p(2) s3p(2) s4p(2) s5p(2) s6p(2) s7p(2)], ...
+        'location','northoutside','Box','on','NumColumns',4, ...
+        'Orientation','horizontal');
+    newPosition = [0.325 .95 0.5 0];
+    set(hL,'Position', newPosition,'Units', 'normalized');
+else
+    hL = legend([s1p(2) s2p(2) s3p(2) s4p(2)], ...
+        'location','northoutside','Box','on','NumColumns',4, ...
+        'Orientation','horizontal');
+    newPosition = [0.325 .95 0.5 0];
+    set(hL,'Position', newPosition,'Units', 'normalized');
+end
 
 %add labels
 axes(ax(2))

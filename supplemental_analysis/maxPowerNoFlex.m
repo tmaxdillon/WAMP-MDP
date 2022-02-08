@@ -1,10 +1,10 @@
 function [mpnf] = maxPowerNoFlex(wecs,batts)
 
 mdpInputs
-load('WETSForecastMatrix')
-FM = WETSForecastMatrix.FM_subset;
+ld = load('WETSForecastMatrix');
+FM = ld.WETSForecastMatrix.FM_subset;
 clear WETSForecastMatrix
-mpnf = zeros(length(wecs),length(batts));
+mpnf(length(wecs),length(batts)) = struct();
 for w = 1:length(wecs)
     wec.B = wecs(w);
     %unpack data
@@ -22,13 +22,16 @@ for w = 1:length(wecs)
                 if E(i+1) > amp.E_max %topped out, discard power
                     E(i+1) = amp.E_max;
                 elseif E(i+1) < 0 %bottomed out
-                    mpnf(w,b) = consump-1; %[W] this is maximum power
+                    mpnf(w,b).p_avg = consump-1; %[W] this is maximum power
+                    mpnf(w,b).E = E_last;
                     searching = false;
                 end
             end
+            E_last = E; %store for output
             consump = consump+1; %[W]
             if consump > 600
-                mpnf(w,b) = 600;
+                mpnf(w,b).p_avg = 600;
+                mpnf(w,b).E = E;
                 searching = false;
             end
         end

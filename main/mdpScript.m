@@ -35,7 +35,7 @@ tTot = tic;
 if sim.tdsens %two dimensional sensitivity analysis
     multStruct = doTdSens(FM,amp,frc,mdp,sim,wec,tTot);
 elseif sim.senssm %sensitivity small multiple
-    [eta,whl,rhs,rtp,sdr,slt,tbs,ebs,dfr,sub] = ...
+    [eta,whl,rhs,rtp,sdr,slt,tbs,ebs,dfr,sub,s0] = ...
         doSensSM(FM,amp,frc,mdp,sim,wec,tTot);
 else %single simulation
     disp('Simulation beginning')

@@ -12,11 +12,14 @@ sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
-sim.senssm = false; %sensitivity small multiple
+sim.senssm = true; %sensitivity small multiple
 sim.ssm_ca = true; %sensitivity small multiple capacity analysis
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 sim.exdist = false; %batt disc set externally (multiple only, outdated)
+%notifications
+sim.notif = true; %surpress simulateWAMP notifications
+sim.d_notif = 500; %notifications every __ forecasts
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -58,7 +61,7 @@ if isequal(batchtype,'tds')
         sim.tuned_parameter{2} = 'nll';
         beta_on = true;
     end
-    if exist('batcherr','var')
+    if ~isempty(batcherr)
         frc.add_err = true; %add error to forecast
         frc.err_type = batcherr; %1: randomness multiplier 2: sinusoid
     end
@@ -89,10 +92,9 @@ end
 
 %SIM parameters:
 sim.brpar = false;         %parallelizing backward recursions (outdated)
-sim.expar = true;           %parallelizing simulations (def true)
-sim.notif = 500;             %notifications every __ forecasts
+sim.expar = true;           %parallelizing simulations (default true)
 sim.debug = false;          %include debugging variables in output
-sim.debug_brpar = false;      %debug HPC runtime and overhead
+sim.debug_brpar = false;      %debug HPC runtime and overhead (outdated)
 sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
@@ -147,7 +149,7 @@ mdp.alpha = .99;                    %discount factor
 wec.eta_ct = 0.6;           %[~], electrical efficiency, 0.6
 wec.h = 0.10;               %percent of rated power as house load
 wec.B = 3;                  %[m]
-wec.rho = 1020;             %[kg/m^3]
+wec.rho = 1025;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m] - 2 is default
 wec.Tp_ra = 9;              %[s] - 9 is default
@@ -179,7 +181,7 @@ wec.FO = false;             %toggle fred. olsen
 %     % sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
 % end
 
-%override batch variables
+%overwrite batch variables for beta and mu
 if ~isempty(batchbeta)
     mdp.b = batchbeta;
 end

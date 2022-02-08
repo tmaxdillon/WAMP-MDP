@@ -20,7 +20,7 @@ if sim.tdsens
 elseif sim.senssm
     %need to add s0 (baseline)
     save([prepath name '.mat'],'eta','whl','rhs','rtp','sdr', ...
-        'slt','tbs','ebs','dfr','sub','-v7.3')
+        'slt','tbs','ebs','dfr','sub','s0','-v7.3')
 else
     stru.(name) = simStruct;
     save([prepath name '.mat'], '-struct','stru','-v7.3')

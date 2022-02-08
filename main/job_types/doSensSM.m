@@ -1,23 +1,27 @@
-function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10] = ...
+function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s0] = ...
     doSensSM(FM,amp,frc,mdp,sim,wec,tTot)
 
 n = 10; %sensitivity discretization
 p = 10; %number of sensitivity parameters
 %set up tuning capacity array
 if sim.ssm_ca %capacity analysis turned on
+    %for testing
+%     batts = [5000 10000];
+%     wecs = [3 4];
+    %for running
     batts = [1000 2500 5000:5000:35000]; %[Wh]
     wecs = [2 3 4 5]; %[m]
     c = length(batts)*length(wecs); %number of capacity combinations    
     [W,B] = meshgrid(batts,wecs); 
     tc = [reshape(B,[c 1]) reshape(W,[c 1])]; %tuning capacity array
 else %just analyzing one capacity combination
-    c = 1; %number of capacity combinations
+    c = 1; %number of capacity combinations, just one
     tc = [wec.B amp.E_max]; %tuning capacity array
     batts = amp.E_max; %for reshaping multStruct
     wecs = wec.B; %for reshaping multStruct
 end
 
-%preallocate ta
+%preallocate tuning array
 ta = zeros(n,p,c);
 
 %set up tuning matrix and tuned parameter names
@@ -102,30 +106,27 @@ parfor (i = 1:(p*n*c),sim.mw)
     %multStruct(i).wec = wec;
 end
 
-%print results to screen
+%get s0, default results
+output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i);
+s0.amp = amp;
+s0.frc = frc;
+s0.mdp = mdp;
+s0.output = output;
+s0.sim = sim;
+s0.wec = wec;
+
+%print results to screen if using external parallelization
 if sim.expar
     for i = 1:length(multStruct)
         multStruct(i).output.results
     end
 end
 
-%TBD: baseline results, s0 - will need to code this into the parfor loop
 disp([num2str(n*p*c) ' simulations complete after ' ...
         num2str(round(toc(tTot)/60,2)) ' minutes. '])
 
 %organize data output
 multStruct = squeeze(reshape(multStruct,[n p length(wecs) length(batts)]));
-%unpack multstruct into s1, s2, etc.
-% s1 = multStruct(1:1*p);
-% s2 = multStruct(1*p+1:2*p);
-% s3 = multStruct(2*p+1:3*p);
-% s4 = multStruct(3*p+1:4*p);
-% s5 = multStruct(4*p+1:5*p);
-% s6 = multStruct(5*p+1:6*p);
-% s7 = multStruct(6*p+1:7*p);
-% s8 = multStruct(7*p+1:8*p);
-% s9 = multStruct(8*p+1:9*p);
-% s10 = multStruct(9*p+1:10*p);
 s1 = squeeze(multStruct(:,1,:,:));
 s2 = squeeze(multStruct(:,2,:,:));
 s3 = squeeze(multStruct(:,3,:,:));

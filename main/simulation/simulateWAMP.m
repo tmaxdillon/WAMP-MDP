@@ -4,7 +4,7 @@ function [output] = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i)
 
 %PRINT START
 %print status to screen if not doing external parallelization
-if ~sim.expar
+if ~sim.expar && sim.notif
     if sim.tdsens
         disp(['Simulation ' num2str(i) ' beginning after ' ...
             num2str(round(toc(tTot)/60,2)) ' minutes. ' ...
@@ -50,13 +50,13 @@ if ~sim.use_d_n %not discretizing consistent elements (outdated)
         amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
         mdp.n = length(amp.E);
     end
-    if ~sim.expar
+    if ~sim.expar 
         disp(['n = ' num2str(mdp.n)])
     end
 else %battery discretization set by element size (default)
     amp.E = 0:mdp.d_n:amp.E_max;
     mdp.n = length(amp.E);
-    if ~sim.expar
+    if ~sim.expar && sim.notif
         disp(['n = ' num2str(mdp.n) ' and d_n = ' num2str(mdp.d_n)])
     end
 end
@@ -95,7 +95,7 @@ end
 %RUN SIMULATION
 for f=1:1:sim.F %over each forecast
     %print status to command window
-    if mod(f-1,sim.notif) == 0 && f-1 > 0 && ~sim.expar
+    if mod(f-1,sim.d_notif) == 0 && f-1 > 0 && ~sim.expar && sim.notif
         disp([num2str(f-1) ' out of ' num2str(sim.F) ...
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])
@@ -104,7 +104,7 @@ for f=1:1:sim.F %over each forecast
     if f > size(FM_P,2) - (size(FM_P,1)-1) && (sim.tdsens || sim.senssm)
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
-        if ~sim.expar
+        if ~sim.expar && sim.notif
             if sim.tdsens
                 disp(['Simulation ' num2str(i) ' out of ' ...
                     num2str(sim.S) ' complete after ' ...
@@ -153,7 +153,7 @@ for f=1:1:sim.F %over each forecast
         if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
             output.abridged = true; %simulation has been abridged
             %print status to command window
-            if ~sim.expar
+            if ~sim.expar && sim.notif
                 if sim.tdsens
                     disp(['Simulation ' num2str(sim.s) ' out of ' ...
                         num2str(sim.S) ' complete after ' ...
@@ -222,7 +222,7 @@ end
 
 %PRINT END
 %print status to command window
-if ~sim.expar
+if ~sim.expar && sim.notif
     if sim.tdsens
         disp(['Simulation ' num2str(i) ' complete after ' ...
             num2str(round(toc(tSim)/60,2)) ' minutes.'])
