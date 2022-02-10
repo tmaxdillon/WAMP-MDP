@@ -1,8 +1,8 @@
 %interactive job - set values
 %forecast settings
-frc.stagelimit = false; %toggle limit on stages
+frc.stagelimit = true; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
-frc.Flimit = false; %to shorten runtime
+frc.Flimit = true; %to shorten runtime
 frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
@@ -13,7 +13,7 @@ sim.slv2 = false; %toggle for simple logic v2
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
 sim.senssm = true; %sensitivity small multiple
-sim.ssm_ca = true; %sensitivity small multiple capacity analysis
+sim.ssm_ca = false; %sensitivity small multiple capacity analysis
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 sim.exdist = false; %batt disc set externally (multiple only, outdated)
@@ -32,6 +32,7 @@ if ~exist('batchtype','var')
 end
 if isequal(batchtype,'tds')
     sim.tdsens = true;
+    sim.senssm = false;
     if isequal(batchsim,'mdp')
         sim.pb = false;
         sim.sl = false;
@@ -67,6 +68,7 @@ if isequal(batchtype,'tds')
     end
 elseif isequal(batchtype,'ssm')
     sim.senssm = true;
+    sim.tdsens = false;
     if isequal(batchsim,'mdp')
         sim.pb = false;
         sim.sl = false;

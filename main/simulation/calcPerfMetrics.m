@@ -9,10 +9,17 @@ for i = 1:mdp.m
         length(output.a_act_sim(output.a_act_sim > 0));
     power_avg = power_avg + apct(i)*amp.Ps(i);
 end
+%check to see if there is average power discrepancy
 power_avg2 = mean(output.P_sim);
 if abs(power_avg2 - power_avg) > 1 && sim.senssm
+    if sim.senssm
     warning(['power averages not within 1 W. parameter = ' ...
         sim.tp{ceil(j/sim.n)} ' and value = ' num2str(sim.S1(j))])
+    elseif sim.tdsens
+        warning(['power averages not within 1 W. B = ' ...
+            num2str(sim.tuning_array2) ' m and Smax = ' ...
+            num2str(sim.tuning_array1) ' kWh.'])
+    end
 end
 %average beta value
 beta_avg = mean(output.beta);
