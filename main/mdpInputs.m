@@ -1,8 +1,8 @@
 %interactive job - set values
 %forecast settings
-frc.stagelimit = true; %toggle limit on stages
+frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
+frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
@@ -29,6 +29,14 @@ if ~exist('batchtype','var')
     batchbeta = [];
     batcheps = [];
     batcherr = [];
+    batchlims = [];
+end
+if batchlims %limits on
+    frc.stagelimit = true; %toggle limit on stages
+    frc.Flimit = true; %to shorten runtime
+else %limits off
+    frc.stagelimit = false; %toggle limit on stages
+    frc.Flimit = false; %to shorten runtime
 end
 if isequal(batchtype,'tds')
     sim.tdsens = true;
