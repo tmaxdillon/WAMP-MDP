@@ -6,7 +6,7 @@ set(0,'defaulttextinterpreter','none')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
-pbodelta = false;
+pbodelta = true;
 
 B = sim1(1,1).sim.tuning_array2;
 nw = length(B);
@@ -77,12 +77,7 @@ ylims = flipud([1 2 ;3 4 ;5 6;7 8 ]);
 
 %find maximum power no flexibility
 if flexcomp
-    mpnf_struct = maxPowerNoFlex(B,x.*1000);
-    for e = 1:size(mpnf_struct,2)
-        for w = 1:size(mpnf_struct,1)            
-            mpnf(w,e) = mpnf_struct(w,e).p_avg;
-        end
-    end
+    mpnf = maxPowerNoFlex(B,x.*1000);
     apfl_3 = avgPowerFixedLoad(B,x.*1000,450);
     apfl_4 = avgPowerFixedLoad(B,x.*1000,600);
 end
@@ -117,12 +112,12 @@ for w = 1:size(sim1,1) %across all wcd
         'Color',s4c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName',inputname(4));
     if flexcomp
-        s5p(w) = plot(x,mpnf(w,:)'-adj(:,w), ...
+        s5p(w) = plot(x,mpnf(w,:).p_avg-adj(:,w), ...
             'k','LineWidth',lw,'DisplayName','MPNF');
-        s6p(w) = plot(x,apfl_3(w,:)'-adj(:,w) ...
+        s6p(w) = plot(x,apfl_3(w,:)-adj(:,w) ...
             ,'m','LineWidth',lw,'DisplayName', ...
             'APFL450');
-        s7p(w) = plot(x,apfl_4(w,:)'-adj(:,w) ...
+        s7p(w) = plot(x,apfl_4(w,:)-adj(:,w) ...
             ,'c','LineWidth',lw,'DisplayName', ...
             'APFL600');
     end
