@@ -117,7 +117,7 @@ else %not using an HPC
 end
 
 %FORECAST parameters:
-frc.sub = 3;                    %[hr] model spin up buffer
+frc.sub = 3; %[hr] model spin up buffer
 Stemp = load('forecast_randomizer.mat'); %load forecast randomizer array
 frc.rand = Stemp.forecast_randomizer; %store forecast randomizer array
 Stemp = load('forecast_sinusoid.mat'); %load forecast sinusoid array
@@ -137,23 +137,23 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
-mdp.n = 40;                       %number of states [outdated]
-mdp.d_n = 25;                       %[kWh] energy between states - 25
-mdp.m = 4;                          %number of actions
-mdp.eps = 1;                      %aggressiveness factor
-mdp.mu = mdp.eps.*[1 .8 .2 0];       %functional penalties
+mdp.n = 40; %number of states [outdated]
+mdp.d_n = 15; %[kWh] energy between states - 25 (old/flawed)
+mdp.m = 4; %number of actions
+mdp.eps = 1; %aggressiveness factor
+mdp.mu = mdp.eps.*[1 .8 .2 0]; %functional penalties
 %pseudocode start - enter this into simulate wamp (post sensitivity update)
 % mdp.mu_mult = 5;
 % mdp.mu = 1/(mdp.mu_mult)* ...
 %     beta(mdp.d_n,0:mdp.d_n:amp.E_max,amp.E_max,mdp,b,mdp_lb);     
 %pseudocode end - above goes in simulate wamp post sensitivity update
-mdp.beta_lb = 0.5;           %lower bound % (of starting charge) for beta()
-mdp.dt = 1;                         %time between stages
-mdp.b = 0;                          %battery steepness [1: on, 0: off]
+mdp.beta_lb = 0.5; %lower bound % (of starting charge) for beta()
+mdp.dt = 1; %time between stages
+mdp.b = 0; %battery steepness [1: on, 0: off]
 if exist('beta_on','var')
     mdp.b = 1;
 end
-mdp.alpha = .99;                    %discount factor
+mdp.alpha = .99; %discount factor
 
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency, 0.6
