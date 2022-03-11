@@ -10,7 +10,7 @@ for i = 1:mdp.m
     power_avg = power_avg + apct(i)*amp.Ps(i);
 end
 %check to see if there is average power discrepancy
-power_avg2 = mean(output.P_sim);
+power_avg2 = mean(output.P_sim(output.P_sim > 0));
 if abs(power_avg2 - power_avg) > 1 && sim.senssm
     if sim.senssm
     warning(['power averages not within 1 W. parameter = ' ...
