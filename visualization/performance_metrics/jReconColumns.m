@@ -6,13 +6,10 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('mbzsim','var') || ...
-        ~exist('pbzsim','var') || ~exist('sl2sim','var')
+        ~exist('slosim','var') || ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
-    load('mbzsim');
-    load('pbzsim');
     load('sl2sim');
 end
 
@@ -32,15 +29,9 @@ for w = 1:size(mdpsim,1) %across all wcd
         J_avg(e,w,3) = mean(slosim(w,e).output.J_recon);
         J_hh(e,w,3) = prctile(slosim(w,e).output.J_recon,hh);
         J_ll(e,w,3) = prctile(slosim(w,e).output.J_recon,ll);
-        J_avg(e,w,4) = mean(mbzsim(w,e).output.J_recon);
-        J_hh(e,w,4) = prctile(mbzsim(w,e).output.J_recon,hh);
-        J_ll(e,w,4) = prctile(mbzsim(w,e).output.J_recon,ll);
-        J_avg(e,w,5) = mean(pbzsim(w,e).output.J_recon);
-        J_hh(e,w,5) = prctile(pbzsim(w,e).output.J_recon,hh);
-        J_ll(e,w,5) = prctile(pbzsim(w,e).output.J_recon,ll);
-        J_avg(e,w,6) = mean(sl2sim(w,e).output.J_recon);
-        J_hh(e,w,6) = prctile(sl2sim(w,e).output.J_recon,hh);
-        J_ll(e,w,6) = prctile(sl2sim(w,e).output.J_recon,ll);
+        J_avg(e,w,4) = mean(sl2sim(w,e).output.J_recon);
+        J_hh(e,w,4) = prctile(sl2sim(w,e).output.J_recon,hh);
+        J_ll(e,w,4) = prctile(sl2sim(w,e).output.J_recon,ll);
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -55,9 +46,7 @@ x = mdpsim(1).sim.tuning_array1./1000;
 % pc = brewermap(c,'greens'); pc = pc(c-nw:end,:);
 % sc = brewermap(c,'purples'); sc = sc(c-nw:end-1,:);
 mdpc = [205 0 0]/256;
-mbzc = [255	49 83]/256;
 pboc = [0 110 78]/256;
-pbzc = [105, 255, 105]/256;
 sloc = [64, 32, 96]/256;
 sl2c = [147, 112, 219]/256;
 %col1 = flipud(brewermap(8,'reds')); %col(1,:) = col1(c,:);
@@ -107,13 +96,7 @@ for w = 1:size(mdpsim,1) %across all wcd
     slop(w) = plot(x,J_avg(:,w,3),'-s','MarkerEdgeColor',sloc, ...
         'Color',sloc,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic');
-    pbzp(w) = plot(x,J_avg(:,w,5),'-*','MarkerEdgeColor',pbzc, ...
-        'Color',pbzc,'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','PB (no beta)');
-    mbzp(w) = plot(x,J_avg(:,w,4),'-o','MarkerEdgeColor',mbzc, ...
-        'Color',mbzc,'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','MDP (no beta)');
-    sl2p(w) = plot(x,J_avg(:,w,6),'-s','MarkerEdgeColor',sl2c, ...
+    sl2p(w) = plot(x,J_avg(:,w,4),'-s','MarkerEdgeColor',sl2c, ...
         'Color',sl2c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic 2');
 %     fill([x,flip(x)],[J_ll(:,w,2)',flip(J_hh(:,w,2)')], ...
@@ -151,7 +134,7 @@ for w = 1:size(mdpsim,1) %across all wcd
     %set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 end
 
-hL = legend([mdpp(2) pbop(2) slop(2) mbzp(2) pbzp(2) sl2p(2)], ...
+hL = legend([mdpp(2) pbop(2) slop(2) sl2p(2)], ...
     'location','northoutside','Box','on','NumColumns',3, ...
     'Orientation','horizontal');
 newPosition = [0.325 .95 0.5 0];

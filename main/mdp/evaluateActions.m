@@ -10,10 +10,10 @@ for a=1:m %over all actions
     %1: compute evolution of battery and find actual achievable action
     if pb == 0 % using forecast
         [~,a_act,~,E_evolved] = ...
-            powerBalance(P_fc,E(s),a,sdr,E_max,Ps,dt);
+            powerBalance(P_fc,E(s),a,sdr,E_max,Ps,dt,false);
     elseif pb == 1 % posterior bound
         [~,a_act,~,E_evolved] = ...
-            powerBalance(P_pb,E(s),a,sdr,E_max,Ps,dt);
+            powerBalance(P_pb,E(s),a,sdr,E_max,Ps,dt,false);
     end
     %2: find the state index of the evolved battery
     [~,state_evol_a(a)] = min(abs(E - E_evolved));

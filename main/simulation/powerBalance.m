@@ -1,5 +1,8 @@
 function [draw_act,a_act_ind,power_disc,E_evolved] = ...
-    powerBalance(power_wec,E,a_ind,sdr,E_max,Ps,dt)
+    powerBalance(power_wec,E,a_ind,sdr,E_max,Ps,dt,rc)
+
+%rc = reconstruction, meaning we do not alter action due to insufficient
+%energy availability (if rc = true)
 
 sd = E*(sdr/100)*(1/(30*24))*dt; %[Wh] self discharge
 draw_att = Ps(a_ind); %attempted draw
@@ -20,7 +23,9 @@ elseif E_evolved < 0 %bottomed out, find actual draw
     else %negative values in Ps_temp, consumption possible
         [~,a_act_ind] = max(Ps_temp(Ps_temp<0)); %largest possible
     end
-    draw_act = Ps(a_act_ind); 
+    if ~rc %not reconstruction
+        draw_act = Ps(a_act_ind); 
+    end
     E_evolved = dt*(power_wec - draw_act) + E - sd;
 end
 
