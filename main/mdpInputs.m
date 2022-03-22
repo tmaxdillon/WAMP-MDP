@@ -138,7 +138,7 @@ amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
 mdp.n = 40; %number of states [outdated]
-mdp.d_n = 5; %[kWh] energy between states - 15-25 (old/flawed)
+mdp.d_n = 10; %[kWh] energy between states - 15-25 (old/flawed)
 mdp.m = 4; %number of actions
 mdp.eps = 1; %aggressiveness factor
 mdp.mu = mdp.eps.*[1 .8 .2 0]; %functional penalties
