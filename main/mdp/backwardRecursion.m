@@ -17,8 +17,6 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     if sim.debug
         wec_power(t) = FM_P(t,f,2); %power produced by wec
     end
-    %reduce overhead by unpacking variables from matrices and structs
-    Jstar_t1 = Jstar(:,t+1); %Jstar one time step ahead
     if frc.add_err %add error to forecasted (mdp) power
         if frc.err_type == 1 %randomizer
             P_fc = FM_P(t,f,2)*frc.rand(f);
@@ -33,6 +31,8 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     else
         P_pb = [];
     end
+    %reduce overhead by unpacking variables from matrices and structs
+    Jstar_t1 = Jstar(:,t+1); %Jstar one time step ahead
     E = amp.E; %discretized battery capacities
     Ps = amp.Ps; %sensor loads
     sdr = amp.sdr; %self discharge rate
