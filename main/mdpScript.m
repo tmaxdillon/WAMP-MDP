@@ -29,7 +29,7 @@ if ~exist('FM','var')
     clear WETSForecastMatrix
 end
 mdpInputs
-disp(['Nominal beta = ' num2str(mdp.b) ' and epsilon = ' num2str(mdp.eps)])
+%disp(['Nominal beta = ' num2str(mdp.b) ' and epsilon = ' num2str(mdp.eps)])
 
 tTot = tic;
 if sim.tdsens %two dimensional sensitivity analysis

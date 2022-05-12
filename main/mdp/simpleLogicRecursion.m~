@@ -8,9 +8,13 @@ Jstar = zeros(mdp.n,mdp.T+1); %values to go for each state and stage
 Tf = find(~isnan(FM_P(:,f,2)),1,'last');
 for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     %reduce overhead by unpacking variables from matrices and structs
+    P_fc = FM_P(t,f,2);
+    if sim.pb == 1  %posterior bound power
+        P_pb = FM_P(1,f+t-1,2);
+    else
+        P_pb = [];
+    end
     Jstar_t1 = Jstar(:,t+1); %Jstar one time step ahead
-    %P_fc = FM_P(t,f,2); %forecast power, which should be used? fc or pb?
-    P_pb = FM_P(1,f+t-1,2); %posterior bound power
     E = amp.E; %discretized battery capacities
     Ps = amp.Ps; %sensor loads
     sdr = amp.sdr; %self discharge rate

@@ -24,6 +24,8 @@ elseif ~sim.tdsens && sim.senssm %sensitivity small multiple
         wec.Tp_ra = sim.S1{1}(i);
     elseif isequal(sim.S1{2}(i),'sdr') %self dischg rate
         amp.sdr = sim.S1{1}(i);
+    elseif isequal(sim.S1{2}(i),'est') %battery start fraction
+        amp.est = sim.S1{1}(i);
     elseif isequal(sim.S1{2}(i),'slt') %stage limit
         frc.stagelimit = true; frc.stagelimit = sim.S1{1}(i);
     elseif isequal(sim.S1{2}(i),'tbs') %time btwn stages

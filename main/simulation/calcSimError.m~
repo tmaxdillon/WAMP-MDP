@@ -18,9 +18,9 @@ if P_a == 0
     Pw_zero = P_a_f;
     id_zero = P_a_f == 0; %find zero forecasts in P_a_f
     Pw_zero(id_zero) = 1; %set zero forecasts to on
-    Pw_zero(~id_zero) = nan; %set nonzero forecasts to nan
+    Pw_zero(id_zero) = nan; %set nonzero forecasts to nan
 else
-    Pw_zero = nan(size(P_a_f));
+    Pw_zero = zeros(size(P_a_f));
 end
     
     

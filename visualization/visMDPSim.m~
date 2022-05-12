@@ -116,12 +116,9 @@ caxis([-max(abs(output.error.val(:)/1000)) ...
 % freezeColors
 % cbfreeze(c)
 hold on
-colordata = permute(repmat([1 1 1]'./256, ...
-    [1,size(time_surf,2),size(time_surf,1)]),[3 2 1]);
-s2 = surf(datetime(time_surf,'ConvertFrom','datenum'),extent_surf, ...
-    output.error.zero,colordata);
-set(s2, 'edgecolor','none')
-%colormap(gca,[0 0 0])
+s2 = pcolor(datetime(time_surf,'ConvertFrom','datenum'),extent_surf, ...
+    output.error.zero/1000);
+colormap(gca,[0 0 0])
 ylabel({'Forecast','Extent [days]'})
 ylim([1 inf])
 xlabel('Time')

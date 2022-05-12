@@ -1,6 +1,6 @@
 %interactive job - set values
 %forecast settings
-frc.stagelimit = false; %toggle limit on stages
+frc.stagelimit = true; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 2; %number of forecasts to simulate
@@ -8,18 +8,18 @@ frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 %simulation types
 sim.pb = false; %toggle for posterior bound
-sim.sl = false; %toggle for simple logic
+sim.sl = true; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
-sim.senssm = true; %sensitivity small multiple
+sim.senssm = false; %sensitivity small multiple
 sim.ssm_ca = false; %sensitivity small multiple capacity analysis
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 sim.exdist = false; %batt disc set externally (multiple only, outdated)
 %notifications
 sim.notif = true; %surpress simulateWAMP notifications
-sim.d_notif = 500; %notifications every __ forecasts
+sim.d_notif = 5; %notifications every __ forecasts
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -128,6 +128,7 @@ amp.E_max = 10000;                      %[Wh], maximum battery capacity
 if ~sim.hpc 
     amp.E_max = 10000; %shorten runtime if using laptop
 end
+amp.est = 0.5;                          %battery starting fraction
 %amp.E = linspace(0,amp.E_max,mdp.n);   %[Wh], discretized battery state
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate

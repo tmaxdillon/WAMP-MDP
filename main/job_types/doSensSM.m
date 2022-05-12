@@ -1,8 +1,8 @@
-function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s0] = ...
+function [s1,s2,s3,s4,s5,s6,s7,s8,s9,s10,s11,s0] = ...
     doSensSM(FM,amp,frc,mdp,sim,wec,tTot)
 
 n = 10; %sensitivity discretization
-p = 10; %number of sensitivity parameters
+p = 11; %number of sensitivity parameters
 %set up tuning capacity array
 if sim.ssm_ca %capacity analysis turned on
     %for testing
@@ -22,7 +22,7 @@ else %just analyzing one capacity combination
 end
 
 %preallocate tuning array
-ta = zeros(n,p,c);
+ta = zeros(p,n,c);
 
 %set up tuning matrix and tuned parameter names
 for i = 1:c
@@ -37,17 +37,19 @@ for i = 1:c
     ta(4,:,i) = linspace(5,14,n);
     tp{5} = 'sdr'; %self discharge rate
     ta(5,:,i) = linspace(0,9,n);
+    tp{6} = 'est'; %battery starting fraction
+    ta(6,:,i) = linspace(0.1,1,n);
     %MARKOV DECISION PROCESS PARAMETERS
-    tp{6} = 'slt'; %stage limit
-    ta(6,:,i) = linspace(18,180,n);
-    tp{7} = 'tbs'; %time between stages
-    ta(7,:,i) = linspace(1,19,n);
-    tp{8} = 'ebs'; %energy between states
-    ta(8,:,i) = linspace(17.5,40,n);
-    tp{9} = 'dfr'; %discount factor
-    ta(9,:,i) = linspace(.5,.99,n);
-    tp{10} = 'sub'; %spin up buffer
-    ta(10,:,i) = linspace(0,9,n);
+    tp{7} = 'slt'; %stage limit
+    ta(7,:,i) = linspace(18,180,n);
+    tp{8} = 'tbs'; %time between stages
+    ta(8,:,i) = linspace(1,19,n);
+    tp{9} = 'ebs'; %energy between states
+    ta(9,:,i) = linspace(17.5,40,n);
+    tp{10} = 'dfr'; %discount factor
+    ta(10,:,i) = linspace(.5,.99,n);
+    tp{11} = 'sub'; %spin up buffer
+    ta(11,:,i) = linspace(0,9,n);
 end
 
 %preallocate and print simulation combinations
@@ -73,8 +75,9 @@ DT = table([ta(1,1,1) ta(1,end,1)],[ta(2,1,1) ta(2,end,1)], ...
     [ta(5,1,1) ta(5,end,1)],[ta(6,1,1) ta(6,end,1)], ...
     [ta(7,1,1) ta(7,end,1)],[ta(8,1,1) ta(8,end,1)], ...
     [ta(9,1,1) ta(9,end,1)],[ta(10,1,1) ta(10,end,1)], ...
+    [ta(11,1,1) ta(11,end,1)], ...
     'VariableNames',{tp{1},tp{2},tp{3},tp{4}, ...
-    tp{5},tp{6},tp{7},tp{8},tp{9},tp{10}});
+    tp{5},tp{6},tp{7},tp{8},tp{9},tp{10},tp{11}});
 disp(DT)
 
 %assemble tuning cell S1
@@ -137,7 +140,7 @@ s7 = squeeze(multStruct(:,7,:,:));
 s8 = squeeze(multStruct(:,8,:,:));
 s9 = squeeze(multStruct(:,9,:,:));
 s10 = squeeze(multStruct(:,10,:,:));
+s11 = squeeze(multStruct(:,11,:,:));
 
-    
 end
 

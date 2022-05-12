@@ -1,4 +1,4 @@
-function [apct,power_avg,beta_avg,E_sim_ind,E_recon,J_recon] = ...
+function [apct,power_avg,E_sim_ind,E_recon,J_recon] = ...
     calcPerfMetrics(amp,mdp,sim,wec,output,j)
 
 %percent of each operational state and average output power
@@ -22,7 +22,7 @@ if abs(power_avg2 - power_avg) > 1 && sim.senssm
     end
 end
 %average beta value
-beta_avg = mean(output.beta);
+% beta_avg = mean(output.beta);
 %battery indicies
 E_sim_ind = zeros(1,length(output.E_sim));
 for i = 1:length(output.E_sim)
@@ -43,8 +43,6 @@ for f = 1:f_ext
 %         amp.sdr,amp.E_max,mdp.dt,wec.FO);
     [~,~,~,E_recon(f+1)] = powerBalance(output.Pw_sim(f),E_recon(f), ...
         output.a_act_sim(f),amp.sdr,amp.E_max,amp.Ps,1,true);
-    J_recon(f) = ...
-        beta(output.E_sim(f),amp.E,amp.E_max,mdp.b,mdp.beta_lb) + ...
-        mdp.mu(output.a_act_sim(f));
+    J_recon(f) = mdp.mu(output.a_act_sim(f));
 end
 

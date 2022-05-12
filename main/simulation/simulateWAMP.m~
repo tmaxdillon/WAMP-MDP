@@ -72,8 +72,7 @@ output.D_sim = zeros(sim.F,1); %power discarded time series
 %output.Pb_sim = zeros(sim.F,1); %net power sent to battery time series
 output.wec.cw = zeros(sim.F,1); %capture width
 output.wec.cwr = zeros(sim.F,1); %capture width ratio
-output.error.val = zeros(ceil((mdp.T*mdp.dt-1)/24),sim.F); %error matrix
-output.error.zero = nan(size(output.error.val)); %zero when power is zero
+output.Pw_error = zeros(ceil((mdp.T*mdp.dt-1)/24),sim.F); %error matrix
 %output.beta = zeros(sim.F,1); %beta time series
 output.val_Jstar = zeros(sim.F,1); %Jstar time series
 if sim.debug
@@ -102,9 +101,8 @@ for f=1:1:sim.F %over each forecast
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])
     end
-    %abridge at posterior bound limit for various reasons
-    if f > size(FM_P,2) - (size(FM_P,1)-1) && ...
-            (sim.tdsens || sim.senssm || sim.sl || sim.sl2)
+    %if multiple simulation, abridge at posterior bound limit
+    if f > size(FM_P,2) - (size(FM_P,1)-1) && (sim.tdsens || sim.senssm)
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
         if ~sim.expar && sim.notif
@@ -133,8 +131,8 @@ for f=1:1:sim.F %over each forecast
         else
             output.a_sim(f) = 1;
         end
-%         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
-%         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
+        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
     %SIMPLE LOGIC v2
     elseif sim.slv2
         tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
@@ -211,13 +209,11 @@ for f=1:1:sim.F %over each forecast
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
     %calculate forecast error
     if f > mdp.dt && mdp.dt == 1
-        [output.error.val(:,f), output.error.zero(:,f)] ...
-            = calcSimError(FM_P,mdp,f);
+        output.Pw_error(:,f) = calcSimError(FM_P,mdp,f);
         %figure this out later so that it works with tbs and mdp.dt > 1
         %output.Pw_error(:,f) = nan;
-    else
-        output.error.val(:,f) = nan;
-        output.error.zero(:,f) = nan;
+    elseif mdp.dt > 1
+        output.Pw_error(:,f) = nan;
     end
 end
 
@@ -247,7 +243,7 @@ if sim.tdsens %two dimensional sensitivity analysis - print after
     output.results.(sim.tuned_parameter{1}) = sim.S1(i);
     output.results.(sim.tuned_parameter{2}) = sim.S2(i);
     output.results.power_avg = output.power_avg;
-    %output.results.beta_avg = output.beta_avg;
+    output.results.beta_avg = output.beta_avg;
 elseif sim.senssm
     %clean up large uneccessary variables
     output = rmfield(output,'FM_P');

@@ -39,15 +39,15 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     E_max = amp.E_max; %maximum battery capacity
     dt = mdp.dt; %time discretization
     pb = sim.pb; %posterior bound toggle
-    b = mdp.b; %b value for beta function
-    beta_lb = mdp.beta_lb; %lower bound for beta function
+    %b = mdp.b; %b value for beta function
+    %beta_lb = mdp.beta_lb; %lower bound for beta function
     mu = mdp.mu; %sensing penalties
     alpha = mdp.alpha; %discount factor
     m = mdp.m; %number of states
     for s = 1:mdp.n %over all states
         [Jstar_s(s),policy_s(s),compare_sa(s,:),state_evol_sa(s,:)] = ...
             evaluateActions(Jstar_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
-            dt,pb,b,beta_lb,mu,alpha,m,t,s);
+            dt,pb,mu,alpha,m,t,s);
     end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
