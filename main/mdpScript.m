@@ -37,6 +37,8 @@ if sim.tdsens %two dimensional sensitivity analysis
 elseif sim.senssm %sensitivity small multiple
     [eta,whl,rhs,rtp,sdr,slt,tbs,ebs,dfr,sub,s0] = ...
         doSensSM(FM,amp,frc,mdp,sim,wec,tTot);
+elseif sim.pyssm %python parallelized sensitivivity small multiple
+    pySsmStruct = doPySsm(FM,amp,frc,mdp,sim,wec,tTot);
 else %single simulation
     disp('Simulation beginning')
     sim.expar = false;

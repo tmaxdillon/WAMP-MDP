@@ -34,10 +34,6 @@ elseif ~sim.tdsens && sim.senssm && ~sim.pySsm %old ssm
     %update WEC and battery capacities
     wec.B = sim.S1{3}(i);
     amp.E_max = sim.S1{4}(i);
-elseif ~sim.tdsens && ~sim.senssm && sim.pySsm %python (new) ssm
-    amp.E_max = sim.S1(i);
-    wec.B = sim.S2(i);
-end
-
+elseif ~sim.tdsens && sim.senssm && ~sim.pySsm
 end
 

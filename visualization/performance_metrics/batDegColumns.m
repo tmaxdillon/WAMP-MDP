@@ -9,13 +9,10 @@ medmode = 1; %set median mode versus mean mode
 plotmode = 2; %1: line, 2: shade, 3: errorbar
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('mbzsim','var') || ...
-        ~exist('pbzsim','var') || ~exist('sl2sim','var')
+        ~exist('slosim','var') ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
     load('slosim');
-    load('mbzsim');
-    load('pbzsim');
     load('sl2sim');
 end
 
@@ -33,9 +30,7 @@ for w = 1:size(mdpsim,1) %across all wcd
         [L(e,w,1)] = calcBatDeg(mdpsim(w,e),y,x(e)*1000)*100;
         [L(e,w,2)] = calcBatDeg(pbosim(w,e),y,x(e)*1000)*100;
         [L(e,w,3)] = calcBatDeg(slosim(w,e),y,x(e)*1000)*100;
-        [L(e,w,4)] = calcBatDeg(mbzsim(w,e),y,x(e)*1000)*100;
-        [L(e,w,5)] = calcBatDeg(pbzsim(w,e),y,x(e)*1000)*100;
-        [L(e,w,6)] = calcBatDeg(sl2sim(w,e),y,x(e)*1000)*100;
+        [L(e,w,4)] = calcBatDeg(sl2sim(w,e),y,x(e)*1000)*100;
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -99,13 +94,7 @@ for w = 1:size(mdpsim,1) %across all wcd
     slop(w) = plot(x,L(:,w,3),'-s','MarkerEdgeColor',sloc, ...
         'Color',sloc,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic');
-    pbzp(w) = plot(x,L(:,w,5),'-*','MarkerEdgeColor',pbzc, ...
-        'Color',pbzc,'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','PB (no beta)');
-    mbzp(w) = plot(x,L(:,w,4),'-o','MarkerEdgeColor',mbzc, ...
-        'Color',mbzc,'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','MDP (no beta)');
-    sl2p(w) = plot(x,L(:,w,6),'-s','MarkerEdgeColor',sl2c, ...
+    sl2p(w) = plot(x,L(:,w,4),'-s','MarkerEdgeColor',sl2c, ...
         'Color',sl2c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic 2');
     tt(w) = title({[num2str(B(w)) ' m WEC'], ...
@@ -138,7 +127,7 @@ for w = 1:size(mdpsim,1) %across all wcd
     %set(gca,'Units','Inches','Position',[xoff yoff xdist ydist])
 end
 
-hL = legend([mdpp(2) pbop(2) slop(2) mbzp(2) pbzp(2) sl2p(2)], ...
+hL = legend([mdpp(2) pbop(2) slop(2) sl2p(2)], ...
     'location','northoutside','Box','on','NumColumns',3, ...
     'Orientation','horizontal');
 newPosition = [0.325 .95 0.5 0];

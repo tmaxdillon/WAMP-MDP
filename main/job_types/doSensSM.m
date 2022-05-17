@@ -9,7 +9,7 @@ if sim.ssm_ca %capacity analysis turned on
 %     batts = [5000 10000];
 %     wecs = [3 4];
     %for running
-    batts = [1000 2500 5000:5000:35000]; %[Wh]
+    batts = [2500 5000:10000:35000]; %[Wh]
     wecs = [2 3 4 5]; %[m]
     c = length(batts)*length(wecs); %number of capacity combinations    
     [W,B] = meshgrid(batts,wecs); 
