@@ -1,4 +1,5 @@
-function [pySsmStruct,s0] = doPySsm(FM,amp,frc,mdp,sim,wec,tTot)
+function [pySsmStruct] = doPySsm(FM,amp,frc,mdp,sim,wec,tTot)
+
 
 %set up capacity arrays (S1 and S2)
 batts = [2500 5000:10000:35000]; %[Wh]
@@ -17,67 +18,108 @@ end
 
 %preallocate and print simulation combinations
 clear multStruct
-multStruct(c) = struct();
+pySsmStruct(c) = struct();
+
+% %get s0, default results - think you'll just submit an mdpsim...
+% output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,nan);
+% s0.amp = amp;
+% s0.frc = frc;
+% s0.mdp = mdp;
+% s0.output = output;
+% s0.sim = sim;
+% s0.wec = wec;
 
 %set sensitivity parameters
 %POWER SYSTEM PARAMETERS
 if isequal(sim.tp,'eta') %conversion and transmission efficiency
-    ta = linspace(0.4,1,n);  
-    wec.eta_ct = ta(sim.ta_i);
+    sim.ta = linspace(0.4,1,n);  
+    wec.eta_ct = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'whl') %wec hotel load
-    ta = linspace(0,.18,n);
-    wec.h = ta(sim.ta_i);
+    sim.ta = linspace(0,.18,n);
+    wec.h = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'rhs') %rated significant wave height
-    ta = linspace(0.5,5,n);
-    wec.Hs_ra = ta(sim.ta_i);
+    sim.ta = linspace(0.5,5,n);
+    wec.Hs_ra = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'rtp') %rated peak period
-    ta = linspace(5,14,n);
-    wec.Tp_ra = ta(sim.ta_i);
+    sim.ta = linspace(5,14,n);
+    wec.Tp_ra = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'sdr') %self discharge rate
-    ta = linspace(0,9,n);
-    amp.sdr = ta(sim.ta_i);
+    sim.ta = linspace(0,9,n);
+    amp.sdr = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'est') %battery starting fraction
-    ta = linspace(0.1,1,n);
-    amp.est = ta(sim.ta_i);
+    sim.ta = linspace(0.1,1,n);
+    amp.est = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 %MARKOV DECISION PROCESS PARAMETERS
 elseif isequal(sim.tp,'slt') %stage limit
-    ta = linspace(18,180,n);
-    frc.stagelimit = true; frc.stagelimitval = ta(sim.ta_i);
+    sim.ta = linspace(18,180,n);
+    frc.stagelimit = true; frc.stagelimitval = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'tbs') %time between stages
-    ta = linspace(1,19,n);
-    mdp.dt = ta(sim.ta_i);
+    sim.ta = linspace(1,19,n);
+    mdp.dt = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'ebs') %energy between states
-    ta = linspace(17.5,40,n);
-    mdp.d_n = ta(sim.ta_i);
+    sim.ta = linspace(17.5,40,n);
+    mdp.d_n = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'dfr') %discount factor
-    ta = linspace(.5,.99,n);
-    mdp.alpha = ta(sim.ta_i);
+    sim.ta = linspace(.5,.99,n);
+    mdp.alpha = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'sub') %spin up buffer
-    ta = linspace(0,9,n);
-    frc.sub = ta(sim.ta_i);
+    sim.ta = linspace(0,9,n);
+    frc.sub = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
-        num2str(sim.ta_i) ' equating to ' num2str(round(ta(sim.ta_i),2))])
+        num2str(sim.ta_i) ' equating to ' ...
+        num2str(round(sim.ta(sim.ta_i),2))])
 end
 
+%parallization loop
+parfor (i = 1:c,sim.mw)
+    output = simulateWAMP(FM,amp,frc,mdp,sim,wec,tTot,i);
+    pySsmStruct(i).output = output;
+end
+
+%s0 default results? - likely will do this independently...
+
+%print results to screen
+if sim.expar
+    for i = 1:length(pySsmStruct)
+        pySsmStruct(i).output.results
+    end
+end
+
+%organize data output
+pySsmStruct = reshape(pySsmStruct,[length(wecs) length(batts)]);
+
+disp([num2str(c) ' simulations complete after ' ...
+        num2str(round(toc(tTot)/60,2)) ' minutes. '])
+    
 end
 

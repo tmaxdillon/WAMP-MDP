@@ -103,7 +103,7 @@ elseif isequal(batchtype,'ssm')
 elseif isequal(batchtype,'pySsm')
     sim.pyssm = true;
     sim.tdsens = false;
-    sim.ssm = false;
+    sim.senssm = false;
     sim.pb = false;
     sim.sl = false;
     sim.slv2 = false;
@@ -203,12 +203,12 @@ wec.FO = false;             %toggle fred. olsen
 %     % sim.tuning_array = [3 4 5 6 ; 1500 3000 6000 10000];
 % end
 
-%overwrite batch variables for beta and mu, can be commented out soon
-if ~isempty(batchbeta)
-    mdp.b = batchbeta;
-end
-if ~isempty(batcheps)
-    mdp.eps = batcheps;
-    mdp.mu = mdp.eps.*[1 .8 .2 0];       %functional penalties
-end
+% %overwrite batch variables for beta and mu, can be commented out soon
+% if ~isempty(batchbeta)
+%     mdp.b = batchbeta;
+% end
+% if ~isempty(batcheps)
+%     mdp.eps = batcheps;
+%     mdp.mu = mdp.eps.*[1 .8 .2 0];       %functional penalties
+% end
 

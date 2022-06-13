@@ -23,7 +23,7 @@ end
 
 %SENSITIVITY ANALYSIS
 %update sensitivity analysis
-if sim.tdsens || sim.senssm || sim.pyssm
+if sim.tdsens || sim.senssm
     [FM,amp,frc,mdp,sim,wec] = updateSensitivity(FM,amp,frc,mdp,sim,wec,i);
 else %not sensitivity, set i value for calcPerfMetrics
     i = nan;
@@ -210,7 +210,7 @@ for f=1:1:sim.F %over each forecast
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
     %calculate forecast error
-    if f > mdp.dt && mdp.dt == 1 && ~sim.pyssm
+    if f > mdp.dt && mdp.dt == 1
         [output.error.val(:,f), output.error.zero(:,f)] ...
             = calcSimError(FM_P,mdp,f);
         %figure this out later so that it works with tbs and mdp.dt > 1
@@ -272,26 +272,7 @@ elseif sim.senssm
         results
     end
 elseif sim.pyssm
-    %clean up large uneccessary variables
-    output = rmfield(output,'FM_P');
-    output = rmfield(output,'FM_mod');
-    %store sensitivity parameter and array for visualization
-    output.tuned_parameter = sim.tp;
-    output.tuning_array = sim.ta;
-    output.ta_i = sim.ta_i;
-    if sim.expar %save outputs for post-parellization
-        output.results.(char(sim.tp)) = sim.ta(sim.ta_i);
-        output.results.rp = output.wec.rp;
-        output.results.E_max = output.wec.E_max;
-        output.results.power_avg = output.power_avg;
-        %output.results.beta_avg = output.beta_avg;
-    else %not parallelized, print outputs
-        results.rp = output.wec.rp;
-        results.E_max = output.wec.E_max;
-        results.power_avg = output.power_avg;
-        %results.beta_avg = output.beta_avg;
-        results
-    end
+    
 else %single simulation, print results now
     results.rp = output.wec.rp;
     results.E_max = output.wec.E_max;
