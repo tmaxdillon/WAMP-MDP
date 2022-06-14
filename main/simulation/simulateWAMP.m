@@ -42,23 +42,11 @@ if frc.Flimit
 else
     sim.F = size(FM_P,2);
 end
-%3: discretize battery
-if ~sim.use_d_n %not discretizing consistent elements (outdated)
-    if sim.hpc && sim.hr_on || sim.exdist %high discretization
-        amp.E = linspace(0,amp.E_max,mdp.n); %[Wh], disc. battery states
-    elseif ~sim.exdist %discretize so there's a state lower than Ps(2)
-        amp.E = 0:amp.Ps(2)-5:amp.E_max; %[Wh], discretized battery state
-        mdp.n = length(amp.E);
-    end
-    if ~sim.expar 
-        disp(['n = ' num2str(mdp.n)])
-    end
-else %battery discretization set by element size (default)
-    amp.E = 0:mdp.d_n:amp.E_max;
-    mdp.n = length(amp.E);
-    if ~sim.expar && sim.notif
-        disp(['n = ' num2str(mdp.n) ' and d_n = ' num2str(mdp.d_n)])
-    end
+%3: discretize battery by element size (default)
+amp.E = 0:mdp.d_n:amp.E_max;
+mdp.n = length(amp.E);
+if ~sim.expar && sim.notif
+    disp(['n = ' num2str(mdp.n) ' and d_n = ' num2str(mdp.d_n)])
 end
 amp.E_start = amp.E(round(length(amp.E)* ...
     amp.est)); %[Wh], starting battery level
@@ -86,8 +74,6 @@ if sim.debug
 end
 %5: set initial output values
 output.E_sim(1) = amp.E_start; %set initial value of battery time series
-% output.beta(1) = beta(amp.E_start, ...
-%     amp.E,amp.E_max,mdp.b,mdp.beta_lb); %set initial beta value
 %6: set default values
 output.abridged = false; %default: not posterior bound abridged
 if sim.sl || sim.slv2 %simple logic
@@ -102,9 +88,10 @@ for f=1:1:sim.F %over each forecast
             ' forecasts complete after ' num2str(round(toc(tSim)/60,2)) ...
             ' minutes.'])
     end
-    %abridge at posterior bound limit for various reasons
+    %abridge at posterior bound limit for various reasons (all the time?)
     if f > size(FM_P,2) - (size(FM_P,1)-1) && ...
-            (sim.tdsens || sim.senssm || sim.sl || sim.sl2)
+            (sim.tdsens || sim.senssm || sim.sl || sim.slv2 || ...
+            sim.pyssm || frc.pb_abr)
         output.abridged = true; %simulation has been abridged
         %print status to command window if not external parallelization
         if ~sim.expar && sim.notif
@@ -133,8 +120,8 @@ for f=1:1:sim.F %over each forecast
         else
             output.a_sim(f) = 1;
         end
-%         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
-%         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
+        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
     %SIMPLE LOGIC v2
     elseif sim.slv2
         tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
@@ -152,19 +139,19 @@ for f=1:1:sim.F %over each forecast
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
     %MDP AND POSTERIOR BOUND
     else
-        %abridge simulation if using posterior bound to full duration
-        if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
-            output.abridged = true; %simulation has been abridged
-            %print status to command window
-            if ~sim.expar && sim.notif
-                if sim.tdsens
-                    disp(['Simulation ' num2str(sim.s) ' out of ' ...
-                        num2str(sim.S) ' complete after ' ...
-                        num2str(round(toc(tSim)/60,2)) ' minutes.'])
-                end
-            end
-            break
-        end
+%         %abridge simulation if using posterior bound to full duration
+%         if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
+%             output.abridged = true; %simulation has been abridged
+%             %print status to command window
+%             if ~sim.expar && sim.notif
+%                 if sim.tdsens
+%                     disp(['Simulation ' num2str(sim.s) ' out of ' ...
+%                         num2str(sim.S) ' complete after ' ...
+%                         num2str(round(toc(tSim)/60,2)) ' minutes.'])
+%                 end
+%             end
+%             break
+%         end
         %BACKWARD RECURSION
         if rem(f-1,mdp.dt) == 0 %time to make a decision based on stage
             if sim.debug %if debugging mdp
@@ -202,10 +189,7 @@ for f=1:1:sim.F %over each forecast
     [output.P_sim(f),output.a_act_sim(f),output.D_sim(f),E_evolved] = ...
         powerBalance(output.Pw_sim(f),output.E_sim(f), ...
         output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1,false); 
-%     output.beta(f+1) = beta(E_evolved,amp.E,amp.E_max, ...
-%         mdp.b,mdp.beta_lb); %document beta value
     [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
-    %could add counter of whether E_evolved rounded up or down ^^
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
@@ -213,8 +197,6 @@ for f=1:1:sim.F %over each forecast
     if f > mdp.dt && mdp.dt == 1 && ~sim.pyssm
         [output.error.val(:,f), output.error.zero(:,f)] ...
             = calcSimError(FM_P,mdp,f);
-        %figure this out later so that it works with tbs and mdp.dt > 1
-        %output.Pw_error(:,f) = nan;
     else
         output.error.val(:,f) = nan;
         output.error.zero(:,f) = nan;
@@ -263,12 +245,10 @@ elseif sim.senssm
         output.results.rp = output.wec.rp;
         output.results.E_max = output.wec.E_max;
         output.results.power_avg = output.power_avg;
-        %output.results.beta_avg = output.beta_avg;
     else %not parallelized, print outputs
         results.rp = output.wec.rp;
         results.E_max = output.wec.E_max;
         results.power_avg = output.power_avg;
-        %results.beta_avg = output.beta_avg;
         results
     end
 elseif sim.pyssm
@@ -284,19 +264,16 @@ elseif sim.pyssm
         output.results.rp = output.wec.rp;
         output.results.E_max = output.wec.E_max;
         output.results.power_avg = output.power_avg;
-        %output.results.beta_avg = output.beta_avg;
     else %not parallelized, print outputs
         results.rp = output.wec.rp;
         results.E_max = output.wec.E_max;
         results.power_avg = output.power_avg;
-        %results.beta_avg = output.beta_avg;
         results
     end
 else %single simulation, print results now
     results.rp = output.wec.rp;
     results.E_max = output.wec.E_max;
     results.power_avg = output.power_avg;
-    %results.beta_avg = output.beta_avg;
     results
 end
 
