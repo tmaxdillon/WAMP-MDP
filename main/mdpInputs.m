@@ -3,7 +3,7 @@
 frc.stagelimit = true; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 2; %number of forecasts to simulate
+frc.Flimitval = 24; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
