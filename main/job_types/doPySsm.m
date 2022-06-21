@@ -98,6 +98,9 @@ elseif isequal(sim.tp,'sub') %spin up buffer
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
         num2str(sim.ta_i) ' equating to ' ...
         num2str(round(sim.ta(sim.ta_i),2))])
+elseif isequal(sim.tp,'bbb')
+    sim.ta = [];
+    disp('Python ssm beginning for baseline case.')
 end
 
 %parallization loop

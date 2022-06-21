@@ -11,7 +11,11 @@ function [] = pySsmSave(prepath,tp,ta_i,batchlims)
 batchtype = 'pySsm'; %set batch inputs to pySsm
 mdpScript
 
-name = [tp '_' num2str(ta_i)];
+if isequal(tp,'bbb') %set baseline output filename without index
+    name = tp;
+else
+    name = [tp '_' num2str(ta_i)];
+end
 stru.(name) = pySsmStruct;
 save([prepath name '.mat'],'-struct','stru','-v7.3')
 
