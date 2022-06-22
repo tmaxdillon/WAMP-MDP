@@ -2,7 +2,7 @@ function [pySsmStruct] = doPySsm(FM,amp,frc,mdp,sim,wec,tTot)
 
 n = 10; %number of discrete sensitivity array values
 %set up capacity arrays (S1 and S2)
-batts = [2500 5000:10000:35000]; %[Wh]
+batts = [2500 5000:5000:40000]; %[Wh]
 wecs = [2 3 4 5]; %[m]
 c = length(batts)*length(wecs); %number of capacity combinations
 [S1,S2] = meshgrid(batts,wecs);
