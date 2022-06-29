@@ -1,9 +1,9 @@
 %interactive job - set values
 %forecast settings
-frc.stagelimit = true; %toggle limit on stages
+frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 240; %number of forecasts to simulate
+frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
@@ -33,7 +33,7 @@ if ~exist('batchtype','var')
     batchlims = [];
 end
 if batchlims %limits on
-    frc.stagelimit = false; %toggle limit on stages
+    frc.stagelimit = true; %toggle limit on stages
     frc.Flimit = true; %to shorten runtime
 else %limits off
     frc.stagelimit = false; %toggle limit on stages
@@ -167,8 +167,8 @@ wec.h = 0.10;               %percent of rated power as house load
 wec.B = 3;                  %[m]
 wec.rho = 1025;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
-wec.Hs_ra = 3;              %[m] - 2 is old (?) default
-wec.Tp_ra = 9;              %[s] - 9 is default
+wec.Hs_ra = 2;              %[m] - 2 is old (?) default
+wec.Tp_ra = 12;              %[s] - 9 is default
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
 

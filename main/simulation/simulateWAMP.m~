@@ -253,8 +253,8 @@ elseif sim.senssm
     end
 elseif sim.pyssm
     %clean up large uneccessary variables
-    output.FM_P_1 = squeeze(output.FM_P(1,:,:));
-    output.FM_mod_1 = squeeze(output.FM_mod(1,:,:));
+    output.FM_P_1 = squeeze(simStruct.output.FM_P(1,:,:));
+    output.FM_mod_1 = squeeze(simStruct.output.FM_mod(1,:,:));
     if ~isequal(sim.tp,'bbb') %save extra for baseline
         output = rmfield(output,'FM_P');
         output = rmfield(output,'FM_mod');
