@@ -41,6 +41,8 @@ cJS = [128 0 64]/255;
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper/'))
 cSC = AdvancedColormap('kr ryy yl lg ggk',1000);
 
+%ADD GRID LINES FOR TP SO PLOTYY HAS BOTH GRIDLINES
+
 mdp_ts = figure;
 set(gcf,'Units','inches','Color','w')
 set(gcf, 'Position', [1, 1, 6.5, 4.5])

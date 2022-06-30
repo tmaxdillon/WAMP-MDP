@@ -1,13 +1,13 @@
 function [FM,amp,frc,mdp,sim,wec] = ...
     updateSensitivity(FM,amp,frc,mdp,sim,wec,i)
 
-if sim.tdsens && ~sim.senssm && ~sim.pySsm %two dimensional sensitivity
+if sim.tdsens && ~sim.senssm && ~sim.pyssm %two dimensional sensitivity
     if isequal(sim.tuned_parameter{1},'emx') && ...
             isequal(sim.tuned_parameter{2},'wcd') && sim.tdsens
         amp.E_max = sim.S1(i);
         wec.B = sim.S2(i);
     end
-elseif ~sim.tdsens && sim.senssm && ~sim.pySsm %old ssm
+elseif ~sim.tdsens && sim.senssm && ~sim.pyssm %old ssm
     if isequal(sim.S1{2}(i),'eta') %c/t efficiency
         wec.eta_ct = sim.S1{1}(i);
     elseif isequal(sim.S1{2}(i),'whl') %hotel load
