@@ -7,6 +7,11 @@ if sim.tdsens && ~sim.senssm && ~sim.pyssm %two dimensional sensitivity
         amp.E_max = sim.S1(i);
         wec.B = sim.S2(i);
     end
+    if isequal(sim.tuned_parameter{1},'ebs') && ...
+            isequal(sim.tuned_parameter{2},'wcd') && sim.tdsens
+        mdp.d_n = sim.S1(i);
+        wec.B = sim.S2(i);
+    end
 elseif ~sim.tdsens && sim.senssm && ~sim.pyssm %old ssm
     if isequal(sim.S1{2}(i),'eta') %c/t efficiency
         wec.eta_ct = sim.S1{1}(i);

@@ -71,12 +71,17 @@ if isequal(batchtype,'tds')
         sim.tuned_parameter{1} = 'eps'; %epsilon
         sim.tuned_parameter{2} = 'nll';
         beta_on = true;
+    elseif isequal(batchpar1,'ebs') && isequal(batchpar2,'wcd')
+        sim.tuning_array1 = [0.1 0.5 1 3 5];
+        sim.tuning_array2 = [2 3 4 5];
+        sim.tuned_parameter{1} = 'ebs'; %energy between states
+        sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     end
     if ~isempty(batcherr)
         frc.add_err = true; %add error to forecast
         frc.err_type = batcherr; %1: randomness multiplier 2: sinusoid
     end
-elseif isequal(batchtype,'ssm')
+elseif isequal(batchtype,'ssm') %outdated
     sim.senssm = true;
     sim.tdsens = false;
     sim.pyssm = false;
@@ -136,7 +141,7 @@ Stemp = load('forecast_sinusoid.mat'); %load forecast sinusoid array
 frc.sinu = Stemp.forecast_sinusoid; %store forecast sinusoid array
 
 %AMP parameters:
-amp.E_max = 10000;                      %[Wh], maximum battery capacity
+amp.E_max = 2500;                      %[Wh], maximum battery capacity
 if ~sim.hpc 
     amp.E_max = 10000; %shorten runtime if using laptop
 end
@@ -149,7 +154,7 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
-mdp.d_n = 10; %[Wh] energy between states - 15-25 (old/flawed)
+mdp.d_n = 3; %[Wh] energy between states - 15-25 (old/flawed)
 mdp.m = 4; %number of actions
 mdp.eps = 1; %aggressiveness factor
 mdp.mu = mdp.eps.*[1 .8 .2 0]; %functional penalties
@@ -164,7 +169,7 @@ mdp.alpha = .99; %discount factor
 %WEC parameters:
 wec.eta_ct = 0.6;           %[~], electrical efficiency, 0.6
 wec.h = 0.10;               %percent of rated power as house load
-wec.B = 3;                  %[m]
+wec.B = 2;                  %[m]
 wec.rho = 1025;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m] - 2 is old (?) default

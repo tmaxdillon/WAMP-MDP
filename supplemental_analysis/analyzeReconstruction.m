@@ -1,11 +1,16 @@
-s = mdpdn5(1,3);
+s = ebs_1(1,1);
 y = 2017;
-d = 21;
+d = 08;
 m = 07;
-h = 15;
+h = 12;
 
 dn = datenum(y,m,d,h,0,0);
-pt = find(s.output.FM_P(1,:,1) == dn);
+if isfield('s.output','FM_P')
+    pt = find(s.output.FM_P(1,:,1) == dn);
+else %sensitivity analysis, unpack appropraitely
+    pt = find(s.output.FM_P_1(:,1) == dn);
+    s.amp = bbb.amp; %baseline amp structure
+end
 
 [~,~,~,E_next] = powerBalance(s.output.Pw_sim(pt),s.output.E_recon(pt), ...
         s.output.a_act_sim(pt),s.amp.sdr,s.amp.E_max,s.amp.Ps,1,true);
