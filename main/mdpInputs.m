@@ -1,4 +1,5 @@
 %interactive job - set values
+mdp.d_n = 3; %[Wh] energy between states - 15-25 (old/flawed)
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
@@ -156,7 +157,6 @@ amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
 
 %MDP parameters:
-mdp.d_n = 3; %[Wh] energy between states - 15-25 (old/flawed)
 mdp.m = 4; %number of actions
 mdp.eps = 1; %aggressiveness factor
 mdp.mu = mdp.eps.*[1 .8 .2 0]; %functional penalties
