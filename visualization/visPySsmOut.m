@@ -1,15 +1,21 @@
-function [] = visPySsmOut(var)
+function [] = visPySsmOut(var,n)
 
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper'))
+data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/' ...
+    'pyssm_out/'];
+bbb = load([data_path 'bbb.mat']);
 w = 4;
 b = 9;
 O = zeros(w,b,10);
+B = zeros(w,b);
 for i = 1:10
-    temp = load(['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/pyssm_out/' ...
-        var '_' num2str(i) '.mat']);
+    temp = load([data_path var '_' num2str(i) '.mat']);
     for j = 1:w
         for k = 1:b
             O(j,k,i) = temp.([var '_' num2str(i)])(j,k).output.power_avg;
+            if i == 1 %populate baseline matrix
+                B(j,k) = bbb.bbb(j,k).output.power_avg;
+            end
         end
     end
 end
@@ -53,7 +59,12 @@ sensfig = figure;
 set(gcf,'Units','inches','Position',[0 5 3 9],'Color','w')
 for j = 1:w
     for k = 1:b
-        p(j,k) = plot(ta,squeeze(O(j,k,:))','LineWidth',1.5);
+        if n
+            p(j,k) = plot(ta,100.*(squeeze(O(j,k,:))./B(j,k))', ...
+                'LineWidth',1.5);
+        else
+            p(j,k) = plot(ta,squeeze(O(j,k,:))','LineWidth',1.5);
+        end
         p(j,k).DisplayName = [num2str(wecs(j)) ...
             ' m WEC, ' num2str(round(batts(k)/1000,0)) ' kWh batt'];
         p(j,k).Color = c(j,b+k,:);
@@ -63,8 +74,13 @@ end
 legend(reshape(p',[1 36]),'Location','southoutside','NumColumns',1)
 set(gca,'Units','inches','Position',[0.75 7 2 1.8])
 xlabel(xlab)
-ylabel('Average Power [W]')
+if n
+    ylabel('Change in P_{avg} [%]')
+else
+    ylabel('Average Power [W]')
+    ylim([0 625])
+end
 grid on
-ylim([0 625])
+
 
 

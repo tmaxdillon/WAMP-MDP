@@ -1,4 +1,4 @@
-close all
+%close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
@@ -9,7 +9,7 @@ if ~exist('simStruct','var')
     simStruct = mdpsim;
 end
 w = 3; %wec index 
-b = 7; %battery index
+b = 3; %battery index
 
 %unpack data structure
 FM_P_1 = squeeze(simStruct(w,b).output.FM_P(1,:,:));

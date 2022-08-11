@@ -7,14 +7,16 @@ frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
+frc.abr_val = 1790; %forecast abridge value 
 %simulation types
 sim.pb = false; %toggle for posterior bound
 sim.sl = true; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
-sim.senssm = false; %sensitivity small multiple
-sim.ssm_ca = false; %sensitivity small multiple capacity analysis
+sim.senssm = false; %sensitivity small multiple (outdated)
+sim.ssm_ca = false; %sensitivity small multiple cap analysis (outdated)
+sim.pyssm = false; %sensitivy small multiple (python)
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 %sim.exdist = false; %batt disc set externally (multiple only, outdated)
