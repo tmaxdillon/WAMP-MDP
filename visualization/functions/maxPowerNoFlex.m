@@ -1,15 +1,18 @@
-function [mpnf] = maxPowerNoFlex(wecs,batts)
+function [mpnf] = maxPowerNoFlex(wecs,batts,mdpsim)
 
-mdpInputs
-ld = load('WETSForecastMatrix');
-FM = ld.WETSForecastMatrix.FM_subset;
-clear WETSForecastMatrix
+%mdpInputs
+%ld = load('WETSForecastMatrix');
+% FM = ld.WETSForecastMatrix.FM_subset;
+% clear WETSForecastMatrix
 mpnf(length(wecs),length(batts)) = struct();
+amp = mdpsim(1,1).amp;
+mdp = mdpsim(1,1).mdp;
 for w = 1:length(wecs)
     wec.B = wecs(w);
     %unpack data
-    [FM_P,~] = modifyFM(FM,frc,mdp,wec);
+    %[FM_P,~] = modifyFM(FM,frc,mdp,wec);
     for b = 1:length(batts)
+        FM_P = mdpsim(w,b).output.FM_P;       
         amp.E_max = batts(b);
         consump = 1; %[W]
         searching = true;
@@ -31,12 +34,17 @@ for w = 1:length(wecs)
             consump = consump+1; %[W]
             if consump > 600
                 mpnf(w,b).p_avg = 600;
-                mpnf(w,b).E = E;
                 searching = false;
             end
         end
+        %variables needed to calculate intermittency and degradatoin
+        mpnf(w,b).output.a_sim = 4.*ones(size(E));
+        mpnf(w,b).output.E_sim = E;
+        mpnf(w,b).output.FM_mod = mdpsim(w,b).output.FM_mod;
     end
 end
+
+
 
 end
 

@@ -1,17 +1,17 @@
 %interactive job - set values
-mdp.d_n = 3; %[Wh] energy between states - 15-25 (old/flawed)
+mdp.d_n = 20; %[Wh] energy between states - 15-25
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 2; %number of forecasts to simulate
+frc.Flimitval = 5; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
-frc.abr_val = 1790; %forecast abridge value 
+frc.abr_val = 1790; %forecast abridge value
 %simulation types
 sim.pb = false; %toggle for posterior bound
-sim.sl = true; %toggle for simple logic
+sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
@@ -21,9 +21,10 @@ sim.pyssm = false; %sensitivy small multiple (python)
 %battery discretization
 sim.use_d_n = true; %battery discretization set by constant delta
 %sim.exdist = false; %batt disc set externally (multiple only, outdated)
+sim.round = 2; %1: nearest disc value, 2: dynamic
 %notifications
 sim.notif = true; %surpress simulateWAMP notifications
-sim.d_notif = 5; %notifications every __ forecasts
+sim.d_notif = 25; %notifications every __ forecasts
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -38,7 +39,7 @@ end
 if batchlims %limits on
     frc.stagelimit = true; %toggle limit on stages
     frc.Flimit = true; %to shorten runtime
-else %limits off
+elseif ~batchlims %limits off
     frc.stagelimit = false; %toggle limit on stages
     frc.Flimit = false; %to shorten runtime
 end
@@ -121,10 +122,9 @@ elseif isequal(batchtype,'pySsm')
 end
 
 %SIM parameters:
-sim.brpar = false;         %parallelizing backward recursions (outdated)
 sim.expar = true;           %parallelizing simulations (default true)
 sim.debug = false;          %include debugging variables in output
-sim.debug_brpar = false;      %debug HPC runtime and overhead (outdated)
+sim.debug_disc = false;      %debug E discretization
 sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
@@ -150,7 +150,7 @@ if ~sim.hpc
 end
 amp.est = 0.5;                          %battery starting fraction
 amp.Ps = [1 45 450 600];                %[W], power consumption per
-amp.sdr = 3;                            %[%/month] self discharge rate
+amp.sdr = 0;                            %[%/month] self discharge rate (3)
 amp.fpr = 0.70;                         %simple logic full power ratio
 amp.mpr = 0.65;                         %simple logic medium power ratio
 amp.lpr = 0.15;                         %simple logic low power ratio

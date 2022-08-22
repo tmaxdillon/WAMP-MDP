@@ -52,6 +52,7 @@ amp.E_start = amp.E(round(length(amp.E)* ...
     amp.est)); %[Wh], starting battery level
 %4: preallocate outputs
 output.E_sim = zeros(sim.F,1); %battery time series
+output.E_true = zeros(sim.F,1); %true battery time series
 output.a_sim = zeros(sim.F,1); %action time series
 output.a_act_sim = zeros(sim.F,1); %actual action time series
 output.Pw_sim = zeros(sim.F,1); %power from WEC time series
@@ -74,6 +75,8 @@ if sim.debug
 end
 %5: set initial output values
 output.E_sim(1) = amp.E_start; %set initial value of battery time series
+output.E_true(1) = amp.E_start;
+dE(1) = output.E_true(1) - output.E_sim(1);
 %6: set default values
 output.abridged = false; %default: not posterior bound abridged
 if sim.sl || sim.slv2 %simple logic
@@ -122,7 +125,7 @@ for f=1:1:sim.F %over each forecast
         end
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,1,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
-    %SIMPLE LOGIC v2
+        %SIMPLE LOGIC v2
     elseif sim.slv2
         tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
             output.E_sim(f)*amp.sdr/(100*30*24)); %[h]
@@ -137,21 +140,21 @@ for f=1:1:sim.F %over each forecast
         end
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,2,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
-    %MDP AND POSTERIOR BOUND
+        %MDP AND POSTERIOR BOUND
     else
-%         %abridge simulation if using posterior bound to full duration
-%         if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
-%             output.abridged = true; %simulation has been abridged
-%             %print status to command window
-%             if ~sim.expar && sim.notif
-%                 if sim.tdsens
-%                     disp(['Simulation ' num2str(sim.s) ' out of ' ...
-%                         num2str(sim.S) ' complete after ' ...
-%                         num2str(round(toc(tSim)/60,2)) ' minutes.'])
-%                 end
-%             end
-%             break
-%         end
+        %         %abridge simulation if using posterior bound to full duration
+        %         if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb
+        %             output.abridged = true; %simulation has been abridged
+        %             %print status to command window
+        %             if ~sim.expar && sim.notif
+        %                 if sim.tdsens
+        %                     disp(['Simulation ' num2str(sim.s) ' out of ' ...
+        %                         num2str(sim.S) ' complete after ' ...
+        %                         num2str(round(toc(tSim)/60,2)) ' minutes.'])
+        %                 end
+        %             end
+        %             break
+        %         end
         %BACKWARD RECURSION
         if rem(f-1,mdp.dt) == 0 %time to make a decision based on stage
             if sim.debug %if debugging mdp
@@ -180,7 +183,7 @@ for f=1:1:sim.F %over each forecast
                 output.val_Jstar(f:f+mdp.dt) = Jstar(ind_E_sim,1);
             else
                 output.a_sim(f:end) = policy(ind_E_sim,1);
-                output.val_Jstar(f:end) = Jstar(ind_E_sim,1);              
+                output.val_Jstar(f:end) = Jstar(ind_E_sim,1);
             end
         end
     end
@@ -188,9 +191,33 @@ for f=1:1:sim.F %over each forecast
     %find power for sensing, power discarded and battery evolution
     [output.P_sim(f),output.a_act_sim(f),output.D_sim(f),E_evolved] = ...
         powerBalance(output.Pw_sim(f),output.E_sim(f), ...
-        output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1,false); 
-    [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
+        output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1,false);
+    [~,~,~,output.E_true(f+1)] = powerBalance(output.Pw_sim(f), ...
+        output.E_true(f),output.a_act_sim(f),amp.sdr,amp.E_max, ...
+        amp.Ps,1,true);
+    if sim.round == 1 %round to nearest index
+        [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
+    elseif sim.round == 2 %round dynamically based on E_true
+        [~,ind_temp] = min(abs(amp.E - E_evolved));
+        truegreater = output.E_true(f+1) > E_evolved;
+        roundup = amp.E(ind_temp) > E_evolved;
+        if truegreater && ~roundup %need to round up
+            ind_E_sim_evolved = ind_temp + 1;
+        elseif ~truegreater && roundup %need to round down
+            ind_E_sim_evolved = ind_temp - 1;
+        else %stay as rounded
+            ind_E_sim_evolved = ind_temp;
+        end
+    end
     output.E_sim(f+1) = amp.E(ind_E_sim_evolved); %discretized energy state
+    if sim.debug_disc
+        disp(['E_evolved = ' num2str(E_evolved)])
+        disp(['E_sim = ' num2str(output.E_sim(f+1))])
+        disp(['E_true = ' num2str(output.E_true(f+1))])
+        dE(f+1) = output.E_true(f+1) - output.E_sim(f+1);
+        disp(['dE = ' num2str(dE(f+1))])
+        disp(['dEdE = ' num2str(dE(f+1)-dE(f))])
+    end
     output.wec.cw(f) = FM_P(1,f,3); %capture width
     output.wec.cwr(f) = FM_P(1,f,4); %capture width ratio
     %calculate forecast error
@@ -205,7 +232,7 @@ end
 
 %PERFORMANCE METRICS
 %percent for each operational state and average output power
-[output.apct,output.power_avg,output.E_sim_ind,output.E_recon, ...
+[output.apct,output.power_avg,output.E_sim_ind,~, ...
     output.J_recon] = calcPerfMetrics(amp,mdp,sim,wec,output,i);
 
 %PRINT END

@@ -1,15 +1,18 @@
-function [apfl] = avgPowerFixedLoad(wecs,batts,draw)
+function [apfl] = avgPowerFixedLoad(wecs,batts,draw,mdpsim)
 
-mdpInputs
-ld = load('WETSForecastMatrix');
-FM = ld.WETSForecastMatrix.FM_subset;
-clear WETSForecastMatrix
-apfl = zeros(length(wecs),length(batts));
+% mdpInputs
+% ld = load('WETSForecastMatrix');
+% FM = ld.WETSForecastMatrix.FM_subset;
+% clear WETSForecastMatrix
+apfl(length(wecs),length(batts)) = struct();
+amp = mdpsim(1,1).amp;
+mdp = mdpsim(1,1).mdp;
 for w = 1:length(wecs)
     wec.B = wecs(w);
     %unpack data
-    [FM_P,~] = modifyFM(FM,frc,mdp,wec);
+    %[FM_P,~] = modifyFM(FM,frc,mdp,wec);
     for b = 1:length(batts)
+        FM_P = mdpsim(w,b).output.FM_P;
         amp.E_max = batts(b);
         E = zeros(size(FM_P,2),1);
         L = ones(size(FM_P,2),1)*draw;
@@ -24,7 +27,11 @@ for w = 1:length(wecs)
                 E(i+1) = E(i);
             end
         end
-        apfl(w,b) = mean(L);
+        apfl(w,b).p_avg = mean(L);
+        %variables needed to calculate intermittency and degradatoin
+        apfl(w,b).output.a_sim = 4.*ones(size(E));
+        apfl(w,b).output.E_sim = E;
+        apfl(w,b).output.FM_mod = mdpsim(w,b).output.FM_mod;
     end
 end
 

@@ -18,8 +18,6 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     dt = mdp.dt; %time discretization
     pb = sim.pb; %posterior bound toggle
     FO = wec.FO; %fred olsen toggle
-    b = mdp.b; %b value for beta function
-    beta_lb = mdp.beta_lb; %lower bound for beta function
     mu = mdp.mu; %sensing penalties
     alpha = mdp.alpha; %discount factor
     m = mdp.m; %number of states
@@ -55,8 +53,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
         %3: find the state index of the evolved battery
         [~,state_evol_a(a)] = min(abs(E - E_evolved));
         %4: compute the 'value' of this action via bellman's equation
-        Jstar(s,t) = beta(E(s),E,E_max,b,beta_lb) + mu(a) + ...
-            Jstar_t1(state_evol_a(a))*alpha^t;
+        Jstar(s,t) = mu(a) + Jstar_t1(state_evol_a(a))*alpha^t;
     end
 end
 

@@ -16,19 +16,19 @@ if E_evolved > E_max %topped out, discard power
     power_disc = E_evolved - E_max; %[Wh], power discarded
     E_evolved = E_max;
 elseif E_evolved < 0 %bottomed out, find actual draw
-        if ~rc %only adjust action/draw if it's not the reconstruction
+    if ~rc %only adjust action/draw if it's not the reconstruction
         draw_exact = (E - sd)/dt + power_wec; %[W], exact draw possible
         Ps_temp = Ps - draw_exact;
-            if sum(Ps_temp(:) < 0) == 0 %Ps_temp is all positive
-                a_act_ind = 1; %enter lowest power state
-            else %negative values in Ps_temp, consumption possible
-                [~,a_act_ind] = max(Ps_temp(Ps_temp<0)); %largest possible
-            end
-            draw_act = Ps(a_act_ind);
-            E_evolved = dt*(power_wec - draw_act) + E - sd;
-        else
-            E_evolved = 0;
+        if sum(Ps_temp(:) < 0) == 0 %Ps_temp is all positive
+            a_act_ind = 1; %enter lowest power state
+        else %negative values in Ps_temp, consumption possible
+            [~,a_act_ind] = max(Ps_temp(Ps_temp<0)); %largest possible
         end
+        draw_act = Ps(a_act_ind);
+        E_evolved = dt*(power_wec - draw_act) + E - sd;
+    else
+        E_evolved = 0;
+    end
 end
 
 end
