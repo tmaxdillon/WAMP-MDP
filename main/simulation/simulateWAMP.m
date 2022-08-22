@@ -158,13 +158,8 @@ for f=1:1:sim.F %over each forecast
         %BACKWARD RECURSION
         if rem(f-1,mdp.dt) == 0 %time to make a decision based on stage
             if sim.debug %if debugging mdp
-                if sim.brpar
-                    [policy,Jstar,compare,state_evol,wec_power] = ...
-                        backwardRecursion_par(FM_P,mdp,amp,sim,wec,frc,f);
-                else
-                    [policy,Jstar,compare,state_evol,wec_power] = ...
-                        backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
-                end
+                [policy,Jstar,compare,state_evol,wec_power] = ...
+                    backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
                 %DOCUMENT BELLMANS (AND DEBUG) VALUES
                 output.val_all(:,:,:,f) = compare(:,:,:); %all values
                 output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
