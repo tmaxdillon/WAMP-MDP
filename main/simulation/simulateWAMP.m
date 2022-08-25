@@ -195,10 +195,12 @@ for f=1:1:sim.F %over each forecast
     elseif sim.round == 2 %round dynamically based on E_true
         [~,ind_temp] = min(abs(amp.E - E_evolved));
         truegreater = output.E_true(f+1) > E_evolved;
+        trueless = output.E_true(f+1) < E_evolved;
         roundup = amp.E(ind_temp) > E_evolved;
-        if truegreater && ~roundup %need to round up
+        rounddown = amp.E(ind_temp) < E_evolved;
+        if truegreater && rounddown %need to round up
             ind_E_sim_evolved = ind_temp + 1;
-        elseif ~truegreater && roundup %need to round down
+        elseif trueless && roundup %need to round down
             ind_E_sim_evolved = ind_temp - 1;
         else %stay as rounded
             ind_E_sim_evolved = ind_temp;
