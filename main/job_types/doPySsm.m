@@ -9,7 +9,7 @@ c = length(batts)*length(wecs); %number of capacity combinations
 sim.S1 = reshape(S1,[c 1]);
 sim.S2 = reshape(S2,[c 1]);
 %set number of cores
-if isempty(gcp('nocreate')) && sim.hpc && ~sim.brpar
+if isempty(gcp('nocreate')) && sim.hpc
     cores = feature('numcores'); %find number of cores
     if cores > sim.corelim %only start if using HPC
         parpool(cores);
