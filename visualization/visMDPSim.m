@@ -93,7 +93,7 @@ colormap(gca,brewermap(50,'PiYG'))
 caxis([0 output.wec.E_max/1000])
 hold on
 plot(datetime(FM_P_1(f_pts,1),'ConvertFrom','datenum'), ...
-    output.E_recon(f_pts)/1000,'-r','LineWidth',.7)
+    output.E_true(f_pts)/1000,'-r','LineWidth',.7)
 ylim([0 output.wec.E_max/1000*1.1])
 yticks(linspace(0,output.wec.E_max/1000,3))
 ylabel({'Battery','[kWh]'})

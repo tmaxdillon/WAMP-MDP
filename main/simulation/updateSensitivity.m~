@@ -12,14 +12,6 @@ if sim.tdsens && ~sim.senssm && ~sim.pyssm %two dimensional sensitivity
         mdp.d_n = sim.S1(i);
         wec.B = sim.S2(i);
     end
-    %only do this block of code if rhs or rtp becomes a tds parameter
-%     %update rated conditions based on WEC size change
-%     if ~isequal(sim.S1{2}(i),'rhs') %not rated Hs sensitivity
-%         wec.Hs_ra = interp1([2 3 4 5],wec.Hs_ra_a,wec.B);
-%     end
-%     if ~isequal(sim.S1{2}(i),'rtp') %not rated Tp sensitivity
-%         wec.Tp_ra = interp1([2 3 4 5],wec.Tp_ra_a,wec.B);
-%     end
 elseif ~sim.tdsens && sim.senssm && ~sim.pyssm %old ssm
     if isequal(sim.S1{2}(i),'eta') %c/t efficiency
         wec.eta_ct = sim.S1{1}(i);
@@ -47,23 +39,10 @@ elseif ~sim.tdsens && sim.senssm && ~sim.pyssm %old ssm
     %update WEC and battery capacities
     wec.B = sim.S1{3}(i);
     amp.E_max = sim.S1{4}(i);
-    %update rated conditions based on WEC size change
-    if ~isequal(sim.S1{2}(i),'rhs') %not rated Hs sensitivity
-        wec.Hs_ra = interp1([2 3 4 5],wec.Hs_ra_a,wec.B);
-    end
-    if ~isequal(sim.S1{2}(i),'rtp') %not rated Tp sensitivity
-        wec.Tp_ra = interp1([2 3 4 5],wec.Tp_ra_a,wec.B);
-    end
+    
 elseif ~sim.tdsens && ~sim.senssm && sim.pyssm %python (new) ssm
     amp.E_max = sim.S1(i);
     wec.B = sim.S2(i);
-    %update rated conditions based on WEC size change
-    if ~isequal(sim.tp,'rhs') %not rated Hs sensitivity
-        wec.Hs_ra = interp1([2 3 4 5],wec.Hs_ra_a,wec.B);
-    end
-    if ~isequal(sim.tp,'rtp') %not rated Tp sensitivity
-        wec.Tp_ra = interp1([2 3 4 5],wec.Tp_ra_a,wec.B);
-    end
 end
 
 end

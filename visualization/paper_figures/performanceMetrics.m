@@ -1,12 +1,14 @@
-%clearvars -except mdpsim pbosim slosim sl2sim
+clearvars -except mdpsim pbosim slosim sl2sim
 %close all
+
+%% vis
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/06_22/'];
+    'output_data/'];
 
 slcomp = false; %comparing simple logic, false means baseline comparison
 
@@ -16,13 +18,13 @@ if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
     load([ output_path 'pbosim']); %purples
     load([ output_path 'slosim']); %greens
     load([ output_path 'sl2sim']); %blues
-    mdpsim = mdpsim(2:end,2:end);
-    pbosim = pbosim(2:end,2:end);
-    slosim = slosim(2:end,2:end);
-    sl2sim = sl2sim(2:end,2:end);
+    mdpsim = mdpsim(2:end,:);
+    pbosim = pbosim(2:end,:);
+    slosim = slosim(2:end,:);
+    sl2sim = sl2sim(2:end,:);
 end
 
-x = mdpsim(1,1).sim.tuning_array1(2:end)./1000;
+x = mdpsim(1,1).sim.tuning_array1./1000;
 B = mdpsim(1,1).sim.tuning_array2(2:end);
 nw = length(B);
 

@@ -4,7 +4,7 @@ mdp.d_n = 20; %[Wh] energy between states - 15-25
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 180; %number of forecasts to simulate
+frc.Flimitval = 5; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
@@ -175,7 +175,7 @@ wec.B = 2;                  %[m]
 wec.rho = 1025;             %[kg/m^3]
 wec.g = 9.81;               %[m/s^2]
 wec.Hs_ra = 2;              %[m] - 2 is old (?) default
-wec.Tp_ra = 12;              %[s] - 9 is default
+wec.Tp_ra = [8 8 11 15];              %[s] - 9 is default
 wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;             %toggle fred. olsen
 

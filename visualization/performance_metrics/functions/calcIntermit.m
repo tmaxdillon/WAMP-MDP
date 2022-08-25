@@ -4,7 +4,7 @@ a_sim_orig = a_sim;
 a_sim(a_sim == 0) = [];
 a_sim(a_sim ~= 4) = 0;
 a_sim(a_sim == 4) = 1;
-if max(a_sim_orig) < 4 %never in full power mode
+if max(a_sim_orig) < 4 || sum(a_sim_orig == 4) < 2 %never in fp mode
     a_sim(1) = 1;
     a_sim(end) = 1;
 end

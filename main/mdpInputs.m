@@ -169,15 +169,18 @@ mdp.dt = 1; %time between stages
 mdp.alpha = .99; %discount factor
 
 %WEC parameters:
-wec.eta_ct = 0.6;           %[~], electrical efficiency, 0.6
-wec.h = 0.10;               %percent of rated power as house load
-wec.B = 2;                  %[m]
-wec.rho = 1025;             %[kg/m^3]
-wec.g = 9.81;               %[m/s^2]
-wec.Hs_ra = 2;              %[m] - 2 is old (?) default
-wec.Tp_ra = 12;              %[s] - 9 is default
-wec.F = getWecSimInterp();  %3-d interpolant (Tp, Hs, B) from wecsim
-wec.FO = false;             %toggle fred. olsen
+wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6
+wec.h = 0.10;                   %percent of rated power as house load
+wec.B = 2;                      %[m]
+wec.B_a = [2 3 4 5];            %array of B values
+wec.rho = 1025;                 %[kg/m^3]
+wec.g = 9.81;                   %[m/s^2]
+wec.Hs_ra_a = [3 3 2.5 1.5];    %[m] - 2 is old (?) default
+wec.Tp_ra_a = [8 8 11 14];      %[s] - 9 is default
+wec.Hs_ra = interp1(wec.B_a,wec.Hs_ra_a,wec.B);
+wec.Tp_ra = interp1(wec.B_a,wec.Tp_ra_a,wec.B);
+wec.F = getWecSimInterp();      %3-d interpolant (Tp, Hs, B) from wecsim
+wec.FO = false;                 %toggle fred. olsen
 
 % %overwrite batch variables for beta and mu, can be commented out soon
 % if ~isempty(batchbeta)
