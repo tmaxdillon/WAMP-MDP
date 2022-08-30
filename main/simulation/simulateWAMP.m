@@ -198,7 +198,8 @@ for f=1:1:sim.F %over each forecast
         trueless = output.E_true(f+1) < E_evolved;
         roundup = amp.E(ind_temp) > E_evolved;
         rounddown = amp.E(ind_temp) < E_evolved;
-        if truegreater && rounddown %need to round up
+        if truegreater && rounddown && ...
+                amp.E(ind_temp) < amp.E(end) %need to round up
             ind_E_sim_evolved = ind_temp + 1;
         elseif trueless && roundup %need to round down
             ind_E_sim_evolved = ind_temp - 1;
