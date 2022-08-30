@@ -249,6 +249,9 @@ output.wec.cw_avg = mean(output.wec.cw); %average capture width
 output.wec.cwr_avg = mean(output.wec.cwr); %average capture width ratio
 output.wec.CF = mean(output.Pw_sim)/output.wec.rp; %capacity factor
 output.wec.E_max = amp.E_max; %battery size
+output.wec.B = wec.B; %wec size
+output.wec.Hs_ra = wec.Hs_ra; %rated wave height
+output.wec.Tp_ra = wec.Tp_ra; %rated peak period
 %print results
 if sim.tdsens %two dimensional sensitivity analysis - print after
     output.results.(sim.tuned_parameter{1}) = sim.S1(i);

@@ -14,8 +14,8 @@ if sim.tdsens && ~sim.senssm && ~sim.pyssm %two dimensional sensitivity
     end
     if isequal(sim.tuned_parameter{1},'rhs') && ...
             isequal(sim.tuned_parameter{2},'rtp') && sim.tdsens
-        wec.Hs_ra = sim.S1(i);
-        wec.Tp_ra = sim.S2(i);
+        mdp.d_n = sim.S1(i);
+        wec.B = sim.S2(i);
     end
 %     %only do this block of code if rhs or rtp becomes a tds parameter
 %     without the other one also in the tds

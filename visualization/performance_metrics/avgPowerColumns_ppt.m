@@ -1,4 +1,4 @@
-clearvars -except mdpsim pbosim slosim
+clearvars -except mdpsim pbosim sl2sim
 close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -6,10 +6,10 @@ set(0,'DefaultTextFontname', 'calibri')
 set(0,'DefaultAxesFontName', 'calibri')
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var')
+        ~exist('sl2sim','var')
     load('mdpsim');
     load('pbosim');
-    load('slosim');
+    load('sl2sim');
 end
 
 B = mdpsim(1).sim.tuning_array2;
@@ -19,7 +19,7 @@ for w = 1:size(mdpsim,1) %across all wcd
     for e = 1:size(mdpsim,2) %across all emx       
         power_avg(e,w,1) = mdpsim(w,e).output.power_avg;
         power_avg(e,w,2) = pbosim(w,e).output.power_avg;
-        power_avg(e,w,3) = slosim(w,e).output.power_avg;
+        power_avg(e,w,3) = sl2sim(w,e).output.power_avg;
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -27,7 +27,6 @@ end
 %x axis info
 x = mdpsim(1).sim.tuning_array1./1000;
 %xlab = 'Battery Size [kWh]';
-
 
 %colors
 c = 10;
@@ -44,6 +43,8 @@ col = col1(1:size(mdpsim,1),:);
 c1 = [220,20,60]/256;
 c2 = [0,0,205]/256;
 c3 = [123,104,238]/256;
+%figcol = [255 255 245]/256;
+figcol = [1 1 1];
 
 %sizes
 ms = 6;
@@ -58,7 +59,7 @@ yoff = .85; %[in]
 xdist = 1.5; %[in]
 ydist = 3; %[in]
 xmarg = 0.5; %[in]
-ylims = flipud([570 620; 540 590; 430 480 ; 90 140]);
+ylims = flipud([590 605; 560 610; 260 300 ; 90 140]);
 
 %find max range
 for w = 1:size(mdpsim,1)
@@ -89,7 +90,7 @@ for w = 1:size(mdpsim,1) %across all wcd
     set(gca,'FontSize',fs2)
     tt(w).Position(2) = tt(w).Position(2)*1.025;
     ylim(ylims(w,:))
-    xlim([0 30])
+    xlim([0 40])
     yline(600,'--k','Max Draw', ...
         'LabelHorizontalAlignment','left','FontSize',fs2, ...
         'LineWidth',lw2,'FontName','calibri'); 
@@ -113,7 +114,7 @@ for w = 1:size(mdpsim,1) %across all wcd
 end
 
 hL = legend([mp(2) pp(2) sp(2)],'location','northoutside','Box','on', ...
-    'Orientation','horizontal','FontSize',fs1,'Color',[255 255 245]/256);
+    'Orientation','horizontal','FontSize',fs1,'Color',figcol);
 newPosition = [0.375 .94 0.3 0];
 set(hL,'Position', newPosition,'Units', 'normalized');
 
@@ -139,8 +140,8 @@ for w = 1:size(mdpsim,1)
         [xoff+(xmarg+xdist)*(w-1) yoff xdist ydist])
 end
 
-set(gcf, 'Color',[255 255 245]/256,'InvertHardCopy','off')
-set(ax,'Color',[255 255 245]/256)
+set(gcf, 'Color',figcol,'InvertHardCopy','off')
+set(ax,'Color',figcol)
 print(results_pa,'~/Dropbox (MREL)/Research/General Exam/pf/mdpresults_1',  ...
     '-dpng','-r600')
 

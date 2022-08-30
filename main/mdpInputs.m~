@@ -83,9 +83,7 @@ if isequal(batchtype,'tds')
     elseif isequal(batchpar1,'rhs') && isequal(batchpar2,'rtp')
         sim.tuning_array1 = [1 1.5 2 2.5 3];
         sim.tuning_array2 = [9 10 11 12 13 14 15];
-        sim.tuned_parameter{1} = 'rhs'; %rated Hs
-        sim.tuned_parameter{2} = 'rtp'; %rated Tp
-    end        
+        
     if ~isempty(batcherr)
         frc.add_err = true; %add error to forecast
         frc.err_type = batcherr; %1: randomness multiplier 2: sinusoid
