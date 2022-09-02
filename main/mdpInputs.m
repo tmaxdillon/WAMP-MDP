@@ -82,7 +82,8 @@ if isequal(batchtype,'tds')
         sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
     elseif isequal(batchpar1,'rhs') && isequal(batchpar2,'rtp')
         sim.tuning_array1 = [1 1.5 2 2.5 3];
-        sim.tuning_array2 = [6 7 8 9 10 11 12 13 14 15 16 17 18 19];
+        sim.tuning_array2 = [2 3 4 5 6 7 8 9 10 11 12 13 14 ...
+            15 16 17 18 19 20 21];
         sim.tuned_parameter{1} = 'rhs'; %rated Hs
         sim.tuned_parameter{2} = 'rtp'; %rated Tp
     end        
@@ -182,8 +183,8 @@ wec.rho = 1025;                 %[kg/m^3]
 wec.g = 9.81;                   %[m/s^2]
 % wec.Hs_ra_a = [3 3 2 1.5];    %[m] - 2 is old (?) default
 % wec.Tp_ra_a = [8 8 12 14];      %[s] - 9 is default
-wec.Hs_ra_a = [2.5 2 1.5 2];    %[m] - 2 is old (?) default
-wec.Tp_ra_a = [10 9 10 15];      %[s] - 9 is default
+wec.Hs_ra_a = [2.5 2.5 2.5 2.5];    %[m] - 2 is old (?) default
+wec.Tp_ra_a = [10 10 10 10];      %[s] - 9 is default
 wec.Hs_ra = interp1(wec.B_a,wec.Hs_ra_a,wec.B);
 wec.Tp_ra = interp1(wec.B_a,wec.Tp_ra_a,wec.B);
 wec.F = getWecSimInterp();      %3-d interpolant (Tp, Hs, B) from wecsim
