@@ -10,7 +10,7 @@ addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/'];
 
-slcomp = false; %comparing simple logic, false means baseline comparison
+slcomp = true; %comparing simple logic, false means baseline comparison
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('slosim','var') || ~exist('sl2sim','var')
@@ -178,7 +178,7 @@ for w = 1:nw %across all wcd
     lp(w) = plot(x,zeros(length(x),1),'Color',col(w,:), ...
         'LineWidth',lw);
     if w == 1
-        lp(w).DisplayName = '2 m WEC';
+        lp(w).DisplayName = '3 m WEC';
         s1p(w).DisplayName = 'MDP';
         if slcomp
             s2p(w).DisplayName = 'SoC Based';
@@ -189,20 +189,20 @@ for w = 1:nw %across all wcd
             s2p(w).DisplayName = 'APDC600';
         end
     elseif w == 2
-        lp(w).DisplayName = '3 m WEC';
-    elseif w == 3
         lp(w).DisplayName = '4 m WEC';
+    elseif w == 3
+        lp(w).DisplayName = '5 m WEC';
     end
 end
 yline(600,'--k','Maximum Draw', ...
     'LabelHorizontalAlignment','left',...
-    'LabelVerticalAlignment','bottom','FontSize',fs, ...
+    'LabelVerticalAlignment','top','FontSize',fs, ...
     'LineWidth',lw2,'FontName','cmr10');
 set(gca,'FontSize',10)
 if slcomp
-    ylim([370 600])
+    ylim([400 620])
 else
-    ylim([50 600])
+    ylim([50 610])
 end
 %add labels
 axes(ax(1))
