@@ -3,8 +3,8 @@ function [] = avgPowerFunction(sim1,sim2,sim3,sim4,flexcomp)
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
-set(0,'DefaultTextFontname', 'cmr10')
-set(0,'DefaultAxesFontName', 'cmr10')
+set(0,'DefaultTextFontname', 'calibri')
+set(0,'DefaultAxesFontName', 'calibri')
 
 pbodelta = false;
 
@@ -66,8 +66,8 @@ yoff = .55; %[in]
 xdist = .95; %[in]
 ydist = 2.4; %[in]
 xmarg = 0.4; %[in]
-%ylims = flipud([110 650; 80 590; 60 480 ; 20 140]);
-ylims = flipud([1 2 ;3 4 ;5 6;7 8 ]);
+ylims = flipud([110 650; 80 590; 60 480 ; 20 140]);
+%ylims = flipud([1 2 ;3 4 ;5 6;7 8 ]);
 
 % %find max range
 % for w = 1:size(sim1,1)

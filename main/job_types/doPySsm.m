@@ -60,7 +60,8 @@ elseif isequal(sim.tp,'est') %battery starting fraction
         num2str(round(sim.ta(sim.ta_i),2))])
 %MARKOV DECISION PROCESS PARAMETERS
 elseif isequal(sim.tp,'slt') %stage limit
-    sim.ta = linspace(18,180,n);
+    %sim.ta = linspace(18,180,n);
+    sim.ta = linspace(4,166,n);
     frc.stagelimit = true; frc.stagelimitval = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
         num2str(sim.ta_i) ' equating to ' ...
@@ -72,13 +73,13 @@ elseif isequal(sim.tp,'tbs') %time between stages
         num2str(sim.ta_i) ' equating to ' ...
         num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'ebs') %energy between states
-    sim.ta = linspace(5,50,n);
+    sim.ta = linspace(5,140,n);
     mdp.d_n = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
         num2str(sim.ta_i) ' equating to ' ...
         num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'dfr') %discount factor
-    sim.ta = linspace(.99,.999,n);
+    sim.ta = linspace(.55,1,n);
     mdp.alpha = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
         num2str(sim.ta_i) ' equating to ' ...

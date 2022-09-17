@@ -4,13 +4,14 @@ clearvars -except mdpsim pbosim slosim sl2sim
 %% vis
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
-set(0,'DefaultTextFontname', 'cmr10')
-set(0,'DefaultAxesFontName', 'cmr10')
+set(0,'DefaultTextFontname', 'calibri')
+set(0,'DefaultAxesFontName', 'calibri')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/'];
 
 slcomp = true; %comparing simple logic, false means baseline comparison
+printfig = true; %print figure
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('slosim','var') || ~exist('sl2sim','var')
@@ -315,7 +316,10 @@ set(ax(3),'Units','inches','position',...
     [xoff+xmarg+xdist yoff xdist ydist])
 grid on
 
-
+if printfig
+    print(results_pa,['~/Dropbox (MREL)/Research/NREL/' ...
+        'postdoc app/figures/mdpresults_0'],'-dpng','-r600')
+end
 
 
 
