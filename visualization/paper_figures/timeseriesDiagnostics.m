@@ -3,13 +3,18 @@ set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
+addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
+output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
+    'output_data/'];
+
+printfig = true; %print figure
 
 if ~exist('simStruct','var')
-    load('mdpsim');
+    load([output_path 'mdpsim']);
     simStruct = mdpsim;
 end
-w = 3; %wec index 
-b = 3; %battery index
+w = 2; %wec index 
+b = 7; %battery index
 
 %unpack data structure
 FM_P_1 = squeeze(simStruct(w,b).output.FM_P(1,:,:));
@@ -41,23 +46,29 @@ cJS = [128 0 64]/255;
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper/'))
 cSC = AdvancedColormap('kr ryy yl lg ggk',1000);
 
-%ADD GRID LINES FOR TP SO PLOTYY HAS BOTH GRIDLINES
 
-mdp_ts = figure;
+tsdiag = figure;
 set(gcf,'Units','inches','Color','w')
 set(gcf, 'Position', [1, 1, 6.5, 4.5])
 %RESOURCE TIME SERIES
 ax(1) = subaxis(6,1,1,'SpacingVert',0.02);
-yyaxis left
+hold(ax(1),'on')
+plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
+    -10.*ones(size(FM_mod_1(f_pts,2)))); %dummy plot to set x axis
+%draw right axis gridlines on bottom because matlab doesn't do this
+gl1 = 5; %[s] grid line 1
+gl2 = 10; %[s] grid line 2
+hs = FM_mod_1(f_pts,2);
+tp = FM_mod_1(f_pts,3);
 lHs = plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_mod_1(f_pts,2),'Color',cHs,'LineWidth',.8);
 lHs.Color(4) = 1;
-set(gca,'ylim',[0 inf],'ycolor',cHs,'FontSize',fs)
+set(gca,'ylim',[0 2.14],'ycolor',cHs,'FontSize',fs)
 yl = ylabel({'Significant','Wave','Height','[m]'},'Color',cHs, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
 set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
-grid on
+ytl = get(gca,'YTick');
 yyaxis right
 lTp = plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_mod_1(f_pts,3),'Color',cTp,'LineWidth',.8);
@@ -69,6 +80,26 @@ ylpos = get(yl,'Position');
 set(yl,'Position',[1.1 ylpos(2) ylpos(3)])
 set(gca,'XTickLabel',[]);
 grid on
+yyaxis left
+hl(1) = yline(max(hs)*(gl1/max(tp)));
+set(hl(1),'LineStyle','-','Color',[.8 .8 .8], ...
+    'Alpha',1)
+hl(2) = yline(max(hs)*(gl2/max(tp)));
+set(hl(2),'LineStyle','-','Color',[.8 .8 .8], ...
+    'Alpha',1)
+% Set yline to 'back'
+% Temporarily disable the warning that appears when accessing 
+% the undocumented properties.
+warnState = warning('off','MATLAB:structOnObject');
+cleanupObj = onCleanup(@()warning(warnState)); 
+Sxh = struct(hl(1));% Get undocumented properties (you'll get a warning)
+clear('cleanupObj')      % Trigger warning reset
+Sxh.Edge.Layer = 'back'; % Set ConstantLine uistack
+warnState = warning('off','MATLAB:structOnObject');
+cleanupObj = onCleanup(@()warning(warnState)); 
+Sxh = struct(hl(2));% Get undocumented properties (you'll get a warning)
+clear('cleanupObj')      % Trigger warning reset
+Sxh.Edge.Layer = 'back'; % Set ConstantLine uistack
 xlim([datetime(FM_mod_1(f_pts(1),1),'ConvertFrom','datenum') ...
     datetime(FM_mod_1(f_pts(end),1),'ConvertFrom','datenum')]);
 xl = xlim;
@@ -92,7 +123,7 @@ plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_P_1(f_pts,2)/1000,'k');
 ylim([0 output.wec.rp*1.1/1000])
 yticks([0:1:ceil(output.wec.rp*1.1/1000)])
-yl = ylabel({'Power','Produced','[kW]'}, ...
+yl = ylabel({'WEC','Power','Output','[kW]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
 set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
@@ -142,7 +173,7 @@ colormap(ax(5),cSC)
 caxis([0 output.wec.E_max/1000])
 hold on
 dvp = plot(datetime(FM_P_1(f_pts,1),'ConvertFrom','datenum'), ...
-    output.E_recon(f_pts)/1000,'-m','LineWidth',.9);
+    output.E_true(f_pts)/1000,'-m','LineWidth',.9);
 ylim([0 output.wec.E_max/1000*1.1])
 yticks(linspace(0,output.wec.E_max/1000,5))
 yl = ylabel({'State','of','Charge','[kWh]'},'Color',cSC(end,:), ...
@@ -174,13 +205,15 @@ xlim(xl)
 xticks(xt)
 grid on
 
-
 xticks(xt)
-
 
 for i = 1:length(ax)
     set(ax(i),'Units','Inches','Position',[xoff ...
         (length(ax)-i)*(ylength+ymarg)+yoff xlength ylength])
 end
 
+if printfig
+    print(tsdiag,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+        'paper_figures/tsdiag'],'-dpng','-r600')
+end
 

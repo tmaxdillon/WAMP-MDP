@@ -4,8 +4,8 @@ clearvars -except mdpsim pbosim slosim sl2sim
 %% vis
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
-set(0,'DefaultTextFontname', 'calibri')
-set(0,'DefaultAxesFontName', 'calibri')
+set(0,'DefaultTextFontname', 'cmr10')
+set(0,'DefaultAxesFontName', 'cmr10')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/'];
@@ -15,10 +15,10 @@ printfig = true; %print figure
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('slosim','var') || ~exist('sl2sim','var')
-    load([ output_path 'mdpsim']); %reds
-    load([ output_path 'pbosim']); %purples
-    load([ output_path 'slosim']); %greens
-    load([ output_path 'sl2sim']); %blues
+    load([ output_path 'mdpsim']);
+    load([ output_path 'pbosim']); 
+    load([ output_path 'slosim']); 
+    load([ output_path 'sl2sim']); 
     mdpsim = mdpsim(2:end,:);
     pbosim = pbosim(2:end,:);
     slosim = slosim(2:end,:);
@@ -90,7 +90,7 @@ if ~exist('i_mx','var')
                 [~,~,~,~,~,~,i_mx(e,w,3)] =  ...
                     calcIntermit(apfl_3_struct(w,e).output.a_sim,99,1);
                 [~,~,~,~,~,~,i_mx(e,w,2)] =  ...
-                    calcIntermit(apfl_3_struct(w,e).output.a_sim,99,1);
+                    calcIntermit(apfl_4_struct(w,e).output.a_sim,99,1);
             end
         end
     end
@@ -114,6 +114,7 @@ if ~exist('L','var')
     else %baseline comparisons
         for w = 1:size(mdpsim,1) %across all wcd
             for e = 1:size(mdpsim,2) %across all emx
+                %disp(['w = ' num2str(w) ' e = ' num2str(e)])
                 [L(e,w,4)] = calcBatDeg(mpnf_struct(w,e),y,x(e)*1000)*100;
                 [L(e,w,3)] = ...
                     calcBatDeg(apfl_3_struct(w,e),y,x(e)*1000)*100;
@@ -140,7 +141,7 @@ else
     cf = [223,255,0]/256; %fill
 end
 mt = {'-*',':o','--sq','-.d'};
-ms = 5;
+ms = 4.5;
 fs = 10;
 fsl = 8; %legend font size
 lw = 1.2;
@@ -201,9 +202,9 @@ yline(600,'--k','Maximum Draw', ...
     'LineWidth',lw2,'FontName','cmr10');
 set(gca,'FontSize',10)
 if slcomp
-    ylim([400 620])
+    ylim([410 610])
 else
-    ylim([50 610])
+    ylim([75 610])
 end
 %add labels
 axes(ax(1))
@@ -257,6 +258,11 @@ for w = 1:nw %across all wcd
     end
 end
 set(gca,'FontSize',10)
+if slcomp
+    ylim([0 275])
+else
+    ylim([0 200])
+end
 axes(ax(2))
 ylabdim = [-.5 .5];
 ylab = {'Longest','Full','Power','Intermitency','[h]'};
@@ -298,7 +304,11 @@ yline(20,'--k',{'Estimated battery','end of life'}, ...
         'LabelVerticalAlignment','bottom','FontSize',fs, ...
         'LineWidth',lw2,'FontName','cmr10'); 
 set(gca,'FontSize',10)
-ylim([8 20])
+if slcomp
+    ylim([9 20])
+else
+    ylim([9 20])
+end
 axes(ax(3))
 xlabdim = [0.5 -.155];
 xlab = 'Battery Storage Capacity [kWh]';
@@ -317,8 +327,13 @@ set(ax(3),'Units','inches','position',...
 grid on
 
 if printfig
-    print(results_pa,['~/Dropbox (MREL)/Research/NREL/' ...
-        'postdoc app/figures/mdpresults_0'],'-dpng','-r600')
+    if slcomp
+        print(results_pa,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+            'paper_figures/mdpresults_sl'],'-dpng','-r600')
+    else
+        print(results_pa,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+            'paper_figures/mdpresults_bl'],'-dpng','-r600')
+    end
 end
 
 

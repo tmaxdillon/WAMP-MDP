@@ -156,7 +156,7 @@ if ~sim.hpc
 end
 amp.est = 0.5;                          %battery starting fraction
 amp.Ps = [1 45 450 600];                %[W], power consumption per
-amp.sdr = 0;                            %[%/month] self discharge rate (3)
+amp.sdr = 3;                            %[%/month] self discharge rate (3)
 amp.fpr = 0.70;                         %simple logic full power ratio
 amp.mpr = 0.65;                         %simple logic medium power ratio
 amp.lpr = 0.15;                         %simple logic low power ratio
@@ -172,7 +172,7 @@ mdp.dt = 1; %time between stages
 % if exist('beta_on','var')
 %     mdp.b = 1;
 % end
-mdp.alpha = .99; %discount factor
+mdp.alpha = .85; %discount factor
 
 %WEC parameters:
 wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6
