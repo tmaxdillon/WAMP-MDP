@@ -62,7 +62,7 @@ elseif isequal(sim.tp,'est') %battery starting fraction
 elseif isequal(sim.tp,'slt') %stage limit
     %sim.ta = linspace(18,180,n);
     %sim.ta = linspace(4,166,n);
-    sim.ta = [1 2 5 10 15 25 35 50 100 180];
+    sim.ta = [0 1 2 5 10 15 30 50 100 180];
     frc.stagelimit = true; frc.stagelimitval = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
         num2str(sim.ta_i) ' equating to ' ...

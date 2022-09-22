@@ -2,7 +2,7 @@
 mdp.d_n = 20; %[Wh] energy between states - 15-25
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 2; %[h] limit on stages
+frc.stagelimitval = 0; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
@@ -24,7 +24,7 @@ sim.use_d_n = true; %battery discretization set by constant delta
 sim.round = 2; %1: nearest disc value, 2: dynamic
 %notifications
 sim.notif = true; %surpress simulateWAMP notifications
-sim.d_notif = 25; %notifications every __ forecasts
+sim.d_notif = 750; %notifications every __ forecasts
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -35,6 +35,10 @@ if ~exist('batchtype','var')
     batcheps = [];
     batcherr = [];
     batchlims = [];
+    sim.tuning_array1 = [2500 5000:5000:35000]; %[Wh]
+    sim.tuning_array2 = [2 3 4 5];
+    sim.tuned_parameter{1} = 'emx'; %E max
+    sim.tuned_parameter{2} = 'wcd'; %wec characteristic diameter
 end
 if batchlims %limits on
     frc.stagelimit = true; %toggle limit on stages
@@ -86,7 +90,7 @@ if isequal(batchtype,'tds')
             15 16 17 18 19 20 21];
         sim.tuned_parameter{1} = 'rhs'; %rated Hs
         sim.tuned_parameter{2} = 'rtp'; %rated Tp
-    end        
+    end
     if ~isempty(batcherr)
         frc.add_err = true; %add error to forecast
         frc.err_type = batcherr; %1: randomness multiplier 2: sinusoid
@@ -151,7 +155,7 @@ frc.sinu = Stemp.forecast_sinusoid; %store forecast sinusoid array
 
 %AMP parameters:
 amp.E_max = 2500;                      %[Wh], maximum battery capacity
-if ~sim.hpc 
+if ~sim.hpc
     amp.E_max = 10000; %shorten runtime if using laptop
 end
 amp.est = 0.5;                          %battery starting fraction
@@ -177,7 +181,7 @@ mdp.alpha = .85; %discount factor
 %WEC parameters:
 wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6
 wec.h = 0.10;                   %percent of rated power as house load
-wec.B = 2;                      %[m]
+wec.B = 4;                      %[m]
 wec.B_a = [2 3 4 5];            %array of B values
 wec.rho = 1025;                 %[kg/m^3]
 wec.g = 9.81;                   %[m/s^2]
