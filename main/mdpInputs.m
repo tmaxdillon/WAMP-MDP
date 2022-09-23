@@ -2,7 +2,7 @@
 mdp.d_n = 20; %[Wh] energy between states - 15-25
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
-frc.stagelimitval = 0; %[h] limit on stages
+frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
 frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
@@ -13,6 +13,7 @@ frc.abr_val = 1790; %forecast abridge value
 sim.pb = false; %toggle for posterior bound
 sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
+sim.slv3 = true; %toggle for simple logic v3
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
 sim.senssm = false; %sensitivity small multiple (outdated)
@@ -24,7 +25,7 @@ sim.use_d_n = true; %battery discretization set by constant delta
 sim.round = 2; %1: nearest disc value, 2: dynamic
 %notifications
 sim.notif = true; %surpress simulateWAMP notifications
-sim.d_notif = 750; %notifications every __ forecasts
+sim.d_notif = 10; %notifications every __ forecasts
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -55,18 +56,27 @@ if isequal(batchtype,'tds')
         sim.pb = false;
         sim.sl = false;
         sim.slv2 = false;
+        sim.sv3 = false;
     elseif isequal(batchsim,'pbo')
         sim.pb = true;
         sim.sl = false;
         sim.slv2 = false;
+        sim.sv3 = false;
     elseif isequal(batchsim,'slo')
         sim.pb = false;
         sim.sl = true;
         sim.slv2 = false;
+        sim.sv3 = false;
     elseif isequal(batchsim,'sl2')
         sim.pb = false;
         sim.sl = false;
         sim.slv2 = true;
+        sim.sv3 = false;
+    elseif isequal(batchsim,'sl3')
+        sim.pb = false;
+        sim.sl = false;
+        sim.slv2 = false;
+        sim.sv3 = true;
     end
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [2500 5000:5000:35000]; %[Wh]
@@ -96,30 +106,30 @@ if isequal(batchtype,'tds')
         frc.err_type = batcherr; %1: randomness multiplier 2: sinusoid
     end
 elseif isequal(batchtype,'ssm') %outdated
-    sim.senssm = true;
-    sim.tdsens = false;
-    sim.pyssm = false;
-    if isequal(batchsim,'mdp')
-        sim.pb = false;
-        sim.sl = false;
-        sim.slv2 = false;
-    elseif isequal(batchsim,'pbo')
-        sim.pb = true;
-        sim.sl = false;
-        sim.slv2 = false;
-    elseif isequal(batchsim,'slo')
-        sim.pb = false;
-        sim.sl = true;
-        sim.slv2 = false;
-    elseif isequal(batchsim,'sl2')
-        sim.pb = false;
-        sim.sl = false;
-        sim.slv2 = true;
-    end
-    batchpar1 = [];
-    batcharr1 = [];
-    patchpar2 = [];
-    batcharr2 = [];
+%     sim.senssm = true;
+%     sim.tdsens = false;
+%     sim.pyssm = false;
+%     if isequal(batchsim,'mdp')
+%         sim.pb = false;
+%         sim.sl = false;
+%         sim.slv2 = false;
+%     elseif isequal(batchsim,'pbo')
+%         sim.pb = true;
+%         sim.sl = false;
+%         sim.slv2 = false;
+%     elseif isequal(batchsim,'slo')
+%         sim.pb = false;
+%         sim.sl = true;
+%         sim.slv2 = false;
+%     elseif isequal(batchsim,'sl2')
+%         sim.pb = false;
+%         sim.sl = false;
+%         sim.slv2 = true;
+%     end
+%     batchpar1 = [];
+%     batcharr1 = [];
+%     patchpar2 = [];
+%     batcharr2 = [];
 elseif isequal(batchtype,'pySsm')
     sim.pyssm = true;
     sim.tdsens = false;
@@ -127,13 +137,14 @@ elseif isequal(batchtype,'pySsm')
     sim.pb = false;
     sim.sl = false;
     sim.slv2 = false;
+    sim.sv3 = false;
     sim.tp = tp;
     sim.ta_i = ta_i;
 end
 
 %SIM parameters:
 sim.expar = true;           %parallelizing simulations (default true)
-sim.debug = false;          %include debugging variables in output
+sim.debug = true;          %include debugging variables in output
 sim.debug_disc = false;      %debug E discretization
 sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC

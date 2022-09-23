@@ -15,11 +15,12 @@ for i = 1:10
             O(j,k,i) = temp.([var '_' num2str(i)])(j,k).output.power_avg;
             if i == 1 %populate baseline matrix
                 B(j,k) = bbb.bbb(j,k).output.power_avg;
+                ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
             end
         end
     end
 end
-ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
+%ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
 batts = [2500 5000:5000:40000]; %[Wh]
 wecs = [2 3 4 5]; %[m]
 

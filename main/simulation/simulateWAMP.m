@@ -141,6 +141,10 @@ for f=1:1:sim.F %over each forecast
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,2,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
         %MDP AND POSTERIOR BOUND
+    elseif sim.slv3
+        output.a_sim(f) = 4;
+        [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,3,f);
+        output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
     else
         %         %abridge simulation if using posterior bound to full duration
         %         if f > size(FM_P,2) - (size(FM_P,1)-1) && sim.pb

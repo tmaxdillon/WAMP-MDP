@@ -34,7 +34,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
             else
                 a = 1;
             end
-        else %version 2
+        elseif v == 2 %version 2
             tte = E(s)/(amp.Ps(3) - P_pb + E(s)*sdr/(100*30*24)); %[h]
             if tte < 0 %producing more power than consuming, full power
                 a = 4;
@@ -45,10 +45,14 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
             else %less than three hours to deplation, survival mode
                 a = 1;
             end
+        elseif v == 3
+            a = 4;
         end
         %2: compute evolution of battery
-        [~,E_evolved] = powerToBattery(P_pb, ...
-            E(s),Ps(a),sdr,E_max,dt,FO);
+%         [~,E_evolved] = powerToBattery(P_pb, ...
+%             E(s),Ps(a),sdr,E_max,dt,FO);
+        [~,a_act,~,E_evolved] = ...
+            powerBalance(P_pb,E(s),a,sdr,E_max,Ps,dt,false);
         %do I use P_pb or P_fc?, ask Archis
         %3: find the state index of the evolved battery
         [~,state_evol_a(a)] = min(abs(E - E_evolved));
