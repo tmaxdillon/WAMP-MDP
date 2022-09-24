@@ -23,6 +23,8 @@ elseif sim.sl
     sim_type = ' [Simple Logic] ';
 elseif sim.slv2
     sim_type = ' [Simple Logic 2] ';
+elseif sim.slv3
+    sim_type = ' [Simple Logic 3] ';
 else
     sim_type = ' [Markov Decision Process] ';
 end
