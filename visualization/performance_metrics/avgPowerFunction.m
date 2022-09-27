@@ -6,7 +6,7 @@ set(0,'defaulttextinterpreter','none')
 set(0,'DefaultTextFontname', 'calibri')
 set(0,'DefaultAxesFontName', 'calibri')
 
-pbodelta = false;
+pbodelta = true;
 
 B = sim1(1,1).sim.tuning_array2;
 nw = length(B);
@@ -92,7 +92,7 @@ if pbodelta
 else
     adj = zeros(size(power_avg(:,:,2)));
 end
-
+    
 %average power
 results_pa = figure;
 set(gcf,'Units','inches')

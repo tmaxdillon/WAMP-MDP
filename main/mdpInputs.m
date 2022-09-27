@@ -56,7 +56,7 @@ if isequal(batchtype,'tds')
         sim.pb = false;
         sim.sl = false;
         sim.slv2 = false;
-        sim.sv3 = false;
+        sim.slv3 = false;
     elseif isequal(batchsim,'pbo')
         sim.pb = true;
         sim.sl = false;
