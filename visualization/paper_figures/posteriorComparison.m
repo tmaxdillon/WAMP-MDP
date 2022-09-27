@@ -6,7 +6,7 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/06_22/'];
+    'output_data/'];
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var')
     load([ output_path 'mdpsim']);
