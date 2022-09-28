@@ -21,6 +21,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     mu = mdp.mu; %sensing penalties
     alpha = mdp.alpha; %discount factor
     m = mdp.m; %number of states
+    blogic = amp.blogic; %bottom out logic
     tt = amp.tt; %time til depletion thresholds
     for s = 1:mdp.n %over all states in parallel
         %1: find action given battery state
@@ -52,12 +53,12 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
 %         [~,E_evolved] = powerToBattery(P_pb, ...
 %             E(s),Ps(a),sdr,E_max,dt,FO);
         [~,a_act,~,E_evolved] = ...
-            powerBalance(P_pb,E(s),a,sdr,E_max,Ps,dt,false);
+            powerBalance(P_pb,E(s),a,sdr,E_max,Ps,dt,blogic);
         %do I use P_pb or P_fc?, ask Archis
         %3: find the state index of the evolved battery
         [~,state_evol_a(a)] = min(abs(E - E_evolved));
         %4: compute the 'value' of this action via bellman's equation
-        Jstar(s,t) = mu(a) + Jstar_t1(state_evol_a(a))*alpha^t;
+        Jstar(s,t) = mu(a_act) + Jstar_t1(state_evol_a(a))*alpha^t;
     end
 end
 

@@ -176,7 +176,6 @@ amp.fpr = 0.70;                         %simple logic full power ratio
 amp.mpr = 0.65;                         %simple logic medium power ratio
 amp.lpr = 0.15;                         %simple logic low power ratio
 amp.tt = [12 3];                        %[h], time til depletion thresholds
-amp.blogic = 2;                         %bottom out logic
 
 %MDP parameters:
 mdp.m = 4; %number of actions

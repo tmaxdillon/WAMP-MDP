@@ -1,16 +1,18 @@
-clearvars -except mdpsim pbosim slosim mbzsim pbzsim sl2sim
+clearvars -except mdpsim pbosim sl3sim mbzsim pbzsim sl3sim
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
+pbodelta = true;
+
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('sl2sim','var')
+        ~exist('sl3sim','var') || ~exist('sl3sim','var')
     load('mdpsim');
     load('pbosim');
-    load('slosim');
-    load('sl2sim');
+    load('sl3sim');
+    load('sl3sim');
 end
 
 B = mdpsim(1).sim.tuning_array2;
@@ -26,12 +28,12 @@ for w = 1:size(mdpsim,1) %across all wcd
         J_avg(e,w,2) = mean(pbosim(w,e).output.J_recon);
         J_hh(e,w,2) = prctile(pbosim(w,e).output.J_recon,hh);
         J_ll(e,w,2) = prctile(pbosim(w,e).output.J_recon,ll);
-        J_avg(e,w,3) = mean(slosim(w,e).output.J_recon);
-        J_hh(e,w,3) = prctile(slosim(w,e).output.J_recon,hh);
-        J_ll(e,w,3) = prctile(slosim(w,e).output.J_recon,ll);
-        J_avg(e,w,4) = mean(sl2sim(w,e).output.J_recon);
-        J_hh(e,w,4) = prctile(sl2sim(w,e).output.J_recon,hh);
-        J_ll(e,w,4) = prctile(sl2sim(w,e).output.J_recon,ll);
+        J_avg(e,w,3) = mean(sl3sim(w,e).output.J_recon);
+        J_hh(e,w,3) = prctile(sl3sim(w,e).output.J_recon,hh);
+        J_ll(e,w,3) = prctile(sl3sim(w,e).output.J_recon,ll);
+        J_avg(e,w,4) = mean(sl3sim(w,e).output.J_recon);
+        J_hh(e,w,4) = prctile(sl3sim(w,e).output.J_recon,hh);
+        J_ll(e,w,4) = prctile(sl3sim(w,e).output.J_recon,ll);
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end
@@ -80,6 +82,12 @@ for w = 1:size(mdpsim,1)
 end
 maxdist = max(round(ceil(maxdist.*1.2),-1));
 
+if pbodelta
+    adj = J_avg(:,:,2);
+else
+    adj = zeros(size(J_avg(:,:,2)));
+end
+
 %average power
 results_pa = figure;
 set(gcf,'Units','inches')
@@ -87,16 +95,16 @@ set(gcf, 'Position', [1, 1, 6.5, 3.75])
 for w = 1:size(mdpsim,1) %across all wcd
     ax(w) = subplot(1,4,w);
     hold on
-    pbop(w) = plot(x,J_avg(:,w,2),'-*','MarkerEdgeColor',pboc, ...
+    pbop(w) = plot(x,J_avg(:,w,2)-adj(:,w),'-*','MarkerEdgeColor',pboc, ...
         'Color',pboc,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Posterior Bound');
-    mdpp(w) = plot(x,J_avg(:,w,1),'-o','MarkerEdgeColor',mdpc, ...
+    mdpp(w) = plot(x,J_avg(:,w,1)-adj(:,w),'-o','MarkerEdgeColor',mdpc, ...
         'Color',mdpc,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','MDP');
-    slop(w) = plot(x,J_avg(:,w,3),'-s','MarkerEdgeColor',sloc, ...
+    slop(w) = plot(x,J_avg(:,w,3)-adj(:,w),'-s','MarkerEdgeColor',sloc, ...
         'Color',sloc,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic');
-    sl2p(w) = plot(x,J_avg(:,w,4),'-s','MarkerEdgeColor',sl2c, ...
+    sl2p(w) = plot(x,J_avg(:,w,4)-adj(:,w),'-s','MarkerEdgeColor',sl2c, ...
         'Color',sl2c,'MarkerSize',ms,'LineWidth',lw, ...
         'DisplayName','Simple Logic 2');
 %     fill([x,flip(x)],[J_ll(:,w,2)',flip(J_hh(:,w,2)')], ...

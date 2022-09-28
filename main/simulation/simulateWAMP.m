@@ -172,6 +172,12 @@ for f=1:1:sim.F %over each forecast
                 output.state_evol_all(:,:,:,f) = state_evol; %state evol
                 output.wec_power_mdp(:,f) = wec_power; %P from wec (mdp)
                 output.wec_power_sim(f) = FM_P(1,f,2); %P from wec (sim)
+%             elseif sim.debugpbo %posterior bound debugging sept 2022
+%                 sim.pb = 0;
+%                 [policy_mdp,Jstar_mdp] = ...
+%                     backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
+%                 [policy_pbo,Jstar_pbo] = ...
+%                     backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
             else %not debugging mdp
                 [policy,Jstar] = ...
                     backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
@@ -190,10 +196,10 @@ for f=1:1:sim.F %over each forecast
     %find power for sensing, power discarded and battery evolution
     [output.P_sim(f),output.a_act_sim(f),output.D_sim(f),E_evolved] = ...
         powerBalance(output.Pw_sim(f),output.E_sim(f), ...
-        output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1,false);
+        output.a_sim(f),amp.sdr,amp.E_max,amp.Ps,1,amp.blogic);
     [~,~,~,output.E_true(f+1)] = powerBalance(output.Pw_sim(f), ...
         output.E_true(f),output.a_act_sim(f),amp.sdr,amp.E_max, ...
-        amp.Ps,1,true);
+        amp.Ps,1,3);
     if sim.round == 1 %round to nearest index
         [~,ind_E_sim_evolved] = min(abs(amp.E - E_evolved)); %evolved index
     elseif sim.round == 2 %round dynamically based on E_true

@@ -1,4 +1,4 @@
-clearvars -except mdpsim pbosim slosim mbzsim pbzsim sl2sim
+clearvars -except mdpsim pbosim sl3sim mbzsim pbzsim sl3sim
 %close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
@@ -6,11 +6,11 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('sl2sim','var')
+        ~exist('sl3sim','var') || ~exist('sl3sim','var')
     load('mdpsim');
     load('pbosim');
-    load('slosim');
-    load('sl2sim');
+    load('sl3sim');
+    load('sl3sim');
 end
 
 B = mdpsim(1).sim.tuning_array2;
@@ -26,12 +26,12 @@ for w = 1:size(mdpsim,1) %across all wcd
         J_avg(e,w,2) = mean(pbosim(w,e).output.val_Jstar);
         J_hh(e,w,2) = prctile(pbosim(w,e).output.val_Jstar,hh);
         J_ll(e,w,2) = prctile(pbosim(w,e).output.val_Jstar,ll);
-        J_avg(e,w,3) = mean(slosim(w,e).output.val_Jstar);
-        J_hh(e,w,3) = prctile(slosim(w,e).output.val_Jstar,hh);
-        J_ll(e,w,3) = prctile(slosim(w,e).output.val_Jstar,ll);
-        J_avg(e,w,4) = mean(sl2sim(w,e).output.val_Jstar);
-        J_hh(e,w,4) = prctile(sl2sim(w,e).output.val_Jstar,hh);
-        J_ll(e,w,4) = prctile(sl2sim(w,e).output.val_Jstar,ll);
+        J_avg(e,w,3) = mean(sl3sim(w,e).output.val_Jstar);
+        J_hh(e,w,3) = prctile(sl3sim(w,e).output.val_Jstar,hh);
+        J_ll(e,w,3) = prctile(sl3sim(w,e).output.val_Jstar,ll);
+        J_avg(e,w,4) = mean(sl3sim(w,e).output.val_Jstar);
+        J_hh(e,w,4) = prctile(sl3sim(w,e).output.val_Jstar,hh);
+        J_ll(e,w,4) = prctile(sl3sim(w,e).output.val_Jstar,ll);
     end
     kW(w) = mdpsim(w,e).output.wec.rp; %rated power
 end

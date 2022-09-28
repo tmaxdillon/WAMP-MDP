@@ -44,10 +44,11 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     mu = mdp.mu; %sensing penalties
     alpha = mdp.alpha; %discount factor
     m = mdp.m; %number of states
+    blogic = amp.blogic; %bottom out logic
     for s = 1:mdp.n %over all states
         [Jstar_s(s),policy_s(s),compare_sa(s,:),state_evol_sa(s,:)] = ...
             evaluateActions(Jstar_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
-            dt,pb,mu,alpha,m,t,s);
+            dt,pb,mu,alpha,m,t,s,blogic);
     end
     Jstar(:,t) = Jstar_s;
     policy(:,t) = policy_s;
