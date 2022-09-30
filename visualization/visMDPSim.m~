@@ -29,7 +29,7 @@ fs = 11; %axis font size
 %calculate intermittency
 hh = .99;
 ll = .01;
-[~,~,~,~,~,~,imx] = calcIntermit(output.a_act_sim,99,1);
+[~,~,~,~,~,~,~] = calcIntermit(output.a_act_sim,99,1);
 
 %RESOURCE TIME SERIES
 ax(1) = subaxis(7,1,1,'SpacingVert',0.02);
@@ -47,9 +47,9 @@ ylabel({'Peak','Wave','Period','[s]'})
 set(gca,'FontSize',fs)
 grid on
 title({['Average Power ' num2str(round(output.power_avg,2)) ...
-    ', WEC = ' num2str(round(output.wec.rp,1)) ' W' ...
-    ', Batt = ' num2str(round(output.wec.E_max/1000,1)) ...
-    ' kWh, Longest I = ' num2str(imx) ' hours'],''})
+    ', WEC = ' num2str(round(output.wec.rp,3)) ' W' ...
+    ', Batt = ' num2str(round(output.wec.E_max/1000,3)) ...
+    ' kWh'],''})
 xl = xlim;
 xt = xticks;
 %CWR TIME SERIES

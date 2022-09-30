@@ -70,27 +70,27 @@ if ~exist('i_mx','var')
     for w = 1:size(mdpsim,1) %across all wcd
         for e = 1:size(mdpsim,2) %across all emx
             [~,~,~,~,~,~,i_mx(e,w,1)] =  ...
-                calcIntermit(mdpsim(w,e).output.a_sim,99,1);
+                calcIntermit(mdpsim(w,e).output.a_act_sim,99,1);
         end
     end
     if slcomp %simple logic comparison
         for w = 1:size(mdpsim,1) %across all wcd
             for e = 1:size(mdpsim,2) %across all emx
                 [~,~,~,~,~,~,i_mx(e,w,2)] =  ...
-                    calcIntermit(slosim(w,e).output.a_sim,99,1);
+                    calcIntermit(slosim(w,e).output.a_act_sim,99,1);
                 [~,~,~,~,~,~,i_mx(e,w,3)] =  ...
-                    calcIntermit(sl2sim(w,e).output.a_sim,99,1);
+                    calcIntermit(sl2sim(w,e).output.a_act_sim,99,1);
             end
         end
     else %baseline comparisons
         for w = 1:size(mdpsim,1) %across all wcd
             for e = 1:size(mdpsim,2) %across all emx
                 [~,~,~,~,~,~,i_mx(e,w,4)] =  ...
-                    calcIntermit(mpnf_struct(w,e).output.a_sim,99,1);
+                    calcIntermit(mpnf_struct(w,e).output.a_act_sim,99,1);
                 [~,~,~,~,~,~,i_mx(e,w,3)] =  ...
-                    calcIntermit(apfl_3_struct(w,e).output.a_sim,99,1);
+                    calcIntermit(apfl_3_struct(w,e).output.a_act_sim,99,1);
                 [~,~,~,~,~,~,i_mx(e,w,2)] =  ...
-                    calcIntermit(apfl_4_struct(w,e).output.a_sim,99,1);
+                    calcIntermit(apfl_4_struct(w,e).output.a_act_sim,99,1);
             end
         end
     end

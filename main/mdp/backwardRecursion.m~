@@ -1,4 +1,4 @@
-function [policy,Jstar,tau,compare,state_evol,wec_power] = ...
+function [policy,Jstar,compare,state_evol,wec_power] = ...
     backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f)
 
 %preallocate backward recursion matrices
@@ -47,12 +47,11 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     alpha = mdp.alpha; %discount factor
     m = mdp.m; %number of states
     blogic = amp.blogic; %bottom out logic
-    tautog = mdp.tau; %tau toggle
     for s = 1:mdp.n %over all states
         [Jstar_s(s),tau_s(s),policy_s(s),compare_sa(s,:), ...
             state_evol_sa(s,:)] = ...
             evaluateActions(Jstar_t1,tau_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
-            dt,pb,mu,alpha,m,t,s,blogic,tautog);
+            dt,pb,mu,alpha,m,t,s,blogic);
     end
     Jstar(:,t) = Jstar_s;
     tau(:,t) = tau_s;

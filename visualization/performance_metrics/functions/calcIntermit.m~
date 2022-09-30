@@ -1,10 +1,12 @@
 function [i_av,i_hh,i_ll,i_me,i_25,i_75,i_mx] = calcIntermit(a_sim,hh,ll)
 
+fpdef = 3; %definition of full power
+
 a_sim_orig = a_sim;
 a_sim(a_sim == 0) = [];
-a_sim(a_sim < 3) = 0;
-a_sim(a_sim >= 3) = 1;
-if max(a_sim_orig) < 3 || sum(a_sim_orig >= 3) < 2 %never in fp mode
+a_sim(a_sim ~= 4 || a_sim ~) = 0;
+a_sim(a_sim == 4 || a_sim == 3) = 1;
+if max(a_sim_orig) < fpdef || sum(a_sim_orig == 4) < 2 %never in fp mode
     a_sim(1) = 1;
     a_sim(end) = 1;
 end
