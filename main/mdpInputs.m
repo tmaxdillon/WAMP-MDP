@@ -4,7 +4,7 @@ mdp.d_n = 20; %[Wh] energy between states - 15-25
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = false; %to shorten runtime
-frc.Flimitval = 2; %number of forecasts to simulate
+frc.Flimitval = 100; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
@@ -25,7 +25,7 @@ sim.use_d_n = true; %battery discretization set by constant delta
 sim.round = 2; %1: nearest disc value, 2: dynamic
 %notifications
 sim.notif = true; %surpress simulateWAMP notifications
-sim.d_notif = 1000; %notifications every __ forecasts
+sim.d_notif = 5; %notifications every __ forecasts
 
 if ~exist('batchtype','var')
     batchtype = [];
@@ -144,7 +144,7 @@ end
 
 %SIM parameters:
 sim.expar = true;           %parallelizing simulations (default true)
-sim.debug = true;          %include debugging variables in output
+sim.debug = false;          %include debugging variables in output
 sim.debug_disc = false;      %debug E discretization
 sim.corelim = 2;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
@@ -169,7 +169,7 @@ amp.E_max = 5000;                      %[Wh], maximum battery capacity
 if ~sim.hpc
     amp.E_max = 10000; %shorten runtime if using laptop
 end
-amp.est = 0.1;                          %battery starting fraction
+amp.est = 0.25;                          %battery starting fraction
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate (3)
 amp.fpr = 0.70;                         %simple logic full power ratio
@@ -188,7 +188,7 @@ mdp.dt = 1; %time between stages
 % if exist('beta_on','var')
 %     mdp.b = 1;
 % end
-mdp.alpha = .85; %discount factor
+mdp.alpha = .95; %discount factor
 mdp.tau = true; %toggle tau penalty
 
 %WEC parameters:
