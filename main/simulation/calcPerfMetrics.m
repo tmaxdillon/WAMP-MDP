@@ -55,6 +55,6 @@ for f = 1:f_ext
     else
         tau = tau + 1;
     end
-    J_recon(f) = mdp.mu(output.a_act_sim(f)) + tau;
+    J_recon(f) = mdp.mu(output.a_act_sim(f)) + (mdp.tau_x^tau-1);
 end
 

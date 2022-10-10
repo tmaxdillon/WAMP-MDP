@@ -48,11 +48,12 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     m = mdp.m; %number of states
     blogic = amp.blogic; %bottom out logic
     tautog = mdp.tau; %tau toggle
+    tau_x = mdp.tau_x; %X coeff for exponential tau composite penalty
     for s = 1:mdp.n %over all states
         [Jstar_s(s),tau_s(s),policy_s(s),compare_sa(s,:), ...
             state_evol_sa(s,:)] = ...
             evaluateActions(Jstar_t1,tau_t1,P_fc,P_pb,E,Ps,sdr,E_max, ...
-            dt,pb,mu,alpha,m,t,s,blogic,tautog);
+            dt,pb,mu,alpha,m,t,s,blogic,tautog,tau_x);
     end
     Jstar(:,t) = Jstar_s;
     tau(:,t) = tau_s;

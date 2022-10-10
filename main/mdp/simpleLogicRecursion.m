@@ -28,6 +28,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     m = mdp.m; %number of states
     blogic = amp.blogic; %bottom out logic
     tautog = mdp.tau; %tau toggle
+    tau_x = mdp.tau_x; %X coeff for exponential tau composite penalty
     tt = amp.tt; %time til depletion thresholds
     for s = 1:mdp.n %over all states in parallel
         %1: find action given battery state
@@ -74,7 +75,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
             tau_a(a) = 0;
         end
         Jstar(s,t) = mu(a_act) + Jstar_t1(state_evol_a(a))*alpha^t ...
-            +tau_a(a);
+            +(tau_x^tau_a(a)-1);
     end
 end
 
