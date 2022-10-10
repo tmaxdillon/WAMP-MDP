@@ -50,11 +50,15 @@ for f = 1:f_ext
 %     disp(['rc = ' num2str(E_recon(f+1))])
 %     dE(f+1) = E_recon(f+1) - E_sim(f+1);
 %     disp(['dE = ' num2str(dE(f+1))])
+if mdp.tau
     if output.a_act_sim(f) >= 3
         tau = 0;
     else
         tau = tau + 1;
     end
+else
+    tau = 0;
+end
     J_recon(f) = mdp.mu(output.a_act_sim(f)) + (mdp.tau_x^tau-1);
 end
 

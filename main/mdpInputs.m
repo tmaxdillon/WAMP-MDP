@@ -10,7 +10,7 @@ frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
 frc.abr_val = 1790; %forecast abridge value
 %simulation types
-sim.pb = false; %toggle for posterior bound
+sim.pb = true; %toggle for posterior bound
 sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
 sim.slv3 = false; %toggle for simple logic v3
