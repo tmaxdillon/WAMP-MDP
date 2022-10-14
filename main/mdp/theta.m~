@@ -1,0 +1,9 @@
+function [theta_a] = theta_a(t,FM,f,mu)
+
+dv = datevec(FM(t,f,1)); %get matlab serial into datevec
+h = dv(3); %hour of day
+
+theta_a(1:2) = 
+
+end
+

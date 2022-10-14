@@ -1,6 +1,6 @@
 function [Jstar,tau,policy,compare_a,state_evol_a] = ...
     evaluateActions(Jstar_t1,tau_t1,P_fc,P_pb,E,Ps,sdr,E_max,dt,pb, ...
-    mu,alpha,m,t,s,blogic,tautog,tau_x)
+    mu,alpha,m,t,s,blogic,tautog,tau_x,theta_a)
 
 %preallocate
 state_evol_a = zeros(1,m);
@@ -29,7 +29,7 @@ for a=1:m %over all actions
         tau_a(a) = 0;
     end
     compare_a(a) = mu(a_act) + Jstar_t1(state_evol_a(a))*alpha^t ...
-        + (tau_x^tau_a(a)-1);
+        + (tau_x^tau_a(a)-1) + theta_a(a_act);
     %  ^ maybe divide Jstar by t as an alternative to discount factor?
 end
 

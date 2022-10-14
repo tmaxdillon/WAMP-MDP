@@ -243,7 +243,7 @@ end
 %PERFORMANCE METRICS
 %percent for each operational state and average output power
 [output.apct,output.power_avg,output.E_sim_ind,~, ...
-    output.J_recon] = calcPerfMetrics(amp,mdp,sim,wec,output,i);
+    output.J_recon] = calcPerfMetrics(amp,mdp,sim,wec,output,i,FM_P);
 
 %PRINT END
 %print status to command window

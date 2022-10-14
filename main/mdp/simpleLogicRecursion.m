@@ -3,7 +3,7 @@ function [Jstar] = ...
 
 %preallocate
 Jstar = zeros(mdp.n,mdp.T+1); %values to go for each state and stage
-tau = zeros(mdp.n,mdp.T+1); %tau penalty values for each state 
+tau = zeros(mdp.n,mdp.T+1); %tau penalty values for each state
 tau_a = zeros(1,mdp.m);
 state_evol_a = zeros(1,mdp.m);
 
@@ -29,6 +29,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     blogic = amp.blogic; %bottom out logic
     tautog = mdp.tau; %tau toggle
     tau_x = mdp.tau_x; %X coeff for exponential tau composite penalty
+    theta_a = theta(t,FM_P,f,mdp.mu,mdp.tp); %phase penalty    
     tt = amp.tt; %time til depletion thresholds
     for s = 1:mdp.n %over all states in parallel
         %1: find action given battery state
@@ -57,8 +58,8 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
             a = 4;
         end
         %2: compute evolution of battery
-%         [~,E_evolved] = powerToBattery(P_pb, ...
-%             E(s),Ps(a),sdr,E_max,dt,FO);
+        %         [~,E_evolved] = powerToBattery(P_pb, ...
+        %             E(s),Ps(a),sdr,E_max,dt,FO);
         [~,a_act,~,E_evolved] = ...
             powerBalance(P_pb,E(s),a,sdr,E_max,Ps,dt,blogic);
         %do I use P_pb or P_fc?, ask Archis
@@ -75,7 +76,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
             tau_a(a) = 0;
         end
         Jstar(s,t) = mu(a_act) + Jstar_t1(state_evol_a(a))*alpha^t ...
-            +(tau_x^tau_a(a)-1);
+            + (tau_x^tau_a(a)-1) + theta_a(a_act);
     end
 end
 

@@ -3,14 +3,14 @@ mdp.d_n = 20; %[Wh] energy between states - 15-25
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 20; %number of forecasts to simulate
+frc.Flimit = false; %to shorten runtime
+frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
 frc.abr_val = 1790; %forecast abridge value
 %simulation types
-sim.pb = false; %toggle for posterior bound
+sim.pb = true; %toggle for posterior bound
 sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
 sim.slv3 = false; %toggle for simple logic v3
@@ -191,7 +191,7 @@ mdp.dt = 1; %time between stages
 mdp.alpha = .95; %discount factor
 mdp.tau = false; %toggle tau penalty
 mdp.tau_x = 2; %X coeff for exponential tau composite penalty
-mdp.tp = 12; %[h] theta period
+mtp.tp = 12; %[h] theta period
 
 %WEC parameters:
 wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6
