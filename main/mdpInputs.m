@@ -4,7 +4,7 @@ mdp.d_n = 20; %[Wh] energy between states - 15-25
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
 frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 20; %number of forecasts to simulate
+frc.Flimitval = 100; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
@@ -13,7 +13,7 @@ frc.abr_val = 1790; %forecast abridge value
 sim.pb = false; %toggle for posterior bound
 sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
-sim.slv3 = false; %toggle for simple logic v3
+sim.slv3 = true; %toggle for simple logic v3
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
 sim.senssm = false; %sensitivity small multiple (outdated)
@@ -169,7 +169,7 @@ amp.E_max = 5000;                      %[Wh], maximum battery capacity
 if ~sim.hpc
     amp.E_max = 10000; %shorten runtime if using laptop
 end
-amp.est = 0.25;                          %battery starting fraction
+amp.est = 0.1;                          %battery starting fraction
 amp.Ps = [1 45 450 600];                %[W], power consumption per
 amp.sdr = 3;                            %[%/month] self discharge rate (3)
 amp.fpr = 0.70;                         %simple logic full power ratio
@@ -192,6 +192,7 @@ mdp.alpha = .95; %discount factor
 mdp.tau = false; %toggle tau penalty
 mdp.tau_x = 2; %X coeff for exponential tau composite penalty
 mdp.tp = 12; %[h] theta period
+mdp.tA = 10; %theta amplitude
 
 %WEC parameters:
 wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6

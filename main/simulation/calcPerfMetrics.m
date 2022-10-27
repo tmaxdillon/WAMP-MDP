@@ -59,7 +59,7 @@ for f = 1:f_ext
     else
         tau = 0;
     end
-    theta_a = theta(1,FM_P,f,mdp.mu,mdp.tp); %phase penalty    
+    theta_a = theta(1,FM_P,f,mdp.mu,mdp.tp,mdp.tA); %phase penalty    
     J_recon(f) = mdp.mu(output.a_act_sim(f)) + (mdp.tau_x^tau-1) ...
         + theta_a(output.a_act_sim(f));
 end

@@ -14,16 +14,15 @@ slcomp = true; %comparing simple logic, false means baseline comparison
 printfig = false; %print figure
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
-        ~exist('slosim','var') || ~exist('sl2sim','var') || ...
-        ~exist('sl3sim','var')
+        ~exist('sl2sim','var') || ~exist('sl3sim','var')
     load([ output_path 'mdpsim']);
     load([ output_path 'pbosim']);
-    load([ output_path 'slosim']);
+    %load([ output_path 'slosim']);
     load([ output_path 'sl2sim']);
     load([ output_path 'sl3sim']);
     mdpsim = mdpsim(2:end,:);
     pbosim = pbosim(2:end,:);
-    slosim = slosim(2:end,:);
+    %slosim = slosim(2:end,:);
     sl2sim = sl2sim(2:end,:);
     sl3sim = sl3sim(2:end,:);
 end

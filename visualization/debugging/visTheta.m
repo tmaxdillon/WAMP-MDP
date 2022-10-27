@@ -9,7 +9,7 @@ mdpInputs
 f = 1;
 
 for t = 1:50
-    theta_a(:,t) = theta(t,FM,f,mdp.mu,mdp.tp);
+    theta_a(:,t) = theta(t,FM,f,mdp.mu,mdp.tp,mdp.tA);
 end
 
 for a = 1:4

@@ -29,7 +29,7 @@ for t=Tf:-1:1 %over all stages, starting backward (backward recursion)
     blogic = amp.blogic; %bottom out logic
     tautog = mdp.tau; %tau toggle
     tau_x = mdp.tau_x; %X coeff for exponential tau composite penalty
-    theta_a = theta(t,FM_P,f,mdp.mu,mdp.tp); %phase penalty    
+    theta_a = theta(t,FM_P,f,mdp.mu,mdp.tp,mdp.tA); %phase penalty    
     tt = amp.tt; %time til depletion thresholds
     for s = 1:mdp.n %over all states in parallel
         %1: find action given battery state
