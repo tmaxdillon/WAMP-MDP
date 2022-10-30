@@ -3,8 +3,8 @@ mdp.d_n = 20; %[Wh] energy between states - 15-25
 %forecast settings
 frc.stagelimit = false; %toggle limit on stages
 frc.stagelimitval = 2; %[h] limit on stages
-frc.Flimit = true; %to shorten runtime
-frc.Flimitval = 100; %number of forecasts to simulate
+frc.Flimit = false; %to shorten runtime
+frc.Flimitval = 2; %number of forecasts to simulate
 frc.add_err = false; %add error to forecast
 frc.err_type = 1; %1: randomness multiplier 2: sinusoid
 frc.pb_abr = true; %toggle on to abridge simulation to the pb limit always
@@ -191,8 +191,10 @@ mdp.dt = 1; %time between stages
 mdp.alpha = .95; %discount factor
 mdp.tau = false; %toggle tau penalty
 mdp.tau_x = 2; %X coeff for exponential tau composite penalty
+mdp.theta = 1; %1: sinusoidal, 2: square
 mdp.tp = 12; %[h] theta period
 mdp.tA = 10; %theta amplitude
+mdp.tsl = 3; %[h] theta square wave length
 
 %WEC parameters:
 wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6
