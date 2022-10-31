@@ -188,13 +188,13 @@ mdp.dt = 1; %time between stages
 % if exist('beta_on','var')
 %     mdp.b = 1;
 % end
-mdp.alpha = .95; %discount factor
+mdp.alpha = .999; %discount factor
 mdp.tau = false; %toggle tau penalty
 mdp.tau_x = 2; %X coeff for exponential tau composite penalty
 mdp.theta = 2; %1: sinusoidal, 2: square
 mdp.tp = 12; %[h] theta period
-mdp.tA = 100; %theta amplitude
-mdp.tsl = 3; %[h] theta square wave length
+mdp.tA = 1000; %theta amplitude
+mdp.tsl = 0; %[h] added hours to square wave
 
 %WEC parameters:
 wec.eta_ct = 0.6;               %[~], electrical efficiency, 0.6
