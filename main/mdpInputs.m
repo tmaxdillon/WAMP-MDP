@@ -193,7 +193,7 @@ mdp.tau = false; %toggle tau penalty
 mdp.tau_x = 2; %X coeff for exponential tau composite penalty
 mdp.theta = 2; %1: sinusoidal, 2: square
 mdp.tp = 12; %[h] theta period
-mdp.tA = 10; %theta amplitude
+mdp.tA = 100; %theta amplitude
 mdp.tsl = 3; %[h] theta square wave length
 
 %WEC parameters:
