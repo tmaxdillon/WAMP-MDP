@@ -9,7 +9,7 @@ if max(a_sim_orig) < 3 || sum(a_sim_orig >= 3) < 2 %never in fp mode
     a_sim(end) = 1;
 end
 ind = find(a_sim == 1);
-I = diff(ind);
+I = diff(ind) - 1;
 i_av = mean(I);
 i_mx = max(I);
 % i_mi = min(I);
