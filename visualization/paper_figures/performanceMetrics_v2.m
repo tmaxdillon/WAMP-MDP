@@ -267,7 +267,7 @@ for w = 1:nw %across all wcd
 end
 set(gca,'FontSize',10)
 if slcomp
-    ylim([0 1.5])
+    ylim([0 .5])
 else
     ylim([0 200])
 end
