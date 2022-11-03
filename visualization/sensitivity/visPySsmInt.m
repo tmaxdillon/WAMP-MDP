@@ -1,20 +1,25 @@
-function [] = visPySsmOut(var,n)
+function [] = visPySsmInt(var,n,s)
 
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper'))
-data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/' ...
-    'pyssm_out/'];
+data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/'];
 bbb = load([data_path 'bbb.mat']);
-w = 4;
+w = 3;
 b = 9;
-O = zeros(w,b,10);
+i_mx = zeros(w,b,10);
+i_av = zeros(w,b,10);
 B = zeros(w,b);
 for i = 1:10
     temp = load([data_path var '_' num2str(i) '.mat']);
     for j = 1:w
         for k = 1:b
-            O(j,k,i) = temp.([var '_' num2str(i)])(j,k).output.power_avg;
+            %O(j,k,i) = temp.([var '_' num2str(i)])(j,k).output.power_avg;
+            [i_av(j,k,i),~,~,~,~,~,i_mx(j,k,i)] =  ...
+                calcIntermit(temp.([var '_' ...
+                num2str(i)])(j+1,k).output.a_act_sim,99,1);
             if i == 1 %populate baseline matrix
-                B(j,k) = bbb.bbb(j,k).output.power_avg;
+                %B(j,k) = bbb.bbb(j,k).output.power_avg;
+                [b_av(j,k),~,~,~,~,~,b_mx(j,k)] =  ...
+                    calcIntermit(bbb.bbb(j+1,k).output.a_act_sim,99,1);
                 ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
             end
         end
@@ -23,6 +28,14 @@ end
 %ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
 batts = [2500 5000:5000:40000]; %[Wh]
 wecs = [2 3 4 5]; %[m]
+
+if s == 1 %maximum
+    I = i_mx;
+    B = b_mx;
+elseif s == 2 %average
+    I = i_av;
+    B = b_av;
+end
 
 %POWER SYSTEM PARAMETERS
 if isequal(var,'eta') %conversion and transmission efficiency
@@ -61,10 +74,10 @@ set(gcf,'Units','inches','Position',[0 5 3 9],'Color','w')
 for j = 1:w
     for k = 1:b
         if n
-            p(j,k) = plot(ta,100.*(squeeze(O(j,k,:))./B(j,k))', ...
+            p(j,k) = plot(ta,100.*(squeeze(I(j,k,:))./B(j,k))', ...
                 'LineWidth',1.5);
         else
-            p(j,k) = plot(ta,squeeze(O(j,k,:))','LineWidth',1.5);
+            p(j,k) = plot(ta,squeeze(I(j,k,:))','LineWidth',1.5);
         end
         p(j,k).DisplayName = [num2str(wecs(j)) ...
             ' m WEC, ' num2str(round(batts(k)/1000,0)) ' kWh batt'];
@@ -72,14 +85,21 @@ for j = 1:w
         hold on
     end
 end
-legend(reshape(p',[1 36]),'Location','southoutside','NumColumns',1)
+legend(reshape(p',[1 w*b]),'Location','southoutside','NumColumns',1)
 set(gca,'Units','inches','Position',[0.75 7 2 1.8])
 xlabel(xlab)
 if n
-    ylabel('Change in P_{avg} [%]')
+    if s == 1
+        ylabel('Change in I_{max} [h]')
+    elseif s == 2
+        ylabel('Change in I_{avg} [h]')
+    end
 else
-    ylabel('Average Power [W]')
-    ylim([0 625])
+    if s == 1
+        ylabel('I_{max} [h]')
+    elseif s == 2
+        ylabel('I_{avg} [h]')
+    end
 end
 grid on
 
