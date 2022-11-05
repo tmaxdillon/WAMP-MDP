@@ -137,7 +137,7 @@ elseif isequal(batchtype,'pySsm')
     sim.pb = false;
     sim.sl = false;
     sim.slv2 = false;
-    sim.sv3 = false;
+    sim.slv3 = false;
     sim.tp = tp;
     sim.ta_i = ta_i;
 end

@@ -1,5 +1,5 @@
 
-clearvars -except mdpsim pbosim slosim sl2sim sl3sim
+%clearvars -except mdpsim pbosim slosim sl2sim sl3sim
 %close all
 
 %% vis
