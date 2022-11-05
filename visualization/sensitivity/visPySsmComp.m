@@ -1,26 +1,30 @@
-function [] = visPySsmInt(var,n,s)
+function [] = visPySsmComp(var,n,s)
 
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper'))
 data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/'];
 bbb = load([data_path 'bbb.mat']);
 w = 3;
 b = 9;
-i_mx = zeros(w,b,10);
-i_av = zeros(w,b,10);
+f_mx = zeros(w,b,10);
+f_av = zeros(w,b,10);
 b_av = zeros(w,b);
 b_mx = zeros(w,b);
 for i = 1:10
     temp = load([data_path var '_' num2str(i) '.mat']);
     for j = 1:w
         for k = 1:b
-            %O(j,k,i) = temp.([var '_' num2str(i)])(j,k).output.power_avg;
-            [i_av(j,k,i),~,~,~,~,~,i_mx(j,k,i)] =  ...
+            p = temp.([var '_' num2str(i)])(j,k).output.power_avg;
+            [i_av,~,~,~,~,~,i_mx] =  ...
                 calcIntermit(temp.([var '_' ...
                 num2str(i)])(j+1,k).output.a_act_sim,99,1);
+            f_av(j,k,i) = p/i_av;
+            f_mx(j,k,i) = p/i_mx;
             if i == 1 %populate baseline matrix
-                %B(j,k) = bbb.bbb(j,k).output.power_avg;
-                [b_av(j,k),~,~,~,~,~,b_mx(j,k)] =  ...
+                p = bbb.bbb(j,k).output.power_avg;
+                [i_av,~,~,~,~,~,i_mx] =  ...
                     calcIntermit(bbb.bbb(j+1,k).output.a_act_sim,99,1);
+                b_av(j,k) = p/i_av;
+                b_mx(j,k) = p/i_mx;
                 ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
             end
         end
@@ -31,10 +35,10 @@ batts = [2500 5000:5000:40000]; %[Wh]
 wecs = [2 3 4 5]; %[m]
 
 if s == 1 %maximum
-    I = i_mx;
+    F = f_mx;
     B = b_mx;
 elseif s == 2 %average
-    I = i_av;
+    F = f_av;
     B = b_av;
 end
 
@@ -75,31 +79,31 @@ set(gcf,'Units','inches','Position',[0 5 3 9],'Color','w')
 for j = 1:w
     for k = 1:b
         if n
-            p(j,k) = plot(ta,100.*(squeeze(I(j,k,:))./B(j,k))', ...
+            pl(j,k) = plot(ta,100.*(squeeze(F(j,k,:))./B(j,k))', ...
                 'LineWidth',1.5);
         else
-            p(j,k) = plot(ta,squeeze(I(j,k,:))','LineWidth',1.5);
+            pl(j,k) = plot(ta,squeeze(F(j,k,:))','LineWidth',1.5);
         end
-        p(j,k).DisplayName = [num2str(wecs(j)) ...
+        pl(j,k).DisplayName = [num2str(wecs(j)) ...
             ' m WEC, ' num2str(round(batts(k)/1000,0)) ' kWh batt'];
-        p(j,k).Color = c(j,b+k,:);
+        pl(j,k).Color = c(j,b+k,:);
         hold on
     end
 end
-legend(reshape(p',[1 w*b]),'Location','southoutside','NumColumns',1)
+legend(reshape(pl',[1 w*b]),'Location','southoutside','NumColumns',1)
 set(gca,'Units','inches','Position',[0.75 7 2 1.8])
 xlabel(xlab)
-if n
+if n %normalized
     if s == 1
-        ylabel('Change in I_{max} [%]')
+        ylabel('Change in F_{max} [%]')
     elseif s == 2
-        ylabel('Change in I_{avg} [%]')
+        ylabel('Change in F_{avg} [%]')
     end
 else
     if s == 1
-        ylabel('I_{max} [h]')
+        ylabel('F_{max} [W/h]')
     elseif s == 2
-        ylabel('I_{avg} [h]')
+        ylabel('F_{avg} [W/h]')
     end
 end
 grid on
