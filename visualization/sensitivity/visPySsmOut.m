@@ -1,7 +1,7 @@
 function [] = visPySsmOut(var,n)
 
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper'))
-data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/'];
+data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/theta_sens_1/'];
 bbb = load([data_path 'bbb.mat']);
 w = 4;
 b = 9;

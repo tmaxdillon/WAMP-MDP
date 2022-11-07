@@ -1,4 +1,4 @@
-function [] = visPySsmComp(var,met,n,s)
+function [] = visPySsm(var,met,n,s)
 
 %var - sensitivity variable
 %met - performance metric
@@ -6,7 +6,7 @@ function [] = visPySsmComp(var,met,n,s)
 %s - intermittency statistic 1: maximum, 2: mean
 
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper'))
-data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/'];
+data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/theta_sens_1/'];
 bbb = load([data_path 'bbb.mat']);
 w = 3;
 b = 9;
@@ -15,27 +15,48 @@ i_mx = zeros(w,b,10);
 i_av = zeros(w,b,10);
 f_mx = zeros(w,b,10);
 f_av = zeros(w,b,10);
+t_r = zeros(w,b,10);
 b_p = zeros(w,b);
 b_i_mx = zeros(w,b);
 b_i_av = zeros(w,b);
 b_f_av = zeros(w,b);
 b_f_mx = zeros(w,b);
+b_t_r = zeros(w,b,10);
+if isequal(var,'tpe')
+    temp = load([data_path var '_1.mat']);
+    tp = temp.([var '_1'])(1,1).output.tuning_array;
+else
+    tp = ones(1,10).*bbb.bbb(1,1).mdp.tp;
+end
 for i = 1:10
-    temp = load([data_path var '_' num2str(i) '.mat']);
+    temp = load([data_path var '_' num2str(i) '.mat']);    
     for j = 1:w
         for k = 1:b
-            p(j,k,i) = temp.([var '_' num2str(i)])(j,k).output.power_avg;
+            temp_output = temp.([var '_' num2str(i)])(j+1,k).output;
+%             p(j,k,i) = temp.([var '_' num2str(i)])(j+1,k).output.power_avg;
+%             p(j,k,i) = 
+%             [i_av(j,k,i),~,~,~,~,~,i_mx(j,k,i)] =  ...
+%                 calcIntermit(temp.([var '_' ...
+%                 num2str(i)])(j+1,k).output.a_act_sim,99,1);
+            p(j,k,i) = temp_output.power_avg;
             [i_av(j,k,i),~,~,~,~,~,i_mx(j,k,i)] =  ...
-                calcIntermit(temp.([var '_' ...
-                num2str(i)])(j+1,k).output.a_act_sim,99,1);
+                calcIntermit(temp_output.a_act_sim,99,1);
             f_av(j,k,i) = p(j,k,i)/i_av(j,k,i);
             f_mx(j,k,i) = p(j,k,i)/i_mx(j,k,i);
+            t_r(j,k,i) = calcThetaRate(temp_output.a_act_sim, ...
+                temp_output.FM_P_1(:,1),tp(i));
             if i == 1 %populate baseline matrix
-                b_p(j,k) = bbb.bbb(j,k).output.power_avg;
+                bbb_output = bbb.bbb(j+1,k).output;
+%                 b_p(j,k) = bbb.bbb(j+1,k).output.power_avg;
+%                 [b_i_av(j,k),~,~,~,~,~,b_i_mx(j,k)] =  ...
+%                     calcIntermit(bbb.bbb(j+1,k).output.a_act_sim,99,1);
+                b_p(j,k) = bbb_output.power_avg;
                 [b_i_av(j,k),~,~,~,~,~,b_i_mx(j,k)] =  ...
-                    calcIntermit(bbb.bbb(j+1,k).output.a_act_sim,99,1);
+                    calcIntermit(bbb_output.a_act_sim,99,1);
                 b_f_av(j,k) = b_p(j,k)/b_i_av(j,k,i);
                 b_f_mx(j,k) = b_p(j,k)/b_i_mx(j,k,i);
+                b_t_r(j,k,i) = calcThetaRate(bbb_output.a_act_sim, ...
+                    bbb_output.FM_P_1(:,1),bbb.bbb(j+1,k).mdp.tp);
                 ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
             end
         end
@@ -51,6 +72,7 @@ if isequal(met,'pow')
     B = b_p;
     if n
         ylab = {'Change in P_{avg} [%]'};
+        ylim([-inf inf])
     else
         ylab = {'Average Power [W]'};
         ylim([0 625])
@@ -96,6 +118,14 @@ elseif isequal(met,'com')
         elseif s == 2
             ylab = {'F_{avg} [W/h]'};
         end
+    end
+elseif isequal(met,'tra')
+    V = t_r;
+    B = b_t_r;
+    if n %normalized
+        ylab = {'Change in Theta Rate [%]'};
+    else
+        ylab = {'Theta Rate [~]'};
     end
 end
 
