@@ -13,7 +13,7 @@ frc.abr_val = 1790; %forecast abridge value
 sim.pb = false; %toggle for posterior bound
 sim.sl = false; %toggle for simple logic
 sim.slv2 = false; %toggle for simple logic v2
-sim.slv3 = true; %toggle for simple logic v3
+sim.slv3 = false; %toggle for simple logic v3
 %multiple simulation types
 sim.tdsens = false; %2-D sensitivity analysis
 sim.senssm = false; %sensitivity small multiple (outdated)
