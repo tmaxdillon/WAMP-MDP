@@ -1,6 +1,6 @@
 
-%clearvars -except mdpsim pbosim slosim sl2sim sl3sim
-%close all
+clearvars -except mdpsim pbosim slosim sl2sim sl3sim
+close all
 
 %% vis
 set(0,'defaulttextinterpreter','tex')
@@ -9,7 +9,7 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/'];
+    'output_data/11_22/'];
 
 slcomp = true; %comparing simple logic, false means baseline comparison
 printfig = false; %print figure

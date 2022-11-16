@@ -1,5 +1,5 @@
 
-%clearvars -except mdpsim pbosim slosim sl2sim sl3sim
+clearvars -except mdpsim pbosim slosim sl2sim sl3sim
 %close all
 
 %% vis
@@ -9,7 +9,7 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/'];
+    'output_data/theta_runs/r5_tp6_tA1000_tsl0/'];
 
 slcomp = true; %comparing simple logic, false means baseline comparison
 printfig = false; %print figure
@@ -33,7 +33,7 @@ B = mdpsim(1,1).sim.tuning_array2(2:end);
 nw = length(B);
 
 %run baseline analysis
-if ~exist('mpnf','var') || ~exist('apfl_3','var') || ...
+if ~exist('mpnf_struct','var') || ~exist('apfl_3','var') || ...
         ~exist('apfl_4','var')
     mpnf_struct = maxPowerNoFlex(B,x.*1000,mdpsim);
     apfl_3_struct = avgPowerFixedLoad(B,x.*1000,450,mdpsim);
@@ -43,7 +43,7 @@ end
 
 %load average power
 if ~exist('power_avg','var')
-    power_avg = zeros(size(mdpsim,2),size(mdpsim,1),3);
+    power_avg = zeros(size(mdpsim,2),size(mdpsim,1),4);
     for w = 1:size(mdpsim,1) %across all wcd
         for e = 1:size(mdpsim,2) %across all emx
             [power_avg(e,w,1)] = getPower(mdpsim(w,e));
@@ -69,8 +69,8 @@ if ~exist('power_avg','var')
     end
 end
 %load intermittency
-if ~exist('i_mx','var')
-    i_mx = zeros(size(mdpsim,2),size(mdpsim,1),3);
+if ~exist('i_mx','var') || ~exits('i_av','var')
+    i_mx = zeros(size(mdpsim,2),size(mdpsim,1),4);
     for w = 1:size(mdpsim,1) %across all wcd
         for e = 1:size(mdpsim,2) %across all emx
             [i_av(e,w,1),~,~,~,~,~,i_mx(e,w,1)] =  ...
@@ -92,18 +92,18 @@ if ~exist('i_mx','var')
         for w = 1:size(mdpsim,1) %across all wcd
             for e = 1:size(mdpsim,2) %across all emx
                 [i_av(e,w,4),~,~,~,~,~,i_mx(e,w,4)] =  ...
-                    calcIntermit(mpnf_struct(w,e).output.a_act_sim,99,1);
+                    calcIntermit(mpnf_struct(w,e).output.a_sim,99,1);
                 [i_av(e,w,3),~,~,~,~,~,i_mx(e,w,3)] =  ...
-                    calcIntermit(apfl_3_struct(w,e).output.a_act_sim,99,1);
+                    calcIntermit(apfl_3_struct(w,e).output.a_sim,99,1);
                 [i_av(e,w,2),~,~,~,~,~,i_mx(e,w,2)] =  ...
-                    calcIntermit(apfl_4_struct(w,e).output.a_act_sim,99,1);
+                    calcIntermit(apfl_4_struct(w,e).output.a_sim,99,1);
             end
         end
     end
 end
 %load degradation
 if ~exist('L','var')
-    L = zeros(size(mdpsim,2),size(mdpsim,1),3);
+    L = zeros(size(mdpsim,2),size(mdpsim,1),4);
     y = 10; %[years] of operation
     for w = 1:size(mdpsim,1) %across all wcd
         for e = 1:size(mdpsim,2) %across all emx
@@ -131,6 +131,48 @@ if ~exist('L','var')
         end
     end
 end
+%load theta rate
+if ~exist('t_r','var')
+    t_r = zeros(size(mdpsim,2),size(mdpsim,1),4);
+    for w = 1:size(mdpsim,1) %across all wcd
+        for e = 1:size(mdpsim,2) %across all emx
+            [t_r(e,w,1)] = calcThetaRate(mdpsim(w,e).output.a_act_sim, ...
+                mdpsim(w,e).output.FM_P(1,:,1),mdpsim(w,e).mdp.tp)*100;
+            [t_r(e,w,2)] = calcThetaRate(pbosim(w,e).output.a_act_sim, ...
+                pbosim(w,e).output.FM_P(1,:,1),pbosim(w,e).mdp.tp)*100;
+        end
+    end
+    if slcomp %simple logic comparison
+        for w = 1:size(mdpsim,1) %across all wcd
+            for e = 1:size(mdpsim,2) %across all emx
+                [t_r(e,w,3)] =  ...
+                    calcThetaRate(sl2sim(w,e).output.a_act_sim, ...
+                    sl2sim(w,e).output.FM_P(1,:,1),mdpsim(w,e).mdp.tp)*100;
+                [t_r(e,w,4)] = ...
+                    calcThetaRate(sl3sim(w,e).output.a_act_sim, ...
+                    sl3sim(w,e).output.FM_P(1,:,1),mdpsim(w,e).mdp.tp)*100;
+            end
+        end
+    else %baseline comparisons
+        for w = 1:size(mdpsim,1) %across all wcd
+            for e = 1:size(mdpsim,2) %across all emx
+                %disp(['w = ' num2str(w) ' e = ' num2str(e)])
+                [t_r(e,w,4)] = ... 
+                    calcThetaRate(mpnf_struct(w,e).output.a_sim, ...
+                    mpnf_struct(w,e).output.FM_mod(1,:,1), ...
+                    mdpsim(w,e).mdp.tp)*100;
+                [t_r(e,w,3)] = ...
+                    calcThetaRate(apfl_3_struct(w,e).output.a_sim, ...
+                    apfl_3_struct(w,e).output.FM_mod(1,:,1), ...
+                    mdpsim(w,e).mdp.tp)*100;
+                [t_r(e,w,2)] = ...
+                    calcThetaRate(apfl_4_struct(w,e).output.a_sim, ...
+                    apfl_4_struct(w,e).output.FM_mod(1,:,1), ...
+                    mdpsim(w,e).mdp.tp)*100;
+            end
+        end
+    end
+end
 
 c = 10;
 mc = brewermap(c,'reds'); mc = mc(c-nw:end,:);
@@ -154,17 +196,17 @@ fsl = 8; %legend font size
 lw = 1.2;
 lw2 = 1;
 xoff = 1.75; %[in]
-yoff = .5; %[in]
+yoff = .75; %[in]
 xdist = 1.5; %[in]
-ydist = 2; %[in]
+ydist = 1.4; %[in]
 xmarg = 1.25; %[in]
 ymarg = 0.25; %[in]
 
 results_pa = figure;
 set(gcf,'Units','inches','Color','w')
-set(gcf, 'Position', [1, 1, 6.5, 5])
+set(gcf, 'Position', [1, 1, 6.5, 7.5])
 %AVG POWER
-ax(1) = subplot(2,2,[1 3]);
+ax(1) = subplot(4,2,[1 3 5 7]);
 for w = 1:nw %across all wcd
     hold on
     s1p(w) = plot(x,power_avg(:,w,1), ...
@@ -237,27 +279,24 @@ legend([s1p(1) s2p(1) s3p(1) s4p(1) lp(1) lp(2) lp(3)],'location', ...
     'northwestoutside','box','off','fontsize',fsl)
 % end
 set(gca,'Units','inches','position',...
-    [xoff yoff xdist 2*ydist+ymarg])
+    [xoff yoff xdist 4*ydist+3*ymarg])
 grid on
 
 %AVG INTERMITTENCY
-ax(2) = subplot(2,2,2);
+ax(2) = subplot(4,2,2);
 for w = 1:nw %across all wcd
     hold on
     s1p(w) = plot(x,i_av(:,w,1), ...
         mt{1},'MarkerEdgeColor',col(w,:), ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Markov Decision Process');
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
     s2p(w) = plot(x,i_av(:,w,2), ...
         mt{2},'MarkerEdgeColor',col(w,:), ...
         'MarkerFaceColor',cf, ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','SoC Based Logic');
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
     s3p(w) = plot(x,i_av(:,w,3), ...
         mt{3},'MarkerEdgeColor',col(w,:), ...
         'MarkerFaceColor',cf, ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Duration Based Logic');
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
     %     if ~slcomp
     s4p(w) = plot(x,i_av(:,w,4), ...
         mt{4},'MarkerEdgeColor',col(w,:), ...
@@ -266,14 +305,92 @@ for w = 1:nw %across all wcd
     %     end
 end
 set(gca,'FontSize',10)
-if slcomp
-    ylim([0 .5])
-else
-    ylim([0 200])
-end
+% if slcomp
+%     ylim([0 .5])
+% else
+%     ylim([0 200])
+% end
 axes(ax(2))
 ylabdim = [-.5 .5];
 ylab = {'Average','Full/Medium','Power','Intermitency','[h]'};
+yl = text(0,0,ylab);
+set(yl,'Units','normalized','Position',ylabdim, ...
+    'HorizontalAlignment','center','FontSize',fs, ...
+    'VerticalAlignment','middle','Rotation',00);
+set(gca,'Units','inches','position',...
+    [xoff+xmarg+xdist yoff+3*(ydist+ymarg) xdist ydist])
+grid on
+
+%MAX INTERMITTENCY
+ax(3) = subplot(4,2,4);
+for w = 1:nw %across all wcd
+    hold on
+    s1p(w) = plot(x,i_mx(:,w,1), ...
+        mt{1},'MarkerEdgeColor',col(w,:), ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    s2p(w) = plot(x,i_mx(:,w,2), ...
+        mt{2},'MarkerEdgeColor',col(w,:), ...
+        'MarkerFaceColor',cf, ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    s3p(w) = plot(x,i_mx(:,w,3), ...
+        mt{3},'MarkerEdgeColor',col(w,:), ...
+        'MarkerFaceColor',cf, ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    %     if ~slcomp
+    s4p(w) = plot(x,i_mx(:,w,4), ...
+        mt{4},'MarkerEdgeColor',col(w,:), ...
+        'MarkerFaceColor',cf, ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    %     end
+end
+set(gca,'FontSize',10)
+% if slcomp
+%     ylim([0 .5])
+% else
+%     ylim([0 200])
+% end
+axes(ax(3))
+ylabdim = [-.5 .5];
+ylab = {'Max','Full/Medium','Power','Intermitency','[h]'};
+yl = text(0,0,ylab);
+set(yl,'Units','normalized','Position',ylabdim, ...
+    'HorizontalAlignment','center','FontSize',fs, ...
+    'VerticalAlignment','middle','Rotation',00);
+set(gca,'Units','inches','position',...
+    [xoff+xmarg+xdist yoff+2*(ydist+ymarg) xdist ydist])
+grid on
+
+%THETA RATE
+ax(4) = subplot(4,2,6);
+for w = 1:nw %across all wcd
+    hold on
+    s1p(w) = plot(x,t_r(:,w,1), ...
+        mt{1},'MarkerEdgeColor',col(w,:), ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    s2p(w) = plot(x,t_r(:,w,2), ...
+        mt{2},'MarkerEdgeColor',col(w,:), ...
+        'MarkerFaceColor',cf, ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    s3p(w) = plot(x,t_r(:,w,3), ...
+        mt{3},'MarkerEdgeColor',col(w,:), ...
+        'MarkerFaceColor',cf, ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    %     if ~slcomp
+    s4p(w) = plot(x,t_r(:,w,4), ...
+        mt{4},'MarkerEdgeColor',col(w,:), ...
+        'MarkerFaceColor',cf, ...
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
+    %     end
+end
+set(gca,'FontSize',10)
+% if slcomp
+%     ylim([0 .5])
+% else
+%     ylim([0 200])
+% end
+axes(ax(4))
+ylabdim = [-.5 .5];
+ylab = {'Theta','Rate','[%]'};
 yl = text(0,0,ylab);
 set(yl,'Units','normalized','Position',ylabdim, ...
     'HorizontalAlignment','center','FontSize',fs, ...
@@ -283,23 +400,20 @@ set(gca,'Units','inches','position',...
 grid on
 
 %BATTERY DEGRADATION
-ax(3) = subplot(2,2,4);
+ax(5) = subplot(4,2,8);
 for w = 1:nw %across all wcd
     hold on
     s1p(w) = plot(x,L(:,w,1), ...
         mt{1},'MarkerEdgeColor',col(w,:), ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Markov Decision Process');
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
     s2p(w) = plot(x,L(:,w,2), ...
         mt{2},'MarkerEdgeColor',col(w,:), ...
         'MarkerFaceColor',cf, ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','SoC Based Logic');
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
     s3p(w) = plot(x,L(:,w,3), ...
         mt{3},'MarkerEdgeColor',col(w,:), ...
         'MarkerFaceColor',cf, ...
-        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw, ...
-        'DisplayName','Duration Based Logic');
+        'Color',col(w,:),'MarkerSize',ms,'LineWidth',lw);
     %     if ~slcomp
     s4p(w) = plot(x,L(:,w,4), ...
         mt{4},'MarkerEdgeColor',col(w,:), ...
@@ -317,10 +431,10 @@ if slcomp
 else
     ylim([9 20])
 end
-axes(ax(3))
-xlabdim = [0.5 -.155];
+axes(ax(5))
 xlab = 'Battery Storage Capacity [kWh]';
 xl = text(0,0,xlab);
+xlabdim = [0.5 -.34];
 set(xl,'Units','normalized','Position',xlabdim, ...
     'HorizontalAlignment','center','FontSize',fs, ...
     'Rotation',0);
@@ -330,7 +444,7 @@ yl = text(0,0,ylab);
 set(yl,'Units','normalized','Position',ylabdim, ...
     'HorizontalAlignment','center','FontSize',fs, ...
     'VerticalAlignment','middle','Rotation',00);
-set(ax(3),'Units','inches','position',...
+set(ax(5),'Units','inches','position',...
     [xoff+xmarg+xdist yoff xdist ydist])
 grid on
 
