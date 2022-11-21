@@ -1,4 +1,4 @@
-function [] = visPySsm(var,met,n,s)
+function [sensfig] = visPySsm(var,met,n,s)
 
 %var - sensitivity variable
 %met - performance metric
@@ -6,7 +6,7 @@ function [] = visPySsm(var,met,n,s)
 %s - intermittency statistic 1: maximum, 2: mean
 
 addpath(genpath('~/Dropbox (MREL)/MATLAB/Helper'))
-data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/theta_sens_1/'];
+data_path = ['~/Dropbox (MREL)/MATLAB/WAMP-MDP/output_data/pyssm_out/'];
 bbb = load([data_path 'bbb.mat']);
 w = 3;
 b = 9;
@@ -62,7 +62,7 @@ for i = 1:10
         end
     end
 end
-%ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
+ta = temp.([var '_' num2str(i)])(j,k).output.tuning_array;
 batts = [2500 5000:5000:40000]; %[Wh]
 wecs = [2 3 4 5]; %[m]
 
@@ -72,10 +72,10 @@ if isequal(met,'pow')
     B = b_p;
     if n
         ylab = {'Change in P_{avg} [%]'};
-        ylim([-inf inf])
+        %ylim([-inf inf])
     else
         ylab = {'Average Power [W]'};
-        ylim([0 625])
+        %ylim([0 625])
     end
 elseif isequal(met,'int')
     if s == 1 %maximum

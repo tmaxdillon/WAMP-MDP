@@ -58,38 +58,27 @@ if isequal(batchtype,'tds')
         sim.sl = false;
         sim.slv2 = false;
         sim.slv3 = false;
-        sim.slv4 = false;
     elseif isequal(batchsim,'pbo')
         sim.pb = true;
         sim.sl = false;
         sim.slv2 = false;
         sim.slv3 = false;
-        sim.slv4 = false;
     elseif isequal(batchsim,'slo')
         sim.pb = false;
         sim.sl = true;
         sim.slv2 = false;
         sim.slv3 = false;
-        sim.slv4 = false;
     elseif isequal(batchsim,'sl2')
         sim.pb = false;
         sim.sl = false;
         sim.slv2 = true;
         sim.slv3 = false;
-        sim.slv4 = false;
     elseif isequal(batchsim,'sl3')
         sim.pb = false;
         sim.sl = false;
         sim.slv2 = false;
         sim.slv3 = true;
-        sim.slv4 = false;
-    elseif isequal(batchsim,'sl4')
-        sim.pb = false;
-        sim.sl = false;
-        sim.slv2 = false;
-        sim.slv3 = false;
-        sim.slv4 = true;
-    end
+    elseif isequal
     if isequal(batchpar1,'emx') && isequal(batchpar2,'wcd')
         sim.tuning_array1 = [2500 5000:5000:35000]; %[Wh]
         sim.tuning_array2 = [2 3 4 5];

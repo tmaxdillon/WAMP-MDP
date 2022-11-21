@@ -14,7 +14,7 @@ if ~exist('simStruct','var')
     simStruct = mdpsim;
 end
 w = 2; %wec index 
-b = 3; %battery index
+b = 2; %battery index
 
 %unpack data structure
 FM_P_1 = squeeze(simStruct(w,b).output.FM_P(1,:,:));
@@ -34,13 +34,11 @@ yoff = .275;
 ymarg = 0.075;
 ylhpos = -0.125; %ylabel horizonal position (normalized)
 fs = 8; %axis font size
-fs2 = 7; %tick font size
+fs2 = 6.5; %tick font size
 cHs = [4 74 116]/255;
-cHs2 = [4 74 125]/255; 
+cHs2 = [9 141 223]/255; 
 cTp = [9 141 223]/255;
-cTp2 = [0 130 210]/255;
 ccw = [4 200 180]/255;
-ccw2 = [0 150 130]/255;
 ckW = [72 54 116]/255;
 cmo(4,:) = [102 0 57]/225;
 cmo(3,:) = [178 0 100]/255;
@@ -72,17 +70,17 @@ lHs = plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_mod_1(f_pts,2),'Color',cHs,'LineWidth',.8);
 lHs.Color(4) = 1;
 set(gca,'ylim',[0 2.14],'ycolor',cHs2,'FontSize',fs)
-yll = ylabel({'Significant','Wave','Height','[m]'},'Color',cHs2, ...
+yl = ylabel({'Significant','Wave','Height','[m]'},'Color',cHs2, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
-ylpos = get(yll,'Position');
-set(yll,'Position',[ylhpos ylpos(2) ylpos(3)])
+ylpos = get(yl,'Position');
+set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
 ytl = get(gca,'YTick');
 yyaxis right
 lTp = plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_mod_1(f_pts,3),'Color',cTp,'LineWidth',.8);
 lTp.Color(4) = .6;
-set(gca,'ylim',[0 inf],'ycolor',cTp2,'FontSize',fs)
-yl = ylabel({'Peak','Wave','Period','[s]'},'Color',cTp2, ...
+set(gca,'ylim',[0 inf],'ycolor',cTp,'FontSize',fs)
+yl = ylabel({'Peak','Wave','Period','[s]'},'Color',cTp, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
 set(yl,'Position',[1.09 ylpos(2) ylpos(3)])
@@ -115,14 +113,12 @@ xt = xticks;
 text(.965,.125,'(a)','Units','Normalized', ...
     'VerticalAlignment','middle','FontWeight','normal', ...
     'FontSize',fs);
-set(gca,'ycolor',cHs2)
-yll.Color = cHs2;
 %CWR TIME SERIES
 ax(2) = subaxis(6,1,2);
 plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ... 
     FM_P_1(f_pts,4),'Color',ccw);
 yticks([0 .05 .1 .15])
-yl = ylabel({'Capture','Width','Ratio'}','Color',ccw2, ...
+yl = ylabel({'Capture','Width','Ratio'}','Color',ccw, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
 set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
@@ -131,8 +127,8 @@ xlim(xl)
 set(gca,'FontSize',fs)
 grid on
 text(1.025,.5,'(b)','Units','Normalized', ...
-    'VerticalAlignment','middle','FontWeight','normal', ...
-    'FontSize',fs);
+            'VerticalAlignment','middle','FontWeight','normal', ...
+            'FontSize',fs);
 %POWER TIME SERIES
 ax(3) = subaxis(6,1,3);
 plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
@@ -167,7 +163,7 @@ grid on
 xlim(xl)
 xticks(xt)
 ylim([0.5 4.5])
-yl = ylabel({'Operational','Mode'},'Color',cmo(4,:), ...
+yl = ylabel({'Operational','Mode'},'Color',cmo(3,:), ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
 set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
@@ -198,7 +194,7 @@ dvp = plot(datetime(FM_P_1(f_pts,1),'ConvertFrom','datenum'), ...
     output.E_true(f_pts)/1000,'-m','LineWidth',.9);
 ylim([0 output.wec.E_max/1000*1.1])
 yticks(linspace(0,output.wec.E_max/1000,5))
-yl = ylabel({'State','of','Charge','[kWh]'},'Color',cSC(end,:)*.8, ...
+yl = ylabel({'State','of','Charge','[kWh]'},'Color',cSC(end,:), ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
 set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
@@ -206,7 +202,7 @@ set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
 dv_dn = {'Discretization Validation'};
 dvl = legend(dvp,dv_dn,'Units','normalized', ...
-    'Position',[.36 .209 .1 .03],'FontSize',fs2,'NumColumns',1);
+    'Position',[.36 .2325 .1 .03],'FontSize',fs2,'NumColumns',1);
 xlim(xl)
 xticks(xt)
 grid on

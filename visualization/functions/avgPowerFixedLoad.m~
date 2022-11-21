@@ -35,11 +35,10 @@ for w = 1:length(wecs)
                 E(i+1) = E(i);
             end
         end
-        apfl(w,b).p_avg = mean(L(1:flength));
+        apfl(w,b).p_avg = mean(L(1:);
         %variables needed to calculate intermittency and degradatoin
         %apfl(w,b).output.a_sim = 4.*ones(size(E));
         apfl(w,b).output.a_sim = A;
-        apfl(w,b).output.a_sim(flength+1:end) = 0;
         apfl(w,b).output.E_sim = E;
         apfl(w,b).output.FM_mod = mdpsim(w,b).output.FM_mod;
     end

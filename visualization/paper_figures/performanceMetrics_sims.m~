@@ -14,7 +14,6 @@ output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
 
 slcomp = true; %comparing simple logic, false means baseline comparison
 printfig = false; %print figure
-close
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('sl2sim','var') || ~exist('sl3sim','var')
@@ -177,15 +176,16 @@ if ~exist('t_r','var')
 end
 
 if slcomp
-    c1 = [72 54 116]/255; %pbo
+    c1 = [0 0 0]/256; %pbo
     c2 = [60,130,60]/256; %dbl
     c3 = [0 240 0]/256; %gre
+    c4 = [255 0 143]/256; %mdp
 else
     c1 = [0,47,108]/256; %apdc600
     c2 = [0, 100, 220]/256; %apdc450
     c3 = [0,180,123]/256; %mpnf
+    c4 = [255 0 143]/256; %mdp
 end
-c4 = [255 0 143]/256; %mdp
 mt{1} = 'd-';
 mt{2} = '*-';
 mt{3} = 'o-';
@@ -237,7 +237,7 @@ for w = 1:nw
         if slcomp
             s1p(w).DisplayName = 'Posterior Bound';
             s2p(w).DisplayName = 'Duration Based';
-            s3p(w).DisplayName = 'Greedy Logic';
+            s3p(w).DisplayName = 'MDP';
         else
             s3p(w).DisplayName = 'MPNF';
             s2p(w).DisplayName = 'APDC450';
@@ -253,7 +253,7 @@ for w = 1:nw
         if slcomp
             ylim([410 490])
             yticks([410 430 450 470 490])
-            lg = legend([s4p(1) s1p(1) s3p(1) s2p(1)], ...
+            lg = legend([s4p(1) s2p(1) s3p(1) s2p(1)], ...
             'NumColumns',1,'box','off','fontsize',fs2, ...
             'units','normalized','position',[-.1 .025 .4 .03]);
         else
@@ -568,7 +568,7 @@ for w = 1:nw
         'LineWidth',lw2,'FontName','cmr10');
     set(gca,'FontSize',fs2)
     %add xlabel
-    xlabdim = [0.5 -.35];
+    xlabdim = [0.5 -.4];
     xlab = {'Battery Storage','Capacity [kWh]'};
     xl = text(0,0,xlab);
     set(xl,'Units','normalized','Position',xlabdim, ...

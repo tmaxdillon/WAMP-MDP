@@ -149,7 +149,7 @@ for f=1:1:sim.F %over each forecast
     %SIMPLE LOGIC V4
     elseif sim.slv4
         dv = datevec(FM_P(1,f,1)); %get matlab serial into datevec
-        if rem(dv(4),mdp.tp) <= mdp.tsl
+        if rem(dv(4),tp) <= mdp.tsl
             output.a_sim(f) = 3;
         else
             tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
