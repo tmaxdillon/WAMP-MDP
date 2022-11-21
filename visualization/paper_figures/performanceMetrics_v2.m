@@ -12,7 +12,7 @@ addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/11_22/'];
 
-slcomp = false; %comparing simple logic, false means baseline comparison
+slcomp = true; %comparing simple logic, false means baseline comparison
 printfig = false; %print figure
 close
 
@@ -21,12 +21,12 @@ if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
     load([ output_path 'mdpsim']);
     load([ output_path 'pbosim']);
     %load([ output_path 'slosim']);
-    load([ output_path 'sl2sim']);
+    load([ output_path 'sl4sim']);
     load([ output_path 'sl3sim']);
     mdpsim = mdpsim(2:end,:);
     pbosim = pbosim(2:end,:);
     %slosim = slosim(2:end,:);
-    sl2sim = sl2sim(2:end,:);
+    sl2sim = sl4sim(2:end,:);
     sl3sim = sl3sim(2:end,:);
 end
 
@@ -236,7 +236,7 @@ for w = 1:nw
         s4p(w).DisplayName = 'MDP';
         if slcomp
             s1p(w).DisplayName = 'Posterior Bound';
-            s2p(w).DisplayName = 'Duration Based';
+            s2p(w).DisplayName = 'Duration Based (New)';
             s3p(w).DisplayName = 'Greedy Logic';
         else
             s3p(w).DisplayName = 'MPNF';
@@ -268,8 +268,8 @@ for w = 1:nw
         title({'4 m WEC',''},'Fontweight','normal', ...
             'FontSize',fs);
         if slcomp
-            ylim([530 590])
-            yticks([530 545 560 575 590])
+%             ylim([530 590])
+%             yticks([530 545 560 575 590])
         end
         text(.85,.1,'(b)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
@@ -282,8 +282,8 @@ for w = 1:nw
             'LabelVerticalAlignment','top','FontSize',fs2, ...
             'LineWidth',lw2,'FontName','cmr10');
         if slcomp
-            ylim([575 605])
-            yticks([580 590 600])
+%             ylim([575 605])
+%             yticks([580 590 600])
         end
         text(.85,.1,'(c)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...

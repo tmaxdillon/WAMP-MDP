@@ -150,7 +150,7 @@ for f=1:1:sim.F %over each forecast
     elseif sim.slv4
         dv = datevec(FM_P(1,f,1)); %get matlab serial into datevec
         if rem(dv(4),mdp.tp) <= mdp.tsl
-            output.a_sim(f) = 3;
+            output.a_sim(f) = 4;
         else
             tte = output.E_sim(f)/(amp.Ps(3) - output.Pw_sim(f) + ...
                 output.E_sim(f)*amp.sdr/(100*30*24)); %[h]
