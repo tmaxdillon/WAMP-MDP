@@ -274,7 +274,7 @@ hL2 = legend(reshape(lgvar(2,:),[1 b]),'location','eastoutside', ...
 hL2.ItemTokenSize = [lgits1,lgits2];
 %AVG DUR: NORMALIZED
 ax(6) = subplot(2,3,6);
-for j = 1:w
+for j = w:-1:1 %hopefully this results in the 5m WEC plotting first
     for k = 1:b
         if isequal(var,'tam') %theta amplitude
             lgvar(j,k) = semilogx(ta,100*squeeze(D(j,k,:)./D_b(j,k))', ...
