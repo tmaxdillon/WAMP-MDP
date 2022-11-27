@@ -10,7 +10,7 @@ data_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/pyssm_out/'];
 
 printfig = false; %print figure
-var = 'tbs';
+var = 'tpe';
 
 w = 3;
 b = 8;
@@ -108,7 +108,7 @@ fs_tick = 7;
 fs_leg = 6;
 lgxs = 5.35;
 lgdx = .35;
-lgys = .7;
+lgys = .5;
 lgdy = .75;
 lgits1 = 22;
 lgits2 = 1;
@@ -335,8 +335,8 @@ text(lgxs-xadj2+dx,lgys+yadj,{'4 m','WEC'},'Units','Inches', ...
     'FontSize',fs_leg,'HorizontalAlignment','center')
 text(lgxs-xadj2+2*dx,lgys+yadj,{'5 m','WEC'},'Units','Inches', ...
     'FontSize',fs_leg,'HorizontalAlignment','center')
-text(lgxs-3.6,lgys+.7,{'Color Indicates','Energy System Size'}, ...
-    'Units','Inches','FontSize',fs,'HorizontalAlignment','center')
+text(lgxs-3.4,lgys+.75,'Energy System Size','Units','Inches', ...
+    'FontSize',fs,'HorizontalAlignment','center')
 
 %set(lab,'FontSize',fs_lab)
 
