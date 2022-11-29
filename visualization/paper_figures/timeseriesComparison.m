@@ -1,5 +1,5 @@
 close all
-clearvars -except mdpsim pbosim sl2sim sl3sim
+clearvars -except mdpsim pbosim sl4sim sl3sim
 %% 
 
 disp('plotting...')
@@ -13,11 +13,11 @@ output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
 
 printfig = true; %print figure
 
-if ~exist('mdpsim','var') || ~exist('sl2sim','var') || ...
+if ~exist('mdpsim','var') || ~exist('sl4sim','var') || ...
         ~exist('sl3sim','var') || ~exist('pbosim','var')
     load([output_path 'mdpsim']);
     load([output_path 'pbosim']);
-    load([output_path 'sl2sim']);
+    load([output_path 'sl4sim']);
     load([output_path 'sl3sim']);    
     %simStruct = mdpsim;
 end
@@ -30,7 +30,7 @@ FM_mod_1 = squeeze(mdpsim(w,b).output.FM_mod(1,:,:));
 mdpo = mdpsim(w,b).output;
 pboo = pbosim(w,b).output;
 greo = sl3sim(w,b).output;
-dblo = sl2sim(w,b).output;
+dblo = sl4sim(w,b).output;
 if mdpo.abridged %find forecast time steps being used
     f_pts = 1:find(mdpo.E_sim > 0,1,'last');
 else
@@ -45,7 +45,7 @@ end
 [t_r_gre] = calcThetaRate(greo.a_act_sim,greo.FM_mod(1,:,1), ...
     sl3sim(w,b).mdp.tp)*100;
 [t_r_dbl] = calcThetaRate(dblo.a_act_sim,dblo.FM_mod(1,:,1), ...
-    sl2sim(w,b).mdp.tp)*100;
+    sl4sim(w,b).mdp.tp)*100;
 
 %old colors
 % cmdp(4,:) = [41 31 66]/225;
@@ -108,7 +108,7 @@ ax(1) = subaxis(9,1,1);
 plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_P_1(f_pts,2)/1000,'k');
 ylim([0 ceil(mdpo.wec.rp*1.1/1000)])
-yticks([0 .25 .5 round(output.wec.rp/1000,2) ])
+yticks([0 .25 .5 round(mdpo.wec.rp/1000,2) ])
 yl = ylabel({'WEC','Power','Output','[kW]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
@@ -158,9 +158,9 @@ for i = 1:max(mdpo.a_sim)
 end
 set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
-apl = {['P_{avg} = ' num2str(round(mdpo.power_avg,1)) ' W'], ...
+apl = {['P_{mean} = ' num2str(round(mdpo.power_avg,1)) ' W'], ...
     ['\theta_{rate} = ' num2str(round(t_r_mdp,1)) ' %']};
-text(.14,.2,apl,'Units','Normalized','FontSize',fs3, ...
+text(.134,.2,apl,'Units','Normalized','FontSize',fs3, ...
     'Color',cmdp(3,:),'BackgroundColor','w','EdgeColor','k');
 text(ann_x,.4,'(b)','Units','Normalized', ...
     'VerticalAlignment','middle','FontWeight','normal', ...
@@ -228,7 +228,7 @@ for i = 1:max(pboo.a_sim)
 end
 set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
-apl = {['P_{avg} = ' num2str(round(pboo.power_avg,1)) ' W'], ...
+apl = {['P_{mean} = ' num2str(round(pboo.power_avg,1)) ' W'], ...
     ['\theta_{rate} = ' num2str(round(t_r_pbo,1)) ' %']};
 text(.14,.2,apl,'Units','Normalized','FontSize',fs3, ...
     'Color',cpbo(3,:),'BackgroundColor','w','EdgeColor','k');
@@ -299,7 +299,7 @@ for i = 1:max(greo.a_sim)
 end
 set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
-apl = {['P_{avg} = ' num2str(round(greo.power_avg,1)) ' W'], ...
+apl = {['P_{mean} = ' num2str(round(greo.power_avg,1)) ' W'], ...
     ['\theta_{rate} = ' num2str(round(t_r_gre,1)) ' %']};
 text(.14,.2,apl,'Units','Normalized','FontSize',fs3, ...
     'Color',cgre(3,:)*.85,'BackgroundColor','w','EdgeColor','k');
@@ -368,7 +368,7 @@ for i = 1:max(dblo.a_sim)
 end
 set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
-apl = {['P_{avg} = ' num2str(round(dblo.power_avg,1)) ' W'], ...
+apl = {['P_{mean} = ' num2str(round(dblo.power_avg,1)) ' W'], ...
     ['\theta_{rate} = ' num2str(round(t_r_dbl,1)) ' %']};
 text(.14,.2,apl,'Units','Normalized','FontSize',fs3, ...
     'Color',cdbl(3,:)*.85,'BackgroundColor','w','EdgeColor','k');

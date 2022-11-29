@@ -200,7 +200,7 @@ mdp.dt = 1; %time between stages
 % if exist('beta_on','var')
 %     mdp.b = 1;
 % end
-mdp.alpha = .9; %discount factor
+mdp.alpha = 1; %discount factor
 mdp.tau = false; %toggle tau penalty
 mdp.tau_x = 2; %X coeff for exponential tau composite penalty
 mdp.theta = 2; %1: sinusoidal, 2: square

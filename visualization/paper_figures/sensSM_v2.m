@@ -10,7 +10,8 @@ data_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/pyssm_out/'];
 
 printfig = false; %print figure
-var = 'tbs';
+var = 'slt';
+logp = false; %log scale
 
 w = 3;
 b = 8;
@@ -56,7 +57,6 @@ end
 batts = [2500 5000:5000:35000]; %[Wh]
 wecs = [3 4 5]; %[m]
 
-
 %xlabel
 %POWER SYSTEM PARAMETERS
 if isequal(var,'eta') %conversion and transmission efficiency
@@ -84,7 +84,9 @@ elseif isequal(var,'sub') %spin up buffer
     xlab = 'Spin Up Buffer Applied to Fresh Forecast [h]';
 elseif isequal(var,'tam') %theta amplitude
     xlab = 'Magnitude of Theta Penalty (\theta_A)';
-    %xlims = [0 5];
+    if ~logp
+        %xlims = [0 10];
+    end
 elseif isequal(var,'tpe') %theta period
     xlab = 'Interval of Theta Penalty (\theta_h) [h]';
 end
@@ -120,7 +122,7 @@ set(gcf,'Units','inches','Position',[1 1 6.5 2.8],'Color','w')
 ax(1) = subplot(2,3,1);
 for j = 1:w
     for k = 1:b
-        if isequal(var,'tam') %theta amplitude
+        if logp %theta amplitude
             semilogx(ta,squeeze(P(j,k,:))','LineWidth',1.5, ...
             'Color',c(j,end-b+k,:));
         else
@@ -151,7 +153,7 @@ text(-.7,.5,{'Absolute','Value'},'Units','Normalized', ...
 ax(2) = subplot(2,3,2);
 for j = 1:w
     for k = 1:b
-        if isequal(var,'tam') %theta amplitude
+        if logp
             semilogx(ta,squeeze(T(j,k,:))','LineWidth',1.5, ...
             'Color',c(j,end-b+k,:));
         else
@@ -184,7 +186,7 @@ grid on
 ax(3) = subplot(2,3,3);
 for j = 1:w
     for k = 1:b
-        if isequal(var,'tam') %theta amplitude
+        if logp
             semilogx(ta,squeeze(D(j,k,:))','LineWidth',1.5, ...
             'Color',c(j,end-b+k,:));
         else
@@ -212,7 +214,7 @@ grid on
 ax(4) = subplot(2,3,4);
 for j = 1:w
     for k = 1:b
-        if isequal(var,'tam') %theta amplitude
+        if logp
             lgvar(j,k) = semilogx(ta,100*squeeze(P(j,k,:)./P_b(j,k))', ...
                 'LineWidth',1.5,'Color',c(j,end-b+k,:));
         else
@@ -245,7 +247,7 @@ text(-.7,.5,{'Normalized','by Default','Value'},'Units','Normalized', ...
 ax(5) = subplot(2,3,5);
 for j = 1:w
     for k = 1:b
-        if isequal(var,'tam') %theta amplitude
+        if logp
             lgvar(j,k) = semilogx(ta,100*squeeze(T(j,k,:)./T_b(j,k))', ...
                 'LineWidth',1.5,'Color',c(j,end-b+k,:));
         else
@@ -276,7 +278,7 @@ hL2.ItemTokenSize = [lgits1,lgits2];
 ax(6) = subplot(2,3,6);
 for j = w:-1:1 %hopefully this results in the 5m WEC plotting first
     for k = 1:b
-        if isequal(var,'tam') %theta amplitude
+        if logp
             lgvar(j,k) = semilogx(ta,100*squeeze(D(j,k,:)./D_b(j,k))', ...
                 'LineWidth',1.5,'Color',c(j,end-b+k,:));
         else
@@ -348,142 +350,8 @@ end
 
 if printfig
     print(sensfig,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
-        'paper_figures/sensfig'],'-dpng','-r600')
+        'paper_figures/sens_' var],'-dpng','-r600')
 end
-        
-        
-        
-% %ETA: average power
-% ax(1) = subaxis(2,4,1);
-% for j = 1:w
-%     for k = 1:b
-%         p_eta(j,k) = plot(ta_eta,squeeze(O_eta(j,k,:))','LineWidth',1.5);
-%         p_eta(j,k).DisplayName = [num2str(wecs(j)) ...
-%             ' m WEC, ' num2str(round(batts(k)/1000,1)) ' kWh batt'];
-%         p_eta(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% lab(1) = ylabel({'Average','Power','[W]'}, ...
-%     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
-% ylpos = get(lab(1),'Position');
-% set(lab(1),'Position',[ylhpos ylpos(2) ylpos(3)])
-% xlim([min(ta_eta) max(ta_eta)])
-% set(gca,'XTickLabel',[])
-% title({'Electrical','Efficiency (\eta)',''},'FontWeight','normal')
-% grid on
-% %ETA: normalized
-% ax(5) = subaxis(2,4,5);
-% for j = 1:w
-%     for k = 1:b
-%         pn_eta(j,k) = plot(ta_eta,100.*(squeeze(O_eta(j,k,:))./B(j,k))', ...
-%                 'LineWidth',1.5);
-%         pn_eta(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% lab(2) = ylabel({'Change','in Average','Power','from','Baseline','[%]'}, ...
-%     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
-% ylpos = get(lab(2),'Position');
-% set(lab(2),'Position',[ylhpos ylpos(2) ylpos(3)])
-% yticks([75 100 125 150])
-% xlabel('[\sim]')
-% ylim([70 165])
-% xlim([min(ta_eta) max(ta_eta)])
-% grid on
-% %WHL: average power
-% ax(2) = subaxis(2,4,2);
-% for j = 1:w
-%     for k = 1:b
-%         p_whl(j,k) = plot(ta_whl,squeeze(O_whl(j,k,:))','LineWidth',1.5);
-%         p_whl(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% xlim([min(ta_whl) max(ta_whl)])
-% xticks([min(ta_whl) 5 10 max(ta_whl)]);
-% xt_whl = get(gca,'XTick');
-% set(gca,'XTickLabel',[])
-% title({'Hotel','Load ({\ith})',''},'FontWeight','normal')
-% grid on
-% %WHL: normalized
-% ax(6) = subaxis(2,4,6);
-% for j = 1:w
-%     for k = 1:b
-%         pn_whl(j,k) = plot(ta_whl,100.*(squeeze(O_whl(j,k,:))./B(j,k))', ...
-%                 'LineWidth',1.5);
-%         pn_whl(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% ylim([83 125])
-% yticks([90 100 110 120])
-% xlabel('[%]')
-% xlim([min(ta_whl) max(ta_whl)])
-% xticks(xt_whl)
-% grid on
-% %SLT: average power
-% ax(3) = subaxis(2,4,3);
-% for j = 1:w
-%     for k = 1:b
-%         p_slt(j,k) = plot(ta_slt,squeeze(O_slt(j,k,:))','LineWidth',1.5);
-%         p_slt(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% xlim([min(ta_slt) max(ta_slt)])
-% xticks([min(ta_slt) 50 100 max(ta_slt)]);
-% xt_slt = get(gca,'XTick');
-% set(gca,'XTickLabel',[])
-% title({'Stage','Limit (\itT)',''},'FontWeight','normal')
-% grid on
-% %SLT: normalized
-% ax(7) = subaxis(2,4,7);
-% for j = 1:w
-%     for k = 1:b
-%         pn_slt(j,k) = plot(ta_slt,100.*(squeeze(O_slt(j,k,:))./B(j,k))', ...
-%                 'LineWidth',1.5);
-%         pn_slt(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% ylim([-inf 100.09])
-% yticks([99.95 100 100.05])
-% xlabel('[hours]')
-% xlim([min(ta_slt) max(ta_slt)])
-% xticks(xt_slt)
-% grid on
-% %TBS: average power
-% ax(4) = subaxis(2,4,4);
-% for j = 1:w
-%     for k = 1:b
-%         p_tbs(j,k) = plot(ta_tbs,squeeze(O_tbs(j,k,:))','LineWidth',1.5);
-%         p_tbs(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% xlim([min(ta_tbs) max(ta_tbs)])
-% xticks([min(ta_tbs) 10 20 max(ta_tbs)]);
-% xt_tbs = get(gca,'XTick');
-% set(gca,'XTickLabel',[])
-% title({'Time Between','Stages (\Delta\itt)',''},'FontWeight','normal')
-% grid on
-% %TBS: normalized
-% ax(8) = subaxis(2,4,8);
-% for j = 1:w
-%     for k = 1:b
-%         pn_tbs(j,k) = plot(ta_tbs,100.*(squeeze(O_tbs(j,k,:))./B(j,k))', ...
-%                 'LineWidth',1.5);
-%         pn_tbs(j,k).Color = csm(j,end-b+k,:);
-%         hold on
-%     end
-% end
-% ylim([35 105])
-% xlabel('[hours]')
-% xlim([min(ta_tbs) max(ta_tbs)])
-% xticks(xt_tbs)
-% grid on
-
 
 
 

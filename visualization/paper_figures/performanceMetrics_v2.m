@@ -12,9 +12,9 @@ addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/11_22/'];
 
-slcomp = true; %comparing simple logic, false means baseline comparison
-printfig = false; %print figure
-close
+slcomp = false; %comparing simple logic, false means baseline comparison
+printfig = true; %print figure
+close all
 
 if ~exist('mdpsim','var') || ~exist('pbosim','var') || ...
         ~exist('sl2sim','var') || ~exist('sl3sim','var')
@@ -106,7 +106,7 @@ end
 %load degradation
 if ~exist('L','var')
     L = zeros(size(mdpsim,2),size(mdpsim,1),4);
-    y = 10; %[years] of operation
+    y = 5; %[years] of operation
     for w = 1:size(mdpsim,1) %across all wcd
         for e = 1:size(mdpsim,2) %across all emx
             [L(e,w,4)] = calcBatDeg(mdpsim(w,e),y,x(e)*1000)*100;
@@ -208,11 +208,15 @@ xscdist = .65; %[in]
 ydist = 1; %[in]
 xmarg = .35; %[in]
 ymarg = 0.25; %[in]
-ylabx = -.55;
+ylabx = -.575;
 
-results_pa = figure;
+if slcomp
+    pmsim = figure;
+else
+    pmilc = figure;
+end
 set(gcf,'Units','inches','Color','w')
-set(gcf, 'Position', [0, 4, 6.5, 7.5])
+set(gcf, 'Position', [0, 4, 6.5, 7.4])
 %AVG POWER
 sca = 4;
 for w = 1:nw
@@ -236,8 +240,8 @@ for w = 1:nw
         s4p(w).DisplayName = 'MDP';
         if slcomp
             s1p(w).DisplayName = 'Posterior Bound';
-            s2p(w).DisplayName = 'Duration Based (New)';
-            s3p(w).DisplayName = 'Greedy Logic';
+            s2p(w).DisplayName = 'Duration-Based';
+            s3p(w).DisplayName = 'Greedy';
         else
             s3p(w).DisplayName = 'MPNF';
             s2p(w).DisplayName = 'APDC450';
@@ -245,17 +249,17 @@ for w = 1:nw
         end
         %add ylabel
         ylabdim = [ylabx .5];
-        ylab = {'Average','Power','Consumed','[W]'};
+        ylab = {'Mean','Power','Consumption','[W]'};
         yl = text(0,0,ylab);
         set(yl,'Units','normalized','Position',ylabdim, ...
             'HorizontalAlignment','center','FontSize',fs, ...
             'VerticalAlignment','middle','Rotation',00);
         if slcomp
-            ylim([410 490])
-            yticks([410 430 450 470 490])
+            %ylim([410 490])
+            %yticks([410 430 450 470 490])
             lg = legend([s4p(1) s1p(1) s3p(1) s2p(1)], ...
             'NumColumns',1,'box','off','fontsize',fs2, ...
-            'units','normalized','position',[-.1 .025 .4 .03]);
+            'units','normalized','position',[-.075 .025 .4 .03]);
         else
             lg = legend([s4p(1) s3p(1) s2p(1) s1p(1)], ...
             'NumColumns',1,'box','off','fontsize',fs2, ...
@@ -268,8 +272,8 @@ for w = 1:nw
         title({'4 m WEC',''},'Fontweight','normal', ...
             'FontSize',fs);
         if slcomp
-%             ylim([530 590])
-%             yticks([530 545 560 575 590])
+             ylim([540 585])
+             yticks([540 550 560 570 580])
         end
         text(.85,.1,'(b)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
@@ -350,7 +354,11 @@ for w = 1:nw
     if w == 1
         %add ylabel
         ylabdim = [ylabx .5];
-        ylab = {'Theta','Rate','[%]'};
+        ylab = {'Theta','Rate','[%]','\fontsize{1} ', ...
+            '\fontsize{7.5} (percentage of', ...
+            '\fontsize{7.5} \thetah time steps', ...
+            '\fontsize{7.5} in medium or', ...
+            '\fontsize{7.5} full power)'};
         yl = text(0,0,ylab);
         set(yl,'Units','normalized','Position',ylabdim, ...
             'HorizontalAlignment','center','FontSize',fs, ...
@@ -504,7 +512,7 @@ for w = 1:nw
             'VerticalAlignment','middle','Rotation',00);
         %ylim([0 95])
 %         yticks([410 430 450 470 490])
-        text(.85,.775,'(m)','Units','Normalized', ...
+        text(.8,.35,'(m)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
     elseif w == 2
@@ -516,7 +524,7 @@ for w = 1:nw
     elseif w == 3
 %         ylim([97 100])
 %         yticks([97 98 99 100])
-        text(.85,.9,'(n)','Units','Normalized', ...
+        text(.85,.9,'(o)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
     end
@@ -538,7 +546,7 @@ for w = 1:nw
     set(gca,'FontSize',fs2)
     grid on
 end
-text(.75,.775,'(o)','Units','Normalized', ...
+text(.75,.25,'(p)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
 for w = 1:nw
@@ -580,26 +588,26 @@ for w = 1:nw
     if w == 1
         %add ylabel
         ylabdim = [ylabx .5];
-        ylab = {'Battery','Capacity','Fade','Over Ten','Years','[%]'};
+        ylab = {'Battery','Capacity','Fade','Over Five','Years','[%]'};
         yl = text(0,0,ylab);
         set(yl,'Units','normalized','Position',ylabdim, ...
             'HorizontalAlignment','center','FontSize',fs, ...
             'VerticalAlignment','middle','Rotation',00);
 %         ylim([410 490])
 %         yticks([410 430 450 470 490])
-        text(.85,.9,'(p)','Units','Normalized', ...
+        text(.85,.85,'(q)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
     elseif w == 2
 %         ylim([530 590])
 %         yticks([530 545 560 575 590])
-        text(.85,.9,'(q)','Units','Normalized', ...
+        text(.85,.85,'(r)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
     elseif w == 3
 %         ylim([97 100])
 %         yticks([97 98 99 100])
-        text(.85,.9,'(r)','Units','Normalized', ...
+        text(.85,.85,'(s)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
     end
@@ -621,7 +629,7 @@ for w = 1:nw
     set(gca,'FontSize',fs2)
     grid on
 end
-text(.75,.9,'(s)','Units','Normalized', ...
+text(.75,.85,'(t)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
             'FontSize',fs2);
 yline(20,'--k',{''}, ...
@@ -641,5 +649,15 @@ for w = 1:nw
 end
 set(ax(sca),'Units','inches','position', ...
         [xoff+(w)*(xdist+xmarg) yoff xscdist ydist])
+    
+if printfig
+    if slcomp
+        print(pmsim,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+            'paper_figures/pmsim'],'-dpng','-r600')
+    else
+        print(pmilc,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+            'paper_figures/pmilc'],'-dpng','-r600')
+    end
+end
 
 
