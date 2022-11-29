@@ -150,6 +150,7 @@ elseif isequal(batchtype,'pySsm')
     sim.sl = false;
     sim.slv2 = false;
     sim.slv3 = false;
+    sim.slv4 = false;
     sim.tp = tp;
     sim.ta_i = ta_i;
 end
@@ -158,7 +159,7 @@ end
 sim.expar = true;           %parallelizing simulations (default true)
 sim.debug = false;          %include debugging variables in output
 sim.debug_disc = false;      %debug E discretization
-sim.corelim = 2;            % numcores > corelim == using HPC
+sim.corelim = 1;            % numcores > corelim == using HPC
 if feature('numcores') > sim.corelim  %check to see if HPC
     sim.hpc = true;
     sim.mw = 36; %max workers

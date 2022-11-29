@@ -96,8 +96,8 @@ elseif isequal(sim.tp,'sub') %spin up buffer
         num2str(round(sim.ta(sim.ta_i),2))])
 elseif isequal(sim.tp,'tam')
     %sim.ta = [0 1 5 10 25 250 500 1000 1500 2000]; %old
-    sim.ta = [0 .1 .25 .5 1 1.5 2 3 6 10]; %for zoom scale
-    %sim.ta = [.001 .1 1 5 100 500 750 1000 1500 2000]; %for log scale
+    %sim.ta = [0 .1 .25 .5 1 1.5 2 3 6 10]; %for zoom scale
+    sim.ta = [.001 .1 1 5 100 500 750 1000 1500 2000]; %for log scale
     mdp.tA = sim.ta(sim.ta_i);
     disp(['Python ssm beginning for ' sim.tp ' parameter set to index ' ...
         num2str(sim.ta_i) ' equating to ' ...
