@@ -61,53 +61,38 @@ wecs = [3 4 5]; %[m]
 %POWER SYSTEM PARAMETERS
 if isequal(var,'eta') %conversion and transmission efficiency
     xlab = 'Conversion and Transmission Efficiency';
-    x0 = bbb.bbb(1,1).wec.eta_ct;
 elseif isequal(var,'whl') %wec hotel load
     xlab = 'WEC Hotel Load [% of rated power]';
-    x0 = bbb.bbb(1,1).wec.h;
 elseif isequal(var,'rhs') %rated significant wave height
     xlab = 'Rated Significant Wave Height [m]';
-    x0 = bbb.bbb(1,1).wec.Hs_ra;
 elseif isequal(var,'rtp') %rated peak period
     xlab = 'Rated Peak Period [s]';
-    x0 = bbb.bbb(1,1).wec.Tp_ra;
 elseif isequal(var,'sdr') %self discharge rate
     xlab = 'Battery Self Discharge Rate [%/month]';
-    x0 = bbb.bbb(1,1).amp.sdr;
 elseif isequal(var,'est') %battery starting fraction
     xlab = 'Battery Starting State of Charge [%]';
-    x0 = bbb.bbb(1,1).amp.est;
 %MARKOV DECISION PROCESS PARAMETERS
 elseif isequal(var,'slt') %stage limit
     xlab = 'Forecast Extent (Stage Limit) [h]';
-    x0 = 180;
 elseif isequal(var,'tbs') %time between stages
     xlab = 'Duration of Decisions (Time Between Stages) [h]';
-    x0 = 1;
 elseif isequal(var,'ebs') %energy between states
     xlab = 'Energy Between States (State Discretization) [Wh]';
-    x0 = bbb.bbb(1,1).mdp.d_n;
 elseif isequal(var,'dfr') %discount factor
     xlab = 'Discount Factor Applied to Bellman''s Equation';
-    x0 = bbb.bbb(1,1).mdp.alpha;
 elseif isequal(var,'sub') %spin up buffer
     xlab = 'Spin Up Buffer Applied to Fresh Forecast [h]';
-    x0 = bbb.bbb(1,1).frc.sub;
 elseif isequal(var,'tam') %theta amplitude
     xlab = 'Magnitude of Theta Penalty (\theta_A)';
-    x0 = bbb.bbb(1,1).mdp.tA;
     if ~logp
         %xlims = [0 10];
     end
 elseif isequal(var,'tam_z') %theta amplitude
     xlab = 'Magnitude of Theta Penalty (\theta_A)';
-    x0 = bbb.bbb(1,1).mdp.tA;
 elseif isequal(var,'tam_l') %theta amplitude
     xlab = 'Magnitude of Theta Penalty (\theta_A)';
-    x0 = bbb.bbb(1,1).mdp.tA;
 elseif isequal(var,'tpe') %theta period
     xlab = 'Interval of Theta Penalty (\theta_h) [h]';
-    x0 = bbb.bbb(1,1).mdp.tA;
 end
 
 %set colors
@@ -244,7 +229,7 @@ for j = 1:w
         hold on
     end
 end
-%blt = scatter(
+blt = scatter(
 set(gca,'FontSize',fs_tick)
 lab(1) = ylabel({'[%]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');

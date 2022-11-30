@@ -146,7 +146,7 @@ for f=1:1:sim.F %over each forecast
         output.a_sim(f) = 4;
         [Jstar] = simpleLogicRecursion(FM_P,mdp,amp,sim,wec,3,f);
         output.val_Jstar(f) = Jstar(ind_E_sim,1); %optimal value
-    %SIMPLE LOGIC V4
+    %SIMPLE LOGIC V4 - DURATION BASED V2
     elseif sim.slv4
         dv = datevec(FM_P(1,f,1)); %get matlab serial into datevec
         if rem(dv(4),mdp.tp) <= mdp.tsl
