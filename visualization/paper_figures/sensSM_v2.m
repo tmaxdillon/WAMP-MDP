@@ -1,4 +1,4 @@
-close all
+%close all
 clearvars -except P D T P_b D_b T_b ta
 
 set(0,'defaulttextinterpreter','tex')
@@ -87,6 +87,10 @@ elseif isequal(var,'tam') %theta amplitude
     if ~logp
         %xlims = [0 10];
     end
+elseif isequal(var,'tam_z') %theta amplitude
+    xlab = 'Magnitude of Theta Penalty (\theta_A)';
+elseif isequal(var,'tam_l') %theta amplitude
+    xlab = 'Magnitude of Theta Penalty (\theta_A)';
 elseif isequal(var,'tpe') %theta period
     xlab = 'Interval of Theta Penalty (\theta_h) [h]';
 end
