@@ -1,5 +1,5 @@
-%close all
-clearvars -except P D T P_b D_b T_b ta
+close all
+clearvars -except P D T P_b D_b T_b ta bbb
 
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
@@ -10,8 +10,10 @@ data_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/pyssm_out/'];
 
 printfig = false; %print figure
-var = 'slt';
+var = 'tpe';
 logp = false; %log scale
+
+%SET XTICK TO GO THROUGH X0 (like in ootechec)
 
 w = 3;
 b = 8;
@@ -107,7 +109,7 @@ elseif isequal(var,'tam_l') %theta amplitude
     x0 = bbb.bbb(1,1).mdp.tA;
 elseif isequal(var,'tpe') %theta period
     xlab = 'Interval of Theta Penalty (\theta_h) [h]';
-    x0 = bbb.bbb(1,1).mdp.tA;
+    x0 = bbb.bbb(1,1).mdp.tp;
 end
 
 %set colors
@@ -123,13 +125,19 @@ ymarg = 0.1;
 xlength = .75;
 ylength = .75;
 ylhpos = -.45;
+lw = 1.4; %SET AND TEST A THINNER LINE WIDTH, DUMMY
 fs = 9;
 fs2 = 9;
 fs_tick = 7;
 fs_leg = 6;
+ms = 40;
+mfc = [20,255,100]/256;
+mfa = 0.3;
+mea = 0.8;
+mlw = 1;
 lgxs = 5.35;
 lgdx = .35;
-lgys = .7;
+lgys = .8;
 lgdy = .75;
 lgits1 = 22;
 lgits2 = 1;
@@ -142,10 +150,10 @@ ax(1) = subplot(2,3,1);
 for j = 1:w
     for k = 1:b
         if logp %theta amplitude
-            semilogx(ta,squeeze(P(j,k,:))','LineWidth',1.5, ...
+            semilogx(ta,squeeze(P(j,k,:))','LineWidth',lw, ...
             'Color',c(j,end-b+k,:));
         else
-            plot(ta,squeeze(P(j,k,:))','LineWidth',1.5, ...
+            plot(ta,squeeze(P(j,k,:))','LineWidth',lw, ...
                 'Color',c(j,end-b+k,:));
         end
         hold on
@@ -173,10 +181,10 @@ ax(2) = subplot(2,3,2);
 for j = 1:w
     for k = 1:b
         if logp
-            semilogx(ta,squeeze(T(j,k,:))','LineWidth',1.5, ...
+            semilogx(ta,squeeze(T(j,k,:))','LineWidth',lw, ...
             'Color',c(j,end-b+k,:));
         else
-            plot(ta,squeeze(T(j,k,:))','LineWidth',1.5, ...
+            plot(ta,squeeze(T(j,k,:))','LineWidth',lw, ...
                 'Color',c(j,end-b+k,:));
         end
         hold on
@@ -206,15 +214,23 @@ ax(3) = subplot(2,3,3);
 for j = 1:w
     for k = 1:b
         if logp
-            semilogx(ta,squeeze(D(j,k,:))','LineWidth',1.5, ...
+            semilogx(ta,squeeze(D(j,k,:))','LineWidth',lw, ...
             'Color',c(j,end-b+k,:));
         else
-            plot(ta,squeeze(D(j,k,:))','LineWidth',1.5, ...
+            plot(ta,squeeze(D(j,k,:))','LineWidth',lw, ...
                 'Color',c(j,end-b+k,:));
         end
         hold on
     end
 end
+blt = scatter([],[],ms, ...
+    'MarkerFaceColor',mfc, ...
+    'MarkerEdgeColor','k','LineWidth',mlw, ...
+    'MarkerFaceAlpha',mfa,'MarkerEdgeAlpha',mea, ...
+    'DisplayName','Default Value');
+blg = legend(blt,'Units','Inches','box','off', ...
+    'Position',[lgxs+.2 lgys-.3 lgdx .1],'FontSize',fs_tick);
+blg.ItemTokenSize = [12,1];
 set(gca,'FontSize',fs_tick)
 lab(1) = ylabel({'[h]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
@@ -235,16 +251,20 @@ for j = 1:w
     for k = 1:b
         if logp
             lgvar(j,k) = semilogx(ta,100*squeeze(P(j,k,:)./P_b(j,k))', ...
-                'LineWidth',1.5,'Color',c(j,end-b+k,:));
+                'LineWidth',lw,'Color',c(j,end-b+k,:));
         else
             lgvar(j,k) = plot(ta,100*squeeze(P(j,k,:)./P_b(j,k))', ...
-            'LineWidth',1.5,'Color',c(j,end-b+k,:));
+            'LineWidth',lw,'Color',c(j,end-b+k,:));
         end
         lgvar(j,k).DisplayName = '';
         hold on
     end
 end
-%blt = scatter(
+scatter(x0,100,ms, ...
+    'MarkerFaceColor',mfc, ...
+    'MarkerEdgeColor','k','LineWidth',mlw, ...
+    'MarkerFaceAlpha',mfa,'MarkerEdgeAlpha',mea, ...
+    'DisplayName','Default Value');
 set(gca,'FontSize',fs_tick)
 lab(1) = ylabel({'[%]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
@@ -269,15 +289,20 @@ for j = 1:w
     for k = 1:b
         if logp
             lgvar(j,k) = semilogx(ta,100*squeeze(T(j,k,:)./T_b(j,k))', ...
-                'LineWidth',1.5,'Color',c(j,end-b+k,:));
+                'LineWidth',lw,'Color',c(j,end-b+k,:));
         else
             lgvar(j,k) = plot(ta,100*squeeze(T(j,k,:)./T_b(j,k))', ...
-            'LineWidth',1.5,'Color',c(j,end-b+k,:));
+            'LineWidth',lw,'Color',c(j,end-b+k,:));
         end
         lgvar(j,k).DisplayName = '';
         hold on
     end
 end
+scatter(x0,100,ms, ...
+    'MarkerFaceColor',mfc, ...
+    'MarkerEdgeColor','k','LineWidth',mlw, ...
+    'MarkerFaceAlpha',mfa,'MarkerEdgeAlpha',mea, ...
+    'DisplayName','Default Value');
 set(gca,'FontSize',fs_tick)
 lab(1) = ylabel({'[%]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
@@ -300,15 +325,20 @@ for j = w:-1:1 %hopefully this results in the 5m WEC plotting first
     for k = 1:b
         if logp
             lgvar(j,k) = semilogx(ta,100*squeeze(D(j,k,:)./D_b(j,k))', ...
-                'LineWidth',1.5,'Color',c(j,end-b+k,:));
+                'LineWidth',lw,'Color',c(j,end-b+k,:));
         else
             lgvar(j,k) = plot(ta,100*squeeze(D(j,k,:)./D_b(j,k))', ...
-            'LineWidth',1.5,'Color',c(j,end-b+k,:));
+            'LineWidth',lw,'Color',c(j,end-b+k,:));
         end
         lgvar(j,k).DisplayName = '';
         hold on
     end
 end
+scatter(x0,100,ms, ...
+    'MarkerFaceColor',mfc, ...
+    'MarkerEdgeColor','k','LineWidth',mlw, ...
+    'MarkerFaceAlpha',mfa,'MarkerEdgeAlpha',mea, ...
+    'DisplayName','Default Value');
 set(gca,'FontSize',fs_tick)
 lab(1) = ylabel({'[%]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');

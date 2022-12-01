@@ -231,10 +231,12 @@ wec.Tp_ra = interp1(wec.B_a,wec.Tp_ra_a,wec.B);
 wec.F = getWecSimInterp();      %3-d interpolant (Tp, Hs, B) from wecsim
 wec.FO = false;                 %toggle fred. olsen
 
-if isequal(batchsim,'mod') %modified mdp to compare to greedy
-    mdp.alpha = .9;
-    mdp.tA = 0;
-end
+if exist('batchsim','var')
+    if isequal(batchsim,'mod') %modified mdp to compare to greedy
+        mdp.alpha = .9;
+        mdp.tA = 0;
+    end
+';end
 
 % %overwrite batch variables for beta and mu, can be commented out soon
 % if ~isempty(batchbeta)
