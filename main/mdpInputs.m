@@ -236,7 +236,7 @@ if exist('batchsim','var')
         mdp.alpha = .9;
         mdp.tA = 0;
     end
-';end
+end
 
 % %overwrite batch variables for beta and mu, can be commented out soon
 % if ~isempty(batchbeta)
