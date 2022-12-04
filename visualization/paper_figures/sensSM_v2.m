@@ -1,5 +1,5 @@
-close all
-clearvars -except P D T P_b D_b T_b ta bbb
+%close all
+%clearvars -except P D T P_b D_b T_b ta bbb
 
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
@@ -10,8 +10,8 @@ data_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
     'output_data/pyssm_out/'];
 
 printfig = false; %print figure
-var = 'tpe';
-logp = false; %log scale
+var = 'tam_z';
+logp = true; %log scale
 
 %SET XTICK TO GO THROUGH X0 (like in ootechec)
 
@@ -107,6 +107,7 @@ elseif isequal(var,'tam_z') %theta amplitude
 elseif isequal(var,'tam_l') %theta amplitude
     xlab = 'Magnitude of Theta Penalty (\theta_A)';
     x0 = bbb.bbb(1,1).mdp.tA;
+    logp = true;
 elseif isequal(var,'tpe') %theta period
     xlab = 'Interval of Theta Penalty (\theta_h) [h]';
     x0 = bbb.bbb(1,1).mdp.tp;
@@ -228,8 +229,10 @@ blt = scatter([],[],ms, ...
     'MarkerEdgeColor','k','LineWidth',mlw, ...
     'MarkerFaceAlpha',mfa,'MarkerEdgeAlpha',mea, ...
     'DisplayName','Default Value');
-blg = legend(blt,'Units','Inches','box','off', ...
-    'Position',[lgxs+.2 lgys-.3 lgdx .1],'FontSize',fs_tick);
+if ~isequal(var,'tam_z')
+    blg = legend(blt,'Units','Inches','box','off', ...
+        'Position',[lgxs+.2 lgys-.3 lgdx .1],'FontSize',fs_tick);
+end
 blg.ItemTokenSize = [12,1];
 set(gca,'FontSize',fs_tick)
 lab(1) = ylabel({'[h]'}, ...

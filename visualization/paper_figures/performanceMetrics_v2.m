@@ -10,9 +10,9 @@ set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
 addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
 output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/11_22/'];
+    'output_data/12_22/'];
 
-slcomp = false; %comparing simple logic, false means baseline comparison
+slcomp = true; %comparing simple logic, false means baseline comparison
 printfig = true; %print figure
 close all
 
@@ -255,8 +255,8 @@ for w = 1:nw
             'HorizontalAlignment','center','FontSize',fs, ...
             'VerticalAlignment','middle','Rotation',00);
         if slcomp
-            %ylim([410 490])
-            %yticks([410 430 450 470 490])
+            ylim([420 490])
+            yticks([430 450 470 490])
             lg = legend([s4p(1) s1p(1) s3p(1) s2p(1)], ...
             'NumColumns',1,'box','off','fontsize',fs2, ...
             'units','normalized','position',[-.075 .025 .4 .03]);
@@ -273,7 +273,7 @@ for w = 1:nw
             'FontSize',fs);
         if slcomp
              ylim([540 585])
-             yticks([540 550 560 570 580])
+             yticks([545 555 565 575 585])
         end
         text(.85,.1,'(b)','Units','Normalized', ...
             'VerticalAlignment','middle','FontWeight','normal', ...
@@ -297,7 +297,7 @@ for w = 1:nw
     %plot scale comparison
     ax(sca) = subplot(5,4,sca);
     xticks([0 10 20 30 40])
-    title({'Y-Axis Scale','Comparison',''}, ...
+    title({'All WECs',''}, ...
         'Fontweight','normal','FontSize',fs2);
     hold on
     plot(x,power_avg(:,w,1),mt{1},'MarkerEdgeColor', ...
