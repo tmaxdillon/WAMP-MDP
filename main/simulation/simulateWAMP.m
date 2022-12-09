@@ -189,8 +189,10 @@ for f=1:1:sim.F %over each forecast
 %                 [policy_pbo,Jstar_pbo] = ...
 %                     backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
             else %not debugging mdp
+                tic
                 [policy,Jstar] = ...
                     backwardRecursion(FM_P,mdp,amp,sim,wec,frc,f);
+                toc
             end
             %set action and opt val over next dt time steps based on policy
             if f+mdp.dt < sim.F

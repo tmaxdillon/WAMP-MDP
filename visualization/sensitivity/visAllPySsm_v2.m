@@ -1,4 +1,5 @@
 tt = tic;
+allon = true;
 
 % clearvars -except tt 
 % var = 'eta'; %conversion and transmission efficiency
@@ -24,40 +25,40 @@ tt = tic;
 % var = 'est'; %battery starting fraction
 % disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
 % sensSM_v2
-% clearvars -except tt
-% var = 'slt'; %stage limit
-% disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
-% sensSM_v2
-% clearvars -except tt
-% var = 'tbs'; %time between stages
-% disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
-% sensSM_v2
+clearvars -except tt allon
+var = 'slt'; %stage limit
+disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
+sensSM_v2
+clearvars -except tt allon
+var = 'tbs'; %time between stages
+disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
+sensSM_v2
 % clearvars -except tt
 % var = 'ebs'; %energy between states
 % disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
 % sensSM_v2
-clearvars -except tt
-var = 'dfr'; %discount factor
-disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
-sensSM_v2
-clearvars -except tt
-var = 'sub'; %spin up buffer
-disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
-sensSM_v2
-clearvars -except tt
-var = 'tam'; %theta amplitude
-disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
-sensSM_v2
-clearvars -except tt
-var = 'tam_l'; %theta amplitude log scale
-disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
-sensSM_v2
-clearvars -except tt
+% clearvars -except tt
+% var = 'dfr'; %discount factor
+% disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
+% sensSM_v2
+% clearvars -except tt
+% var = 'sub'; %spin up buffer
+% disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
+% sensSM_v2
+% clearvars -except tt
+% var = 'tam'; %theta amplitude
+% disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
+% sensSM_v2
+% clearvars -except tt
+% var = 'tam_l'; %theta amplitude log scale
+% disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
+% sensSM_v2
+clearvars -except tt allon
 var = 'tam_z'; %theta amplitude zoom scale
 disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
 sensSM_v2
-clearvars -except tt
+clearvars -except tt allon
 var = 'tpe'; %theta period
 disp(['plotting ' var ' after ' num2str(toc(tt),2) ' s'])
 sensSM_v2
-clearvars -except tt
+clear all
