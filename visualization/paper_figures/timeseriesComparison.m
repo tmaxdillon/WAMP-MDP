@@ -1,5 +1,9 @@
-close all
-clearvars -except mdpsim pbosim sl4sim sl3sim
+if ~allon
+    close all
+    clearvars -except mdpsim pbosim sl4sim sl3sim
+    w = 2; %wec index
+    b = 3; %battery index
+end
 %% 
 
 close all
@@ -22,8 +26,6 @@ if ~exist('mdpsim','var') || ~exist('sl4sim','var') || ...
     load([output_path 'sl3sim']);    
     %simStruct = mdpsim;
 end
-w = 2; %wec index
-b = 3; %battery index
 
 %unpack data structure
 FM_P_1 = squeeze(mdpsim(w,b).output.FM_P(1,:,:));
@@ -109,7 +111,13 @@ ax(1) = subaxis(9,1,1);
 plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
     FM_P_1(f_pts,2)/1000,'k');
 ylim([0 ceil(mdpo.wec.rp*1.1/1000)])
-yticks([0 .25 .5 round(mdpo.wec.rp/1000,2) ])
+if w == 2
+    yticks([0 .25 .5 round(mdpo.wec.rp/1000,2) ])
+elseif w == 3
+    yticks([0 .5 1 round(mdpo.wec.rp/1000,2) ])
+elseif w == 4
+    yticks([0 1 2 round(mdpo.wec.rp/1000,2) ])
+end
 yl = ylabel({'WEC','Power','Output','[kW]'}, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
 ylpos = get(yl,'Position');
@@ -410,5 +418,6 @@ end
 
 if printfig
     print(tscomp,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
-        'paper_figures/tscomp'],'-dpng','-r600')
+        'paper_figures/tscomp_w' num2str(w) 'b' ...
+        num2str(b) ],'-dpng','-r600')
 end

@@ -2,8 +2,9 @@
 if ~exist('allon','var')
     close all
     clearvars -except P D T P_b D_b T_b ta bbb
-    var = 'ebs';
+    var = 'eta';
 end
+close all
 
 set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
@@ -63,10 +64,10 @@ wecs = [3 4 5]; %[m]
 %xlabel
 %POWER SYSTEM PARAMETERS
 if isequal(var,'eta') %conversion and transmission efficiency
-    xlab = 'Conversion and Transmission Efficiency';
+    xlab = 'Electrical Efficiency (\eta)';
     x0 = bbb.bbb(1,1).wec.eta_ct;
 elseif isequal(var,'whl') %wec hotel load
-    xlab = 'WEC Hotel Load [% of rated power]';
+    xlab = 'WEC Hotel Load (\sigma) [% of rated power]';
     x0 = bbb.bbb(1,1).wec.h;
 elseif isequal(var,'rhs') %rated significant wave height
     xlab = 'Rated Significant Wave Height [m]';
@@ -75,7 +76,7 @@ elseif isequal(var,'rtp') %rated peak period
     xlab = 'Rated Peak Period [s]';
     x0 = bbb.bbb(1,1).wec.Tp_ra;
 elseif isequal(var,'sdr') %self discharge rate
-    xlab = 'Battery Self Discharge Rate [%/month]';
+    xlab = 'Battery Self Discharge Rate (\Gamma) [%/month]';
     x0 = bbb.bbb(1,1).amp.sdr;
 elseif isequal(var,'est') %battery starting fraction
     xlab = 'Battery Starting State of Charge [%]';
@@ -95,6 +96,7 @@ elseif isequal(var,'ebs') %energy between states
 elseif isequal(var,'dfr') %discount factor
     xlab = 'Discount Factor Applied to Bellman''s Equation';
     x0 = bbb.bbb(1,1).mdp.alpha;
+    xt = [.8 .9 1];
 elseif isequal(var,'sub') %spin up buffer
     xlab = 'Spin Up Buffer Applied to Fresh Forecast [h]';
     x0 = bbb.bbb(1,1).frc.sub;
