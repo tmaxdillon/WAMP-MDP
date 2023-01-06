@@ -221,6 +221,9 @@ plot(datetime(FM_mod_1(f_pts,1),'ConvertFrom','datenum'), ...
 delta = max(output.val_Jstar(f_pts))*.1;
 %ylim([0-delta max(output.val_Jstar(f_pts))+delta])
 ylim([0 1.4])
+ovh = find(output.J_recon > 1.4);
+hold on
+scatter(datetime(FM_mod_1(ovh,1),'ConvertFrom','datenum'),1.4,'ko')
 yticks([0 .2 .8 1])
 yl = ylabel({'Reconstructed','Optimization','Value'},'Color',cJS, ...
     'Rotation',0,'Units','normalized','VerticalAlignment','middle');
