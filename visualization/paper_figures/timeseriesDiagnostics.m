@@ -1,13 +1,15 @@
-%close all
+close all
 set(0,'defaulttextinterpreter','none')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
-addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
-output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/12_22/'];
+%addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
+addpath(genpath('~/MATLAB/Helper'))
+% output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
+%     'output_data/12_22/'];
+output_path = ['~/Documents/WAMP-MDP/output_data/12_22/'];
 
-printfig = true; %print figure
+printfig = false; %print figure
 
 if ~exist('simStruct','var')
     load([output_path 'mdpsim']);
@@ -189,8 +191,8 @@ text(.955,.125,'(d)','Units','Normalized', ...
     'FontSize',fs);
 %STATE OF CHARGE TIME SERIES
 ax(5) = subaxis(6,1,5);
-scatter(datetime(FM_P_1(f_pts,1),'ConvertFrom','datenum'), ...
-    output.E_sim(f_pts)/1000,20,output.E_sim(f_pts)/1000,'Filled')
+scp = scatter(datetime(FM_P_1(f_pts,1),'ConvertFrom','datenum'), ...
+    output.E_sim(f_pts)/1000,20,output.E_sim(f_pts)/1000,'Filled');
 colormap(ax(5),cSC)
 caxis([0 output.wec.E_max/1000])
 hold on
@@ -204,9 +206,6 @@ ylpos = get(yl,'Position');
 set(yl,'Position',[ylhpos ylpos(2) ylpos(3)])
 set(gca,'XTickLabel',[]);
 set(gca,'FontSize',fs)
-dv_dn = {'Discretization Validation'};
-dvl = legend(dvp,dv_dn,'Units','normalized', ...
-    'Position',[.36 .209 .1 .03],'FontSize',fs2,'NumColumns',1);
 xlim(xl)
 xticks(xt)
 grid on
@@ -244,8 +243,17 @@ for i = 1:length(ax)
         (length(ax)-i)*(ylength+ymarg)+yoff xlength ylength])
 end
 
+%set legend to be on top
+dv_dn = {'Discretization Validation'};
+sc_dn = {'State of Charge'};
+dvl = legend([scp dvp],[sc_dn dv_dn],'Units','normalized', ...
+    'Position',[.36 .209 .1 .01],'FontSize',fs2,'NumColumns',1);
+ax = get(gcf,'children');
+ind = find(isgraphics(ax,'Legend'));
+set(gcf,'children',ax([ind:end,1:ind-1]))
+
 if printfig
-    print(tsdiag,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+    print(tsdiag,['~/Documents/WAMP-MDP/' ...
         'paper_figures/tsdiag'],'-dpng','-r600')
 end
 

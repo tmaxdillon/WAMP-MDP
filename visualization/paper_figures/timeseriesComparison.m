@@ -12,9 +12,12 @@ set(0,'defaulttextinterpreter','tex')
 %set(0,'defaulttextinterpreter','latex')
 set(0,'DefaultTextFontname', 'cmr10')
 set(0,'DefaultAxesFontName', 'cmr10')
-addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
-output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
-    'output_data/12_22/'];
+%addpath(genpath('~/MREL Dropbox/Trent Dillon/MATLAB/Helper'))
+addpath(genpath('~/MATLAB/Helper'))
+% output_path = ['~/MREL Dropbox/Trent Dillon/MATLAB/WAMP-MDP/' ...
+%     'output_data/12_22/'];
+output_path = ['~/Documents/WAMP-MDP/output_data/12_22/'];
+
 
 printfig = true; %print figure
 
@@ -417,7 +420,7 @@ for i = 1:length(ax)
 end
 
 if printfig
-    print(tscomp,['~/Dropbox (MREL)/Research/WAMP-MDP/' ...
+    print(tscomp,['~/Documents/WAMP-MDP/' ...
         'paper_figures/tscomp_w' num2str(w) 'b' ...
         num2str(b) ],'-dpng','-r600')
 end
